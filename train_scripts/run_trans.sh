@@ -171,7 +171,7 @@ generate() {
 ########################
 
 echo "Preprocessing documents."
-# preprocess;
+preprocess;
 
 ####################
 ## translation  ##
