@@ -107,7 +107,7 @@ ARCH=bart_base;
 # ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    python train.py $1  \
+    fairseq-train $1  \
     --max-tokens 4400 \
     --task $TASK \
     --add-prev-output-tokens \
@@ -151,7 +151,7 @@ generate() {
 ########################
 
 echo "Preprocessing documents."
-preprocess;
+# preprocess;
 
 ####################
 ## translation  ##
