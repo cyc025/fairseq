@@ -107,7 +107,7 @@ ARCH=bart_base;
 # ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    python train.py $1  \
+    fairseq-train $1  \
     --max-tokens 4400 \
     --task $TASK \
     --add-prev-output-tokens \
@@ -119,7 +119,7 @@ train_translate() {
     --required-batch-size-multiple 1 \
     --init-token 0 \
     --patience $PATIENCE \
-    --arch bart_large \
+    --arch bart_base \
     --criterion cross_entropy \
     --dropout 0.1 --attention-dropout 0.1 \
     --weight-decay 0.01 --optimizer adam --adam-betas "(0.9, 0.98)" --adam-eps 1e-08 \
