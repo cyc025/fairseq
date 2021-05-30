@@ -110,7 +110,7 @@ train_translate() {
     fairseq-train \
     $1 \
     --save-dir checkpoints \
-    --ddp-backend=legacy_ddp \
+    --ddp-backend=no_c10d \
     --task translation_lev \
     --criterion nat_loss \
     --arch levenshtein_transformer \
