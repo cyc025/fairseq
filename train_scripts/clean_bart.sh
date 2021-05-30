@@ -5,6 +5,32 @@
 # LICENSE file in the root directory of this source tree.
 
 
+SRC=data
+TGT=en
+CORPUS_PATH=~/fairseq_test_data
+
+# create result dir
+mkdir -p results
+mkdir -p $CORPUS_PATH/st_corpus
+
+CORPUS_DEST=${SRC}_${TGT}
+
+TRAIN_SRC_PATH=$CORPUS_PATH/train.$SRC
+TEST_SRC_PATH=$CORPUS_PATH/test.$SRC
+DEV_SRC_PATH=$CORPUS_PATH/valid.$SRC
+
+TRAIN_TGT_PATH=$CORPUS_PATH/train.$TGT
+TEST_TGT_PATH=$CORPUS_PATH/test.$TGT
+DEV_TGT_PATH=$CORPUS_PATH/valid.$TGT
+
+# define preprocessed corpus
+TRAINSET_PATH=$CORPUS_PATH/$CORPUS_DEST
+
+# combine src and tgt
+cat $TRAIN_SRC_PATH $TRAIN_TGT_PATH $DEV_SRC_PATH $DEV_TGT_PATH $TEST_SRC_PATH $TEST_TGT_PATH > $CORPUS_PATH/.$SRC-$TGT
+
+SPM_MODEL_PATH=$CORPUS_PATH/$SRC-$TGT;
+SPM_MODEL=$SPM_MODEL_PATH.model;
 
 # clean files
 rm -f $CORPUS_PATH/$CORPUS_DEST/*
