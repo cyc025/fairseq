@@ -52,8 +52,7 @@ DEV_TGT_PATH=$CORPUS_PATH/valid.$TGT
 TRAINSET_PATH=$CORPUS_PATH/$CORPUS_DEST
 
 # combine src and tgt
-# cat $TRAIN_SRC_PATH $TRAIN_TGT_PATH $DEV_SRC_PATH $DEV_TGT_PATH $TEST_SRC_PATH $TEST_TGT_PATH > $CORPUS_PATH/.$SRC-$TGT
-
+cat $TRAIN_SRC_PATH $TRAIN_TGT_PATH $DEV_SRC_PATH $DEV_TGT_PATH $TEST_SRC_PATH $TEST_TGT_PATH > $CORPUS_PATH/.$SRC-$TGT
 
 SPM_MODEL_PATH=$CORPUS_PATH/$SRC-$TGT;
 SPM_MODEL=$SPM_MODEL_PATH.model;
@@ -65,39 +64,39 @@ build_spm_model() {
     # define model path and remove created corpus
     rm $CORPUS_PATH/.$SRC-$TGT;
 }
-# build_spm_model;
 
-echo "Converting source documents to sentencepieces."
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TRAIN_SRC_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TRAIN_TGT_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $DEV_SRC_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $DEV_TGT_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TEST_SRC_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TEST_TGT_PATH
-
-
-# rename paths for preprocessing
-# mv $TRAIN_SRC_PATH.spm $CORPUS_PATH/train.spm.$SRC
-# mv $TRAIN_TGT_PATH.spm $CORPUS_PATH/train.spm.$TGT
-# mv $DEV_SRC_PATH.spm $CORPUS_PATH/dev.spm.$SRC
-# mv $DEV_TGT_PATH.spm $CORPUS_PATH/dev.spm.$TGT
-# mv $TEST_SRC_PATH.spm $CORPUS_PATH/test.spm.$SRC
-# mv $TEST_TGT_PATH.spm $CORPUS_PATH/test.spm.$TGT
-#
+docConverter() {
+    build_spm_model;
+    echo "Converting source documents to sentencepieces."
+    python sentence_piece.py --mode doc2spm \
+    --model_path $SPM_MODEL_PATH \
+    --corpus $TRAIN_SRC_PATH
+    python sentence_piece.py --mode doc2spm \
+    --model_path $SPM_MODEL_PATH \
+    --corpus $TRAIN_TGT_PATH
+    python sentence_piece.py --mode doc2spm \
+    --model_path $SPM_MODEL_PATH \
+    --corpus $DEV_SRC_PATH
+    python sentence_piece.py --mode doc2spm \
+    --model_path $SPM_MODEL_PATH \
+    --corpus $DEV_TGT_PATH
+    python sentence_piece.py --mode doc2spm \
+    --model_path $SPM_MODEL_PATH \
+    --corpus $TEST_SRC_PATH
+    python sentence_piece.py --mode doc2spm \
+    --model_path $SPM_MODEL_PATH \
+    --corpus $TEST_TGT_PATH
+    # rename paths for preprocessing
+    mv $TRAIN_SRC_PATH.spm $CORPUS_PATH/train.spm.$SRC
+    mv $TRAIN_TGT_PATH.spm $CORPUS_PATH/train.spm.$TGT
+    mv $DEV_SRC_PATH.spm $CORPUS_PATH/dev.spm.$SRC
+    mv $DEV_TGT_PATH.spm $CORPUS_PATH/dev.spm.$TGT
+    mv $TEST_SRC_PATH.spm $CORPUS_PATH/test.spm.$SRC
+    mv $TEST_TGT_PATH.spm $CORPUS_PATH/test.spm.$TGT
+}
 
 preprocess() {
+    docConverter;
     fairseq-preprocess \
     --source-lang ${SRC} \
     --target-lang ${TGT} \
