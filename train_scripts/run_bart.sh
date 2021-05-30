@@ -14,9 +14,9 @@ set -e
 
 
 
-SRC=ib
+SRC=data
 TGT=en
-CORPUS_PATH=~/wikibio_train
+CORPUS_PATH=~/fairseq_test_data
 
 # create result dir
 mkdir -p results
