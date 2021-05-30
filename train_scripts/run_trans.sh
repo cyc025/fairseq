@@ -98,7 +98,7 @@ mv $TEST_TGT_PATH.spm $CORPUS_PATH/test.spm.$TGT
 
 
 preprocess() {
-    python preprocess.py \
+    fairseq-preprocess \
     --source-lang ${SRC} \
     --target-lang ${TGT} \
     --trainpref $CORPUS_PATH/train.spm \
@@ -124,7 +124,7 @@ TASK=translation;
 ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    python train.py $1  \
+    fairseq-train $1  \
     --source-lang $2 --target-lang $3 \
     --task $4 \
     --arch $ARCH \
