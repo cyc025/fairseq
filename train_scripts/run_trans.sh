@@ -14,9 +14,9 @@ set -e
 
 
 
-SRC=ib
+SRC=data
 TGT=en
-CORPUS_PATH=~/wikibio_train
+CORPUS_PATH=~/fairseq_test_data
 
 # create result dir
 mkdir -p results
@@ -65,37 +65,37 @@ build_spm_model() {
     # define model path and remove created corpus
     rm $CORPUS_PATH/.$SRC-$TGT;
 }
-# build_spm_model;
+build_spm_model;
 
 echo "Converting source documents to sentencepieces."
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TRAIN_SRC_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TRAIN_TGT_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $DEV_SRC_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $DEV_TGT_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TEST_SRC_PATH
-# python sentence_piece.py --mode doc2spm \
-# --model_path $SPM_MODEL_PATH \
-# --corpus $TEST_TGT_PATH
+python sentence_piece.py --mode doc2spm \
+--model_path $SPM_MODEL_PATH \
+--corpus $TRAIN_SRC_PATH
+python sentence_piece.py --mode doc2spm \
+--model_path $SPM_MODEL_PATH \
+--corpus $TRAIN_TGT_PATH
+python sentence_piece.py --mode doc2spm \
+--model_path $SPM_MODEL_PATH \
+--corpus $DEV_SRC_PATH
+python sentence_piece.py --mode doc2spm \
+--model_path $SPM_MODEL_PATH \
+--corpus $DEV_TGT_PATH
+python sentence_piece.py --mode doc2spm \
+--model_path $SPM_MODEL_PATH \
+--corpus $TEST_SRC_PATH
+python sentence_piece.py --mode doc2spm \
+--model_path $SPM_MODEL_PATH \
+--corpus $TEST_TGT_PATH
 
 
 # rename paths for preprocessing
-# mv $TRAIN_SRC_PATH.spm $CORPUS_PATH/train.spm.$SRC
-# mv $TRAIN_TGT_PATH.spm $CORPUS_PATH/train.spm.$TGT
-# mv $DEV_SRC_PATH.spm $CORPUS_PATH/dev.spm.$SRC
-# mv $DEV_TGT_PATH.spm $CORPUS_PATH/dev.spm.$TGT
-# mv $TEST_SRC_PATH.spm $CORPUS_PATH/test.spm.$SRC
-# mv $TEST_TGT_PATH.spm $CORPUS_PATH/test.spm.$TGT
-#
+mv $TRAIN_SRC_PATH.spm $CORPUS_PATH/train.spm.$SRC
+mv $TRAIN_TGT_PATH.spm $CORPUS_PATH/train.spm.$TGT
+mv $DEV_SRC_PATH.spm $CORPUS_PATH/dev.spm.$SRC
+mv $DEV_TGT_PATH.spm $CORPUS_PATH/dev.spm.$TGT
+mv $TEST_SRC_PATH.spm $CORPUS_PATH/test.spm.$SRC
+mv $TEST_TGT_PATH.spm $CORPUS_PATH/test.spm.$TGT
+
 
 preprocess() {
     python preprocess.py \
@@ -117,11 +117,11 @@ WARMUP_UPDATES=50;
 TOTAL_NUM_UPDATE=100;
 PATIENCE=100;
 TOTAL_EPOCH=300;
-TASK=translation_from_pretrained_bart;
-ARCH=bart_base;
-#
-# TASK=translation;
-# ARCH=transformer_wmt_en_de;
+# TASK=translation_from_pretrained_bart;
+# ARCH=bart_base;
+
+TASK=translation;
+ARCH=transformer_wmt_en_de;
 
 train_translate() {
     python train.py $1  \
@@ -181,7 +181,7 @@ echo "Start self-training loop."
 for I in 1
 do
     echo "Training model."
-    #train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
+    train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
     echo "Generating outputs."
     generate;
 done
