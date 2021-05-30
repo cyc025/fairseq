@@ -35,7 +35,7 @@ class BARTModel(TransformerModel):
             "bart.large.mnli": "http://dl.fbaipublicfiles.com/fairseq/models/bart.large.mnli.tar.gz",
             "bart.large.cnn": "http://dl.fbaipublicfiles.com/fairseq/models/bart.large.cnn.tar.gz",
             "bart.large.xsum": "http://dl.fbaipublicfiles.com/fairseq/models/bart.large.xsum.tar.gz",
-        }
+        } 
 
     def __init__(self, args, encoder, decoder):
         super().__init__(args, encoder, decoder)

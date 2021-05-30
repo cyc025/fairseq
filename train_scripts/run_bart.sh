@@ -98,7 +98,7 @@ echo "Converting source documents to sentencepieces."
 #
 
 preprocess() {
-    python preprocess.py \
+    fairseq-preprocess \
     --source-lang ${SRC} \
     --target-lang ${TGT} \
     --trainpref $CORPUS_PATH/train.spm \
@@ -171,7 +171,7 @@ generate() {
 ########################
 
 echo "Preprocessing documents."
-# preprocess;
+preprocess;
 
 ####################
 ## translation  ##
