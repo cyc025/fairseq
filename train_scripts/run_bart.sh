@@ -108,31 +108,29 @@ ARCH=bart_base;
 
 train_translate() {
     python train.py $1  \
-    --source-lang $2 --target-lang $3 \
-    --task $4 \
-    --arch $ARCH \
-    --max-epoch $TOTAL_EPOCH \
-    --share-decoder-input-output-embed \
-    --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 \
-    --lr 5e-4 --lr-scheduler inverse_sqrt --warmup-updates $WARMUP_UPDATES \
-    --dropout 0.3 --weight-decay 0.0001 \
-    --criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
-    --max-tokens 2048 \
-    --eval-bleu \
-    --eval-bleu-args '{"beam": 5, "max_len_a": 1.2, "max_len_b": 10}' \
-    --eval-bleu-detok moses \
-    --eval-bleu-remove-bpe \
-    --eval-bleu-print-samples \
-    --best-checkpoint-metric bleu \
-    --log-interval 2 \
-    --keep-interval-updates 5 \
-    --patience $PATIENCE \
+    --max-tokens 4400 \
+    --task $TASK \
+    --add-prev-output-tokens \
+    --layernorm-embedding \
     --share-all-embeddings \
-    --upsample-primary 16 \
-    --encoder-layers 3 --decoder-layers 3 \
-    --skip-invalid-size-inputs-valid-test \
-    --maximize-best-checkpoint-metric;
+    --warmup-updates $WARMUP_UPDATES
+    --share-decoder-input-output-embed \
+    --reset-optimizer --reset-dataloader --reset-meters \
+    --required-batch-size-multiple 1 \
+    --init-token 0 \
+    --patience $PATIENCE \
+    --arch bart_large \
+    --criterion nat_loss \
+    --dropout 0.1 --attention-dropout 0.1 \
+    --weight-decay 0.01 --optimizer adam --adam-betas "(0.9, 0.98)" --adam-eps 1e-08 \
+    --clip-norm 0.0 \
+    --lr-scheduler polynomial_decay --lr 5e-4 --total-num-update $TOTAL_NUM_UPDATE \
+    --fp16 --fp16-init-scale 4 --threshold-loss-scale 1 --fp16-scale-window 128 \
+    --max-epoch 10 \
+    --find-unused-parameters \
+    --best-checkpoint-metric accuracy --maximize-best-checkpoint-metric;
 }
+
 
 model=checkpoints/checkpoint_best.pt
 generate() {
