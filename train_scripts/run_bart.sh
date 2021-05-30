@@ -24,22 +24,6 @@ mkdir -p $CORPUS_PATH/st_corpus
 
 CORPUS_DEST=${SRC}_${TGT}
 
-# clean files
-# rm -f $CORPUS_PATH/$CORPUS_DEST/*
-# rm -f $CORPUS_PATH/preprocess.log
-# rm -f $CORPUS_PATH/*spm*
-# rm -f $CORPUS_PATH/*.vocab
-# rm -f $CORPUS_PATH/*.model
-# rm -f $CORPUS_PATH/*.bin
-# rm -f $CORPUS_PATH/*.idx
-# rm -f $CORPUS_PATH/*.txt
-# rm -f $CORPUS_PATH/st_corpus/*spm*
-# rm -f $CORPUS_PATH/st_corpus/*.txt
-# rm -f $CORPUS_PATH/st_corpus/*.bin
-# rm -f $CORPUS_PATH/st_corpus/*.idx
-# rm -f results/*
-# rm -f $CORPUS_PATH/pretrain/*
-
 TRAIN_SRC_PATH=$CORPUS_PATH/train.$SRC
 TEST_SRC_PATH=$CORPUS_PATH/test.$SRC
 DEV_SRC_PATH=$CORPUS_PATH/valid.$SRC
@@ -163,7 +147,6 @@ generate() {
      --skip-invalid-size-inputs-valid-test \
      --source-lang $SRC --target-lang $TGT;
 }
-
 
 ########################
 ## Start of pipeline  ##
