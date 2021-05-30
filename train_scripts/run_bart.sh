@@ -107,7 +107,7 @@ ARCH=bart_base;
 # ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    fairseq-train \
+    python train.py \
     $1 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
