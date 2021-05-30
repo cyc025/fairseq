@@ -100,35 +100,35 @@ WARMUP_UPDATES=50;
 TOTAL_NUM_UPDATE=100;
 PATIENCE=100;
 TOTAL_EPOCH=300;
-TASK=translation_from_pretrained_bart;
+TASK=translation;
 ARCH=bart_base;
 #
 # TASK=translation;
 # ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    fairseq-train $1  \
-    --arch bart_base \
-    --max-tokens 4400 \
-    --task $TASK \
-    --add-prev-output-tokens \
-    --layernorm-embedding \
+    fairseq-train \
+    $1 \
+    --save-dir checkpoints \
+    --ddp-backend=legacy_ddp \
+    --task translation_lev \
+    --criterion nat_loss \
+    --arch levenshtein_transformer \
+    --noise random_delete \
     --share-all-embeddings \
-    --warmup-updates $WARMUP_UPDATES
-    --share-decoder-input-output-embed \
-    --reset-optimizer --reset-dataloader --reset-meters \
-    --required-batch-size-multiple 1 \
-    --init-token 0 \
-    --patience $PATIENCE \
-    --criterion cross_entropy \
-    --dropout 0.1 --attention-dropout 0.1 \
-    --weight-decay 0.01 --optimizer adam --adam-betas "(0.9, 0.98)" --adam-eps 1e-08 \
-    --clip-norm 0.0 \
-    --lr-scheduler polynomial_decay --lr 5e-4 --total-num-update $TOTAL_NUM_UPDATE \
-    --fp16 --fp16-init-scale 4 --threshold-loss-scale 1 --fp16-scale-window 128 \
-    --max-epoch 10 \
-    --find-unused-parameters \
-    --best-checkpoint-metric accuracy --maximize-best-checkpoint-metric;
+    --optimizer adam --adam-betas '(0.9,0.98)' \
+    --lr 0.0005 --lr-scheduler inverse_sqrt \
+    --stop-min-lr '1e-09' --warmup-updates 10000 \
+    --warmup-init-lr '1e-07' --label-smoothing 0.1 \
+    --dropout 0.3 --weight-decay 0.01 \
+    --decoder-learned-pos \
+    --encoder-learned-pos \
+    --apply-bert-init \
+    --log-format 'simple' --log-interval 100 \
+    --fixed-validation-seed 7 \
+    --max-tokens 8000 \
+    --save-interval-updates 10000 \
+    --max-update 300000
 }
 
 
