@@ -107,7 +107,7 @@ ARCH=bart_base;
 # ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    fairseq-train $1  \
+    python train.py $1  \
     --max-tokens 4400 \
     --task $TASK \
     --add-prev-output-tokens \
