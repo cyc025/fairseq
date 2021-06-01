@@ -12,6 +12,8 @@
 
 set -e
 
+# kill all current processes
+nvidia-smi | grep 'python' | awk '{ print $3 }' | xargs -n1 kill -9
 
 
 SRC=data
@@ -107,7 +109,7 @@ ARCH=bart_base;
 # ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    fairseq-train $1 \
+    python3 -m pdb fairseq-train $1 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task translation_lev \

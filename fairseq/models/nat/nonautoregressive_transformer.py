@@ -29,7 +29,7 @@ def _mean_pooling(enc_feats, src_masks):
 def _argmax(x, dim):
     return (x == x.max(dim, keepdim=True)[0]).type_as(x)
 
- 
+
 def _uniform_assignment(src_lens, trg_lens):
     max_trg_len = trg_lens.max()
     steps = (src_lens.float() - 1) / (trg_lens.float() - 1)  # step-size
@@ -140,7 +140,7 @@ class NATransformerModel(FairseqNATModel):
             output_scores=output_scores,
             attn=None,
             history=history,
-        )
+        ) 
 
     def initialize_output_tokens(self, encoder_out, src_tokens):
         # length prediction
