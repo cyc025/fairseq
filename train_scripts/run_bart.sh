@@ -102,19 +102,19 @@ WARMUP_UPDATES=50;
 TOTAL_NUM_UPDATE=100;
 PATIENCE=100;
 TOTAL_EPOCH=300;
-TASK=translation;
-ARCH=bart_base;
+TASK=translation_lev;
+ARCH=nonautoregressive_transformer;
 #
 # TASK=translation;
 # ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    python3 -m pdb fairseq-train $1 \
+    python3 -m pdb train.py $1 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
-    --task translation_lev \
+    --task $TASK \
     --criterion nat_loss \
-    --arch nonautoregressive_transformer \
+    --arch $ARCH \
     --noise full_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
