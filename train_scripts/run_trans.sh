@@ -124,7 +124,7 @@ TASK=translation;
 ARCH=transformer_wmt_en_de;
 
 train_translate() {
-    fairseq-train $1  \
+    python3 -m pdb fairseq-train $1  \
     --source-lang $2 --target-lang $3 \
     --task $4 \
     --arch $ARCH \
