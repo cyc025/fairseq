@@ -100,6 +100,7 @@ class LevenshteinTransformerModel(FairseqNATModel):
                 F.softmax(word_ins_out, -1).view(-1, word_ins_out.size(-1)), 1
             ).view(word_ins_out.size(0), -1)
         else:
+            from fairseq import pdb; pdf.set_trace()
             word_predictions = F.log_softmax(word_ins_out, dim=-1).max(2)[1]
 
         word_predictions.masked_scatter_(
