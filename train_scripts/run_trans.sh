@@ -39,6 +39,7 @@ rm -f $CORPUS_PATH/st_corpus/*.bin
 rm -f $CORPUS_PATH/st_corpus/*.idx
 rm -f results/*
 rm -f $CORPUS_PATH/pretrain/*
+rm checkpoints/*
 
 TRAIN_SRC_PATH=$CORPUS_PATH/train.$SRC
 TEST_SRC_PATH=$CORPUS_PATH/test.$SRC
