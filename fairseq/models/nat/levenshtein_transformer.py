@@ -93,14 +93,13 @@ class LevenshteinTransformerModel(FairseqNATModel):
             prev_output_tokens=masked_tgt_tokens,
             encoder_out=encoder_out,
         )
-
+        from fairseq import pdb; pdf.set_trace()
         # make online prediction
         if self.decoder.sampling_for_deletion:
             word_predictions = torch.multinomial(
                 F.softmax(word_ins_out, -1).view(-1, word_ins_out.size(-1)), 1
             ).view(word_ins_out.size(0), -1)
         else:
-            from fairseq import pdb; pdf.set_trace()
             word_predictions = F.log_softmax(word_ins_out, dim=-1).max(2)[1]
 
         word_predictions.masked_scatter_(
