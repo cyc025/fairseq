@@ -13,7 +13,7 @@
 set -e
 
 # kill all current processes
-nvidia-smi | grep 'python' | awk '{ print $3 }' | xargs -n1 kill -9
+# nvidia-smi | grep 'python' | awk '{ print $3 }' | xargs -n1 kill -9
 
 
 SRC=data
@@ -122,9 +122,6 @@ PATIENCE=100;
 TOTAL_EPOCH=300;
 TASK=translation_lev;
 ARCH=nonautoregressive_transformer;
-#
-# TASK=translation;
-# ARCH=transformer_wmt_en_de;
 
 train_translate() {
     python3 -m pdb train.py $1 \
