@@ -121,6 +121,8 @@ class NATransformerModel(FairseqNATModel):
         output_scores = decoder_out.output_scores
         history = decoder_out.history
 
+        import pdb; pdb.set_trace()
+
         # execute the decoder
         output_masks = output_tokens.ne(self.pad)
         _scores, _tokens = self.decoder(
@@ -140,7 +142,7 @@ class NATransformerModel(FairseqNATModel):
             output_scores=output_scores,
             attn=None,
             history=history,
-        ) 
+        )
 
     def initialize_output_tokens(self, encoder_out, src_tokens):
         # length prediction
