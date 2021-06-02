@@ -119,10 +119,11 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_length + 1  # make sure to mask at least one token.
 
             _, target_rank = target_score.sort(1)
-            target_cutoff = new_arange(target_rank,2) < target_length[:, None].long()
+            target_cutoff = new_arange(target_rank) < target_length[:, None].long()
             prev_target_tokens = target_tokens.masked_fill(
                 target_cutoff.scatter(1, target_rank, target_cutoff), unk
             )
+            from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens
 
         def _full_mask(target_tokens):
