@@ -130,7 +130,7 @@ train_translate() {
     --task $TASK \
     --criterion nat_loss \
     --arch $ARCH \
-    --noise full_mask \
+    --noise random_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
     --lr 0.0005 --lr-scheduler inverse_sqrt \
