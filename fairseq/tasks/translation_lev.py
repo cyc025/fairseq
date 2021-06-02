@@ -64,6 +64,9 @@ class TranslationLevenshteinTask(TranslationTask):
         )
 
     def inject_noise(self, target_tokens):
+
+        from fairseq import pdb; pdb.set_trace()
+
         def _random_delete(target_tokens):
             pad = self.tgt_dict.pad()
             bos = self.tgt_dict.bos()
