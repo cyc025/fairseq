@@ -65,8 +65,6 @@ class TranslationLevenshteinTask(TranslationTask):
 
     def inject_noise(self, target_tokens):
 
-        from fairseq import pdb; pdb.set_trace()
-
         def _random_delete(target_tokens):
             pad = self.tgt_dict.pad()
             bos = self.tgt_dict.bos()
@@ -139,12 +137,16 @@ class TranslationLevenshteinTask(TranslationTask):
             return target_tokens.masked_fill(~target_mask, unk)
 
         if self.cfg.noise == "random_delete":
+            from fairseq import pdb; pdb.set_trace()
             return _random_delete(target_tokens)
         elif self.cfg.noise == "random_mask":
+            from fairseq import pdb; pdb.set_trace()
             return _random_mask(target_tokens)
         elif self.cfg.noise == "full_mask":
+            from fairseq import pdb; pdb.set_trace()
             return _full_mask(target_tokens)
         elif self.cfg.noise == "no_noise":
+            from fairseq import pdb; pdb.set_trace()
             return target_tokens
         else:
             raise NotImplementedError
