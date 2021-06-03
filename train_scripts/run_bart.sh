@@ -147,7 +147,7 @@ train_translate() {
     --fixed-validation-seed 7 \
     --max-tokens 8000 \
     --save-interval-updates 10000 \
-    --max-update 1000;
+    --max-update 500;
 }
 
 
@@ -180,7 +180,7 @@ echo "Start self-training loop."
 for I in 1
 do
     echo "Training model."
-    # train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
+    train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
     echo "Generating outputs."
     generate;
 done
