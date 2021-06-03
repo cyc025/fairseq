@@ -109,6 +109,8 @@ class TranslationLevenshteinTask(TranslationTask):
             eos = self.tgt_dict.eos()
             unk = self.tgt_dict.unk()
 
+            return target_tokens
+
             target_masks = (
                 target_tokens.ne(pad) & target_tokens.ne(bos) & target_tokens.ne(eos)
             )
