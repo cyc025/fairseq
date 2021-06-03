@@ -146,6 +146,7 @@ train_translate() {
     --log-format 'tqdm' --log-interval 100 \
     --fixed-validation-seed 7 \
     --max-tokens 8000 \
+    --keep-best-checkpoints 2 \
     --save-interval-updates 10000 \
     --max-update 500;
 }
