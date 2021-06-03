@@ -121,17 +121,17 @@ TOTAL_NUM_UPDATE=100;
 PATIENCE=100;
 TOTAL_EPOCH=300;
 TASK=translation_lev;
-ARCH=levenshtein_transformer;
+ARCH=nonautoregressive_transformer;
 
 train_translate() {
     # python3 -m pdb train.py $1 \
     python train.py $1 \
     --save-dir checkpoints \
-    --ddp-backend=legacy_ddp \
-    --task translation_lev \
+    --ddp-backend=no_c10d \
+    --task $TASK \
     --criterion nat_loss \
-    --arch levenshtein_transformer \
-    --noise random_delete \
+    --arch $ARCH \
+    --noise random_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
     --lr 0.0005 --lr-scheduler inverse_sqrt \
@@ -140,12 +140,14 @@ train_translate() {
     --dropout 0.3 --weight-decay 0.01 \
     --decoder-learned-pos \
     --encoder-learned-pos \
+    --pred-length-offset \
+    --length-loss-factor 0.1 \
     --apply-bert-init \
-    --log-format 'simple' --log-interval 100 \
+    --log-format 'tqdm' --log-interval 100 \
     --fixed-validation-seed 7 \
     --max-tokens 8000 \
     --save-interval-updates 10000 \
-    --max-update 300000
+    --max-update 300000;
 }
 
 
