@@ -147,7 +147,7 @@ train_translate() {
     --fixed-validation-seed 7 \
     --max-tokens 8000 \
     --save-interval-updates 10000 \
-    --max-update 300000;
+    --max-update 1000;
 }
 
 
@@ -159,7 +159,7 @@ generate() {
     --sentencepiece-model $SPM_MODEL \
     --max-sentences 32 \
      --num-workers 70 \
-     --beam 15 \
+     --beam 3 \
      --results-path outputs \
      --skip-invalid-size-inputs-valid-test \
      --source-lang $SRC --target-lang $TGT;
