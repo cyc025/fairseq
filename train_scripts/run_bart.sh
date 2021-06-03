@@ -125,12 +125,12 @@ ARCH=levenshtein_transformer;
 
 train_translate() {
     # python3 -m pdb train.py $1 \
-    python3 train.py $1 \
+    fairseq-train $1 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
-    --task $TASK \
+    --task translation_lev \
     --criterion nat_loss \
-    --arch $ARCH \
+    --arch levenshtein_transformer \
     --noise random_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
@@ -141,11 +141,11 @@ train_translate() {
     --decoder-learned-pos \
     --encoder-learned-pos \
     --apply-bert-init \
-    --log-format 'tqdm' --log-interval 100 \
+    --log-format 'simple' --log-interval 100 \
     --fixed-validation-seed 7 \
     --max-tokens 8000 \
     --save-interval-updates 10000 \
-    --max-update 300000;
+    --max-update 300000
 }
 
 
