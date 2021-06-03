@@ -127,7 +127,7 @@ train_translate() {
     # python3 -m pdb train.py $1 \
     fairseq-train $1 \
     --save-dir checkpoints \
-    --ddp-backend=no_c10d \
+    --ddp-backend=legacy_ddp \
     --task translation_lev \
     --criterion nat_loss \
     --arch levenshtein_transformer \
