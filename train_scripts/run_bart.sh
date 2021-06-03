@@ -153,7 +153,7 @@ train_translate() {
 
 model=checkpoints/checkpoint_best.pt
 generate() {
-    python generate.py $CORPUS_PATH/$CORPUS_DEST \
+    fairseq-generate $CORPUS_PATH/$CORPUS_DEST \
     --path $model --task $TASK \
     --gen-subset test -t $TGT -s $SRC --bpe 'sentencepiece' \
     --sentencepiece-vocab $SPM_MODEL \
