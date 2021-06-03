@@ -140,8 +140,6 @@ train_translate() {
     --dropout 0.3 --weight-decay 0.01 \
     --decoder-learned-pos \
     --encoder-learned-pos \
-    # --pred-length-offset \
-    # --length-loss-factor 0.1 \
     --apply-bert-init \
     --log-format 'tqdm' --log-interval 100 \
     --fixed-validation-seed 7 \
