@@ -131,7 +131,7 @@ train_translate() {
     --task translation_lev \
     --criterion nat_loss \
     --arch levenshtein_transformer \
-    --noise random_mask \
+    --noise random_delete \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
     --lr 0.0005 --lr-scheduler inverse_sqrt \
