@@ -121,7 +121,7 @@ class NATransformerModel(FairseqNATModel):
         output_scores = decoder_out.output_scores
         history = decoder_out.history
 
-        # import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         # execute the decoder
         output_masks = output_tokens.ne(self.pad)
