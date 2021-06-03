@@ -125,7 +125,7 @@ ARCH=levenshtein_transformer;
 
 train_translate() {
     # python3 -m pdb train.py $1 \
-    python3 -m pdb train.py $1 \
+    python train.py $1 \
     --save-dir checkpoints \
     --ddp-backend=legacy_ddp \
     --task translation_lev \
