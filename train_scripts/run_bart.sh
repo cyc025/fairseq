@@ -156,7 +156,7 @@ generate() {
     fairseq-generate $CORPUS_PATH/$CORPUS_DEST \
     --path $model --task $TASK \
     --gen-subset test -t $TGT -s $SRC --bpe 'sentencepiece' \
-    --sentencepiece-vocab $SPM_MODEL \
+    --sentencepiece-model $SPM_MODEL \
     --max-sentences 32 \
      --num-workers 70 \
      --beam 15 \
