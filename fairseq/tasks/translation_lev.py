@@ -119,7 +119,7 @@ class TranslationLevenshteinTask(TranslationTask):
 
             # define mask length
             # p defines masking probability
-            p = 1.
+            p = 0.
             target_length = target_masks.sum(1).float()
             target_length = target_length * target_length.clone().uniform_(p,p)
             target_length = target_length + 1  # make sure to mask at least one token.
@@ -216,5 +216,4 @@ class TranslationLevenshteinTask(TranslationTask):
         #     # https://arxiv.org/abs/1312.6114 (Appendix B)
         #     # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
         #     KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
-        #     KLD = torch.sum(KLD_element).mul_(-0.5)
-        #     variational_loss = KLD
+        #     var_loss = torch.sum(KLD_element).mul_(-0.5)
