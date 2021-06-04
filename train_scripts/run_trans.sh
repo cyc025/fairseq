@@ -148,6 +148,7 @@ train_translate() {
     --patience $PATIENCE \
     --share-all-embeddings \
     --upsample-primary 16 \
+    --no-epoch-checkpoints \
     --encoder-layers 3 --decoder-layers 3 \
     --skip-invalid-size-inputs-valid-test \
     --maximize-best-checkpoint-metric;

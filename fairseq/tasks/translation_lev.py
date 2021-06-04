@@ -109,15 +109,13 @@ class TranslationLevenshteinTask(TranslationTask):
             eos = self.tgt_dict.eos()
             unk = self.tgt_dict.unk()
 
-            return target_tokens
-
             target_masks = (
                 target_tokens.ne(pad) & target_tokens.ne(bos) & target_tokens.ne(eos)
             )
             target_score = target_tokens.clone().float().uniform_()
             target_score.masked_fill_(~target_masks, 2.0)
             target_length = target_masks.sum(1).float()
-            target_length = target_length * target_length.clone().uniform_()
+            target_length = target_length * torch.ones(target_length.clone().size()) #target_length.clone().uniform_()
             target_length = target_length + 1  # make sure to mask at least one token.
 
             _, target_rank = target_score.sort(1)
