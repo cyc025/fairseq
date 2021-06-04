@@ -129,6 +129,7 @@ train_translate() {
     --source-lang $2 --target-lang $3 \
     --task $4 \
     --arch $ARCH \
+    --save-dir trans_checkpoints \
     --max-epoch $TOTAL_EPOCH \
     --share-decoder-input-output-embed \
     --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 \
@@ -152,7 +153,7 @@ train_translate() {
     --maximize-best-checkpoint-metric;
 }
 
-model=checkpoints/checkpoint_best.pt
+model=trans_checkpoints/checkpoint_best.pt
 generate() {
     python generate.py $CORPUS_PATH/$CORPUS_DEST \
     --path $model --task $TASK \
@@ -161,7 +162,7 @@ generate() {
     --max-sentences 32 \
      --num-workers 70 \
      --beam 15 \
-     --results-path outputs \
+     --results-path trans_outputs \
      --skip-invalid-size-inputs-valid-test \
      --source-lang $SRC --target-lang $TGT;
 }
