@@ -99,6 +99,7 @@ class LabelSmoothedDualImitationCriterion(FairseqCriterion):
         losses, nll_loss = [outputs["var_loss"]], []
 
         for obj in outputs:
+            if obj=="var_loss": continue
             if outputs[obj].get("loss", None) is None:
                 _losses = self._compute_loss(
                     outputs[obj].get("out"),
