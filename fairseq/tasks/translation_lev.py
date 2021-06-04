@@ -118,12 +118,16 @@ class TranslationLevenshteinTask(TranslationTask):
             target_score.masked_fill_(~target_masks, 2.0)
 
             # define mask length
+            # p defines masking probability
+            p = 0.5
             target_length = target_masks.sum(1).float()
-            target_length = target_length * target_length.clone().uniform_(0.5,0.5)
+            target_length = target_length * target_length.clone().uniform_(p,p)
             target_length = target_length + 1  # make sure to mask at least one token.
 
             # masking by checking if each index is smaller than target mask length,
             # then use scatter to reset the respective indices boolean values
+            # 'target_rank' contains the sequence lengths
+            # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
             _, target_rank = target_score.sort(1)
             target_cutoff = new_arange(target_rank) < target_length[:, None].long()
             prev_target_tokens = target_tokens.masked_fill(
