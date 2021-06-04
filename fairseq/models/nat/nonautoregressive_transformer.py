@@ -14,6 +14,9 @@ from fairseq.modules.transformer_sentence_encoder import init_bert_params
 
 
 
+from fairseq.modules.vae import *
+
+
 def _mean_pooling(enc_feats, src_masks):
     # enc_feats: T x B x C
     # src_masks: B x T or None
@@ -228,7 +231,6 @@ class NATransformerDecoder(FairseqNATDecoder):
         self.embed_length = Embedding(256, self.encoder_embed_dim, None)
 
         # vae
-        from fairseq.modules.vae import *
         self.vae = VAE(self.encoder_embed_dim)
 
     @ensemble_decoder
