@@ -13,8 +13,6 @@ from fairseq.models.transformer import Embedding
 from fairseq.modules.transformer_sentence_encoder import init_bert_params
 
 
-# from fairseq.modules.vae import *
-
 
 def _mean_pooling(enc_feats, src_masks):
     # enc_feats: T x B x C
@@ -95,6 +93,9 @@ class NATransformerModel(FairseqNATModel):
         length_tgt = self.decoder.forward_length_prediction(
             length_out, encoder_out, tgt_tokens
         )
+        mask_patterns = self.decoder.forward_mask_prediction(
+            length_out, encoder_out, tgt_tokens
+        )
 
         # decoding
         word_ins_out = self.decoder(
@@ -103,7 +104,7 @@ class NATransformerModel(FairseqNATModel):
             encoder_out=encoder_out,
         )
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         return {
             "word_ins": {
@@ -125,8 +126,6 @@ class NATransformerModel(FairseqNATModel):
         output_tokens = decoder_out.output_tokens
         output_scores = decoder_out.output_scores
         history = decoder_out.history
-
-        # from fairseq import pdb; pdb.set_trace()
 
         # execute the decoder
         output_masks = output_tokens.ne(self.pad)
@@ -155,8 +154,6 @@ class NATransformerModel(FairseqNATModel):
             self.decoder.forward_length(normalize=True, encoder_out=encoder_out),
             encoder_out=encoder_out,
         )
-
-        # from fairseq import pdb; pdb.set_trace()
 
         max_length = length_tgt.clamp_(min=2).max()
         idx_length = utils.new_arange(src_tokens, max_length)
@@ -229,6 +226,10 @@ class NATransformerDecoder(FairseqNATDecoder):
         self.length_loss_factor = getattr(args, "length_loss_factor", 0.1)
         self.src_embedding_copy = getattr(args, "src_embedding_copy", False)
         self.embed_length = Embedding(256, self.encoder_embed_dim, None)
+
+        # vae
+        from fairseq.modules.vae import *
+        self.vae = VAE(self.encoder_embed_dim)
 
     @ensemble_decoder
     def forward(self, normalize, encoder_out, prev_output_tokens, step=0, **unused):
@@ -408,6 +409,16 @@ class NATransformerDecoder(FairseqNATDecoder):
                 length_tgt = pred_lengs
 
         return length_tgt
+
+    def forward_mask_prediction(self, length_out, encoder_out, tgt_tokens=None):
+
+        enc_feats = encoder_out["encoder_out"][0]  # T x B x C
+
+        enc_feats,mu,logvar = self.vae(enc_feats)
+        KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
+        var_loss = torch.sum(KLD_element).mul_(-0.5)
+
+        from fairseq import pdb; pdb.set_trace()
 
 
 @register_model_architecture(
