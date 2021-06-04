@@ -242,6 +242,8 @@ class LevenshteinTransformerModel(FairseqNATModel):
         output_scores = output_scores[:, :cut_off]
         attn = None if attn is None else attn[:, :cut_off, :]
 
+        from fairseq import pdb; pdb.set_trace()
+
         return decoder_out._replace(
             output_tokens=output_tokens,
             output_scores=output_scores,
@@ -379,8 +381,6 @@ class LevenshteinTransformerDecoder(FairseqNATDecoder):
 
         if self.project_out_dim is not None:
             x = self.project_out_dim(x)
-
-        from fairseq import pdb; pdb.set_trace()
 
         return x, {"attn": attn, "inner_states": inner_states}
 
