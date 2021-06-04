@@ -380,11 +380,12 @@ class LevenshteinTransformerDecoder(FairseqNATDecoder):
         if self.project_out_dim is not None:
             x = self.project_out_dim(x)
 
+        from fairseq import pdb; pdb.set_trace()
+
         return x, {"attn": attn, "inner_states": inner_states}
 
     @ensemble_decoder
     def forward_mask_ins(self, normalize, encoder_out, prev_output_tokens, **unused):
-        from fairseq import pdb; pdb.set_trace()
         features, extra = self.extract_features(
             prev_output_tokens,
             encoder_out=encoder_out,
