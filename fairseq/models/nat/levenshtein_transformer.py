@@ -242,8 +242,6 @@ class LevenshteinTransformerModel(FairseqNATModel):
         output_scores = output_scores[:, :cut_off]
         attn = None if attn is None else attn[:, :cut_off, :]
 
-        from fairseq import pdb; pdb.set_trace()
-
         return decoder_out._replace(
             output_tokens=output_tokens,
             output_scores=output_scores,

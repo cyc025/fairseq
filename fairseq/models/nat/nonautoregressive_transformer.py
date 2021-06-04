@@ -103,6 +103,8 @@ class NATransformerModel(FairseqNATModel):
             encoder_out=encoder_out,
         )
 
+        from fairseq import pdb; pdb.set_trace()
+
         return {
             "word_ins": {
                 "out": word_ins_out,
