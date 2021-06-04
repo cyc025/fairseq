@@ -125,7 +125,6 @@ ARCH=nonautoregressive_transformer;
 
 train_translate() {
     python3 -m pdb train.py $1 \
-    # python train.py $1 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
