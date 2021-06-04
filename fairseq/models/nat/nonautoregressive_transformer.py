@@ -154,7 +154,7 @@ class NATransformerModel(FairseqNATModel):
             encoder_out=encoder_out,
         )
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         max_length = length_tgt.clamp_(min=2).max()
         idx_length = utils.new_arange(src_tokens, max_length)

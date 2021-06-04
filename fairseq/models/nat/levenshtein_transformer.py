@@ -384,6 +384,7 @@ class LevenshteinTransformerDecoder(FairseqNATDecoder):
 
     @ensemble_decoder
     def forward_mask_ins(self, normalize, encoder_out, prev_output_tokens, **unused):
+        from fairseq import pdb; pdb.set_trace()
         features, extra = self.extract_features(
             prev_output_tokens,
             encoder_out=encoder_out,
