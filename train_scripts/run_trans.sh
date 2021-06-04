@@ -16,7 +16,7 @@ set -e
 
 SRC=data
 TGT=en
-CORPUS_PATH=~/fairseq_test_data
+CORPUS_PATH=~/fairseq_translation_data
 
 # create result dir
 mkdir -p results
