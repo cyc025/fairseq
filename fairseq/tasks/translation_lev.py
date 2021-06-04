@@ -117,12 +117,13 @@ class TranslationLevenshteinTask(TranslationTask):
             target_score = target_tokens.clone().float().uniform_()
             target_score.masked_fill_(~target_masks, 2.0)
 
-            # length of masks
+            # define mask length
             target_length = target_masks.sum(1).float()
-            target_length = target_length * target_length.clone().uniform_()
+            target_length = target_length * target_length.clone().uniform_(0.,1.)
             target_length = target_length + 1  # make sure to mask at least one token.
 
-            # masking
+            # masking by checking if each index is smaller than target mask length,
+            # then use scatter to reset the respective indices boolean values
             _, target_rank = target_score.sort(1)
             target_cutoff = new_arange(target_rank) < target_length[:, None].long()
             prev_target_tokens = target_tokens.masked_fill(
