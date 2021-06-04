@@ -96,7 +96,7 @@ class LabelSmoothedDualImitationCriterion(FairseqCriterion):
         tgt_tokens, prev_output_tokens = sample["target"], sample["prev_target"]
 
         outputs = model(src_tokens, src_lengths, prev_output_tokens, tgt_tokens)
-        losses, nll_loss = [{"loss":outputs["var_loss"]}], []
+        losses, nll_loss = [], []
 
         for obj in outputs:
             if obj=="var_loss": continue
@@ -120,7 +120,7 @@ class LabelSmoothedDualImitationCriterion(FairseqCriterion):
             if outputs[obj].get("nll_loss", False):
                 nll_loss += [_losses.get("nll_loss", 0.0)]
 
-        loss = sum(l["loss"] for l in losses)
+        loss = sum(l["loss"] for l in losses)+outputs["var_loss"]
         nll_loss = sum(l for l in nll_loss) if len(nll_loss) > 0 else loss.new_tensor(0)
 
         # NOTE:
