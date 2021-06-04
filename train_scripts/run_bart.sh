@@ -124,7 +124,7 @@ TASK=translation_lev;
 ARCH=nonautoregressive_transformer;
 
 train_translate() {
-    python train.py $1 \
+    python3 train.py $1 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
