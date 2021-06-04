@@ -109,23 +109,27 @@ class TranslationLevenshteinTask(TranslationTask):
             eos = self.tgt_dict.eos()
             unk = self.tgt_dict.unk()
 
-            return target_tokens
-
             target_masks = (
                 target_tokens.ne(pad) & target_tokens.ne(bos) & target_tokens.ne(eos)
             )
+
+            # convert target indices to floats to be sorted
             target_score = target_tokens.clone().float().uniform_()
             target_score.masked_fill_(~target_masks, 2.0)
+
+            # length of masks
             target_length = target_masks.sum(1).float()
             target_length = target_length * target_length.clone().uniform_()
             target_length = target_length + 1  # make sure to mask at least one token.
 
+            # masking
             _, target_rank = target_score.sort(1)
             target_cutoff = new_arange(target_rank) < target_length[:, None].long()
             prev_target_tokens = target_tokens.masked_fill(
                 target_cutoff.scatter(1, target_rank, target_cutoff), unk
             )
-            # from fairseq import pdb; pdb.set_trace()
+
+            from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens
 
         def _full_mask(target_tokens):
