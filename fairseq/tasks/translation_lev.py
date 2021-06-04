@@ -119,7 +119,7 @@ class TranslationLevenshteinTask(TranslationTask):
 
             # define mask length
             target_length = target_masks.sum(1).float()
-            target_length = target_length * target_length.clone().uniform_(0.,1.)
+            target_length = target_length * target_length.clone().uniform_(0.5,0.5)
             target_length = target_length + 1  # make sure to mask at least one token.
 
             # masking by checking if each index is smaller than target mask length,
