@@ -111,6 +111,6 @@ class VAE(nn.Module):
 
         m = nn.Sigmoid()
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, mask_distribution
