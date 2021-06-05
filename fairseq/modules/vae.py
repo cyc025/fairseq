@@ -107,7 +107,7 @@ class VAE(nn.Module):
 
         new_x = self.decode(z)
 
-        mask_distribution = torch.max(new_x.view(new_x.size()[1],-1),dim=1)[0]
+        mask_distribution = torch.mean(new_x.view(new_x.size()[1],-1),dim=1)[0]
 
         m = nn.Sigmoid()
 
