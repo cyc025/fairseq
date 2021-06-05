@@ -204,10 +204,8 @@ class TranslationLevenshteinTask(TranslationTask):
             sample["net_input"]["src_tokens"],
             sample["net_input"]["src_lengths"],
         )
-        tgt_tokens, prev_output_tokens = sample["target"], sample["prev_target"]
-        encoder_out = model.encode_only(src_tokens, src_lengths, prev_output_tokens, tgt_tokens)
+        encoder_out = model.encode_only(src_tokens, src_lengths, None, None)
         _,mask_distribution = model.decoder.forward_mask_prediction(encoder_out)
-
 
         sample["prev_target"] = self.inject_noise(sample["target"],mask_distribution)
         loss, sample_size, logging_output = criterion(model, sample)
