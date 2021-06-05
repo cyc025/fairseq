@@ -103,7 +103,7 @@ class VAE(nn.Module):
         z = self.reparameterize(mu, logvar)
 
         # self.collect_z(z) # collect latent var
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         new_x = self.decode(z)
 
