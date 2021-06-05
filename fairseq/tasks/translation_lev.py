@@ -123,8 +123,10 @@ class TranslationLevenshteinTask(TranslationTask):
             # p defines masking probability
             # p = 0.4
             target_length = target_masks.sum(1).float()
-            target_length = target_length * target_length.clone().uniform_()
+            target_length = target_length * mask_distribution #target_length.clone().uniform_()
             target_length = target_length + 1  # make sure to mask at least one token.
+
+            from fairseq import pdb; pdb.set_trace()
 
             # masking by checking if each index is smaller than target mask length,
             # then use scatter to reset the respective indices boolean values
