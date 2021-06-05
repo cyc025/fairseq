@@ -191,23 +191,22 @@ class TranslationLevenshteinTask(TranslationTask):
             src_tokens, src_lengths, self.source_dictionary, append_bos=True
         )
 
-    def train_step(
-        self, sample, model, criterion, optimizer, update_num, ignore_grad=False
-    ):
-        model.train()
-
-
+    def get_mask_distribution(self,sample,model):
         nsentences, ntokens = sample["nsentences"], sample["ntokens"]
-
-        # from fairseq import pdb; pdb.set_trace()
-
         # B x T
         encoder_out = model.encode_only(
             sample["net_input"]["src_tokens"],
             sample["net_input"]["src_lengths"]
         )
         _,mask_distribution = model.decoder.forward_mask_prediction(encoder_out)
+        return mask_distribution
 
+    def train_step(
+        self, sample, model, criterion, optimizer, update_num, ignore_grad=False
+    ):
+        model.train()
+
+        mask_distribution = self.get_mask_distribution(sample,model)
         sample["prev_target"] = self.inject_noise(sample["target"],mask_distribution)
         loss, sample_size, logging_output = criterion(model, sample)
         if ignore_grad:
@@ -218,6 +217,7 @@ class TranslationLevenshteinTask(TranslationTask):
     def valid_step(self, sample, model, criterion):
         model.eval()
         with torch.no_grad():
-            sample["prev_target"] = self.inject_noise(sample["target"],model)
+            mask_distribution = self.get_mask_distribution(sample,model)
+            sample["prev_target"] = self.inject_noise(sample["target"],mask_distribution)
             loss, sample_size, logging_output = criterion(model, sample)
         return loss, sample_size, logging_output
