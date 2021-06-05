@@ -63,7 +63,7 @@ class TranslationLevenshteinTask(TranslationTask):
             prepend_bos=True,
         )
 
-    def inject_noise(self, target_tokens):
+    def inject_noise(self, target_tokens, model=None):
 
         def _random_delete(target_tokens):
             pad = self.tgt_dict.pad()
@@ -134,7 +134,7 @@ class TranslationLevenshteinTask(TranslationTask):
                 target_cutoff.scatter(1, target_rank, target_cutoff), unk
             )
 
-            # from fairseq import pdb; pdb.set_trace()
+            from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens
 
         def _full_mask(target_tokens):
@@ -193,7 +193,7 @@ class TranslationLevenshteinTask(TranslationTask):
         self, sample, model, criterion, optimizer, update_num, ignore_grad=False
     ):
         model.train()
-        sample["prev_target"] = self.inject_noise(sample["target"])
+        sample["prev_target"] = self.inject_noise(sample["target"],model)
         loss, sample_size, logging_output = criterion(model, sample)
         if ignore_grad:
             loss *= 0
@@ -203,6 +203,6 @@ class TranslationLevenshteinTask(TranslationTask):
     def valid_step(self, sample, model, criterion):
         model.eval()
         with torch.no_grad():
-            sample["prev_target"] = self.inject_noise(sample["target"])
+            sample["prev_target"] = self.inject_noise(sample["target"],model)
             loss, sample_size, logging_output = criterion(model, sample)
         return loss, sample_size, logging_output
