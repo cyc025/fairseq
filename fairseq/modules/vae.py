@@ -103,12 +103,14 @@ class VAE(nn.Module):
         z = self.reparameterize(mu, logvar)
 
         # self.collect_z(z) # collect latent var
-        # from fairseq import pdb; pdb.set_trace()
+
 
         new_x = self.decode(z)
 
         mask_distribution = torch.sum(new_x.view(new_x.size()[1],-1),dim=1)[0]
 
         m = nn.Sigmoid()
+
+        from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, m(mask_distribution)
