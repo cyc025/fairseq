@@ -117,7 +117,7 @@ class TranslationLevenshteinTask(TranslationTask):
             target_score = target_tokens.clone().float().uniform_()
             target_score.masked_fill_(~target_masks, 2.0)
 
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
 
             # define mask length
             # p defines masking probability
