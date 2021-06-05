@@ -107,6 +107,6 @@ class VAE(nn.Module):
 
         new_x = self.decode(z)
 
-        mask_distribution = torch.squeeze(self.proj1(new_x.view(-1,50*512)))
+        mask_distribution = torch.max(new_x.view(new_x.size()[1],-1),dim=1)[0]
 
         return new_x, mu, logvar, mask_distribution

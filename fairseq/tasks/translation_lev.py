@@ -200,11 +200,10 @@ class TranslationLevenshteinTask(TranslationTask):
         # from fairseq import pdb; pdb.set_trace()
 
         # B x T
-        src_tokens, src_lengths = (
+        encoder_out = model.encode_only(
             sample["net_input"]["src_tokens"],
-            sample["net_input"]["src_lengths"],
+            sample["net_input"]["src_lengths"]
         )
-        encoder_out = model.encode_only(src_tokens, src_lengths)
         _,mask_distribution = model.decoder.forward_mask_prediction(encoder_out)
 
         sample["prev_target"] = self.inject_noise(sample["target"],mask_distribution)
