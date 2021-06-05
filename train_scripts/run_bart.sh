@@ -159,7 +159,7 @@ generate() {
     --sentencepiece-model $SPM_MODEL \
     --max-sentences 32 \
      --num-workers 70 \
-     --beam 15 \
+     --beam 3 \
      --results-path outputs \
      --skip-invalid-size-inputs-valid-test \
      --source-lang $SRC --target-lang $TGT;
@@ -170,7 +170,7 @@ generate() {
 ########################
 
 echo "Preprocessing documents."
-preprocess;
+# preprocess;
 
 ####################
 ## translation  ##
@@ -180,7 +180,7 @@ echo "Start self-training loop."
 for I in 1
 do
     echo "Training model."
-    train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
+    # train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
     echo "Generating outputs."
     generate;
 done
