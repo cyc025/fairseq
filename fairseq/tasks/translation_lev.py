@@ -63,7 +63,7 @@ class TranslationLevenshteinTask(TranslationTask):
             prepend_bos=True,
         )
 
-    def inject_noise(self, target_tokens, model=None):
+    def inject_noise(self, target_tokens, mask_distribution=None):
 
         def _random_delete(target_tokens):
             pad = self.tgt_dict.pad()
@@ -121,7 +121,7 @@ class TranslationLevenshteinTask(TranslationTask):
             # p defines masking probability
             # p = 0.4
             target_length = target_masks.sum(1).float()
-            target_length = target_length * target_length.clone().uniform_()
+            target_length = target_length * mask_distribution #target_length.clone().uniform_()
             target_length = target_length + 1  # make sure to mask at least one token.
 
             # masking by checking if each index is smaller than target mask length,
@@ -193,7 +193,23 @@ class TranslationLevenshteinTask(TranslationTask):
         self, sample, model, criterion, optimizer, update_num, ignore_grad=False
     ):
         model.train()
-        sample["prev_target"] = self.inject_noise(sample["target"],model)
+
+
+        nsentences, ntokens = sample["nsentences"], sample["ntokens"]
+
+        # from fairseq import pdb; pdb.set_trace()
+
+        # B x T
+        src_tokens, src_lengths = (
+            sample["net_input"]["src_tokens"],
+            sample["net_input"]["src_lengths"],
+        )
+        tgt_tokens, prev_output_tokens = sample["target"], sample["prev_target"]
+        encoder_out = model.encode_only(src_tokens, src_lengths, prev_output_tokens, tgt_tokens)
+        _,mask_distribution = model.decoder.forward_mask_prediction(encoder_out)
+
+
+        sample["prev_target"] = self.inject_noise(sample["target"],mask_distribution)
         loss, sample_size, logging_output = criterion(model, sample)
         if ignore_grad:
             loss *= 0

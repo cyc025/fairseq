@@ -66,6 +66,8 @@ class VAE(nn.Module):
         self.fc3 = nn.Linear(vae_dim, 400)
         self.fc4 = nn.Linear(400, hidden_size)
 
+        self.proj1 = nn.Linear(50*512, 1)
+
     def encode(self, x):
         h1 = F.relu(self.fc1(x))
         return self.fc21(h1), self.fc22(h1)
@@ -100,6 +102,11 @@ class VAE(nn.Module):
         mu, logvar = self.encode(x)
         z = self.reparameterize(mu, logvar)
 
-        self.collect_z(z) # collect latent var
+        # self.collect_z(z) # collect latent var
         from fairseq import pdb; pdb.set_trace()
-        return self.decode(z), mu, logvar
+
+        new_x = self.decode(z)
+
+        mask_distribution = torch.squeeze(self.proj1(new_x.view(-1,50*512)))
+
+        return new_x, mu, logvar, mask_distribution

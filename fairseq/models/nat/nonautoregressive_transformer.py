@@ -83,6 +83,9 @@ class NATransformerModel(FairseqNATModel):
             decoder.apply(init_bert_params)
         return decoder
 
+    def encode_only(self, src_tokens, src_lengths, **kwargs):        
+        return self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
+
     def forward(
         self, src_tokens, src_lengths, prev_output_tokens, tgt_tokens, **kwargs
     ):
@@ -96,8 +99,8 @@ class NATransformerModel(FairseqNATModel):
         length_tgt = self.decoder.forward_length_prediction(
             length_out, encoder_out, tgt_tokens
         )
-        var_loss = self.decoder.forward_mask_prediction(
-            length_out, encoder_out, tgt_tokens
+        var_loss,_ = self.decoder.forward_mask_prediction(
+            encoder_out
         )
 
         # decoding
@@ -415,16 +418,16 @@ class NATransformerDecoder(FairseqNATDecoder):
 
         return length_tgt
 
-    def forward_mask_prediction(self, length_out, encoder_out, tgt_tokens=None):
+    def forward_mask_prediction(self, encoder_out):
 
         enc_feats = encoder_out["encoder_out"][0]  # T x B x C
 
-        enc_feats,mu,logvar = self.vae(enc_feats)
+        enc_feats,mu,logvar,mask_distribution = self.vae(enc_feats)
         KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
         var_loss = torch.sum(KLD_element).mul_(-0.5)
 
         # from fairseq import pdb; pdb.set_trace()
-        return var_loss
+        return var_loss,mask_distribution
 
 
 @register_model_architecture(
