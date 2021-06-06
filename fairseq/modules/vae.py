@@ -111,7 +111,8 @@ class VAE(nn.Module):
         mask_distribution = torch.squeeze(torch.mean(z.view(z.size()[1],-1), 1, True),-1)
         mask_distribution = torch.abs(m2(mask_distribution)*100.-1)
 
-        import torch.distributions.beta.Beta as beta
+        import torch.distributions as dist
+        import dist.beta.Beta as beta
 
         beta_dist = beta(torch.tensor([0.5]), torch.tensor([0.5]))
         mask_distribution = beta_dist.sample(mask_distribution.size())
