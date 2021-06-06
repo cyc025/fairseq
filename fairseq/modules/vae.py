@@ -118,7 +118,7 @@ class VAE(nn.Module):
         _beta_ = random.uniform(0.1, 1)
 
         beta_dist = dist.beta.Beta(torch.tensor([_alpha_]), torch.tensor([_beta_]))
-        mask_distribution = beta_dist.rsample(mask_distribution.size()).cuda(device_id=mask_distribution.get_device())
+        mask_distribution = beta_dist.rsample(mask_distribution.size()).to(mask_distribution.get_device())
 
         # from fairseq import pdb; pdb.set_trace()
 
