@@ -107,10 +107,10 @@ class VAE(nn.Module):
 
         new_x = self.decode(z)
 
-        mask_distribution = torch.squeeze(torch.mean(x.view(x.size()[1],-1), 1, True),-1).uniform_()
+        mask_distribution = torch.squeeze(torch.mean(x.view(x.size()[1],-1), 1, True),-1)
 
         m = nn.Sigmoid()
 
-        # from fairseq import pdb; pdb.set_trace()
+        from fairseq import pdb; pdb.set_trace()
 
-        return new_x, mu, logvar, mask_distribution
+        return new_x, mu, logvar, m(mask_distribution)
