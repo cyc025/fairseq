@@ -150,7 +150,7 @@ class TranslationLevenshteinTask(TranslationTask):
             start_cutoff = new_arange(target_rank) > start_point[:, None].long()
             final_cutoff = start_cutoff == target_cutoff
             prev_target_tokens = target_tokens.masked_fill(
-                final_cutoff.scatter(1, target_rank, final_cutoff), unk
+                target_cutoff.scatter(1, target_rank, target_cutoff), unk
             )
             # from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens
