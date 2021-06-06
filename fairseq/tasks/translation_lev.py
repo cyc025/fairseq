@@ -139,7 +139,7 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_length * target_length.clone().uniform_()
             target_length = target_length + 1  # make sure to mask at least one token.
 
-            logger.info(end_ratio)
+            # logger.info(end_ratio)
 
             # masking by checking if each index is smaller than target mask length,
             # then use scatter to reset the respective indices boolean values
