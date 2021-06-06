@@ -134,7 +134,7 @@ class TranslationLevenshteinTask(TranslationTask):
             while start_ratio[0]>end_ratio[0]:
                 start_ratio = target_length.clone().uniform_()
 
-            start_point = target_length * start_ratio
+            start_point = target_length * 0.
             start_point = start_point + 1  # make sure to mask at least one token.
             target_length = target_length * end_ratio
             target_length = target_length + 1  # make sure to mask at least one token.
