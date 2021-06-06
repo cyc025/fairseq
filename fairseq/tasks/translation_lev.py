@@ -150,7 +150,7 @@ class TranslationLevenshteinTask(TranslationTask):
             prev_target_tokens = target_tokens.masked_fill(
                 final_cutoff.scatter(1, target_rank, final_cutoff), unk
             )
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens
 
         def _full_mask(target_tokens):
