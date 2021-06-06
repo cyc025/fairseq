@@ -13,6 +13,10 @@ from fairseq.tasks.translation import TranslationConfig, TranslationTask, load_l
 from fairseq.utils import new_arange
 
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 NOISE_CHOICES = ChoiceEnum(["random_delete", "random_mask", "no_noise", "full_mask"])
 
 @dataclass
@@ -123,8 +127,10 @@ class TranslationLevenshteinTask(TranslationTask):
             # p defines masking probability
             # p = 0.4
             target_length = target_masks.sum(1).float()
-            target_length = target_length * mask_distribution #target_length.clone().uniform_()
+            target_length = target_length * target_length.clone().uniform_()
             target_length = target_length + 1  # make sure to mask at least one token.
+
+            logger.info(target_length.clone().uniform_())
 
             # from fairseq import pdb; pdb.set_trace()
 
@@ -137,7 +143,6 @@ class TranslationLevenshteinTask(TranslationTask):
             prev_target_tokens = target_tokens.masked_fill(
                 target_cutoff.scatter(1, target_rank, target_cutoff), unk
             )
-
 
             return prev_target_tokens
 
@@ -153,16 +158,12 @@ class TranslationLevenshteinTask(TranslationTask):
             return target_tokens.masked_fill(~target_mask, unk)
 
         if self.cfg.noise == "random_delete":
-            # from fairseq import pdb; pdb.set_trace()
             return _random_delete(target_tokens)
         elif self.cfg.noise == "random_mask":
-            # from fairseq import pdb; pdb.set_trace()
             return _random_mask(target_tokens)
         elif self.cfg.noise == "full_mask":
-            # from fairseq import pdb; pdb.set_trace()
             return _full_mask(target_tokens)
         elif self.cfg.noise == "no_noise":
-            # from fairseq import pdb; pdb.set_trace()
             return target_tokens
         else:
             raise NotImplementedError
