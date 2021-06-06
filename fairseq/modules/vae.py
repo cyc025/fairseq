@@ -109,7 +109,7 @@ class VAE(nn.Module):
 
         mask_distribution = torch.squeeze(torch.mean(z.view(z.size()[1],-1), 1, True),-1)
 
-        m = nn.functional.tanh()
+        m = nn.functional.tanh
 
         # from fairseq import pdb; pdb.set_trace()
 
