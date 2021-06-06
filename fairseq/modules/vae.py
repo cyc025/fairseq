@@ -109,7 +109,7 @@ class VAE(nn.Module):
         m1 = nn.Sigmoid()
         m2 = nn.Softmax()
         mask_distribution = torch.squeeze(torch.mean(z.view(z.size()[1],-1), 1, True),-1)
-        mask_distribution = m1(m2(mask_distribution))
+        mask_distribution = m2(mask_distribution)
 
         # from fairseq import pdb; pdb.set_trace()
 
