@@ -125,7 +125,7 @@ ARCH=nonautoregressive_transformer;
 
 train_translate() {
     python3 train.py $1 \
-    --batch-size 264 \
+    --batch-size 1240 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
@@ -148,7 +148,7 @@ train_translate() {
     --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
-    --max-update 1000;
+    --max-update 100;
 }
 
 
