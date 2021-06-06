@@ -129,7 +129,7 @@ train_translate() {
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
-    --criterion nat_loss \
+    --criterion cross_entropy \
     --arch $ARCH \
     --noise random_mask \
     --share-all-embeddings \
@@ -148,7 +148,7 @@ train_translate() {
     --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
-    --max-update 500;
+    --max-update 100;
 }
 
 
