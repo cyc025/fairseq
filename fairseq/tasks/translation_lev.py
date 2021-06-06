@@ -149,7 +149,7 @@ class TranslationLevenshteinTask(TranslationTask):
             # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
             _, target_rank = target_score.sort(1)
             target_cutoff = new_arange(target_rank) < target_length[:, None].long() \
-                            and new_arange(target_rank) > start_point[:, None].long()
+                            && new_arange(target_rank) > start_point[:, None].long()
             prev_target_tokens = target_tokens.masked_fill(
                 target_cutoff.scatter(1, target_rank, target_cutoff), unk
             )
