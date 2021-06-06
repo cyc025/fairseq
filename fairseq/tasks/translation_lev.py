@@ -141,7 +141,7 @@ class TranslationLevenshteinTask(TranslationTask):
 
             logger.info(end_ratio)
 
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
 
             # masking by checking if each index is smaller than target mask length,
             # then use scatter to reset the respective indices boolean values
