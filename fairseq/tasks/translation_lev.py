@@ -129,8 +129,8 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_masks.sum(1).float()
 
             # get ratios
-            end_ratio = target_length.clone().uniform_(0.6,0.9)
-            start_ratio = target_length.clone().uniform_(0.0,0.5)
+            end_ratio = target_length.clone().uniform_(0.8,0.9)
+            start_ratio = target_length.clone().uniform_(0.2,0.7)
 
             start_point = target_length * start_ratio
             start_point = start_point + 1  # make sure to mask at least one token.
