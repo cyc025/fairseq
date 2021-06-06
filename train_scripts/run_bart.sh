@@ -16,9 +16,9 @@ set -e
 # nvidia-smi | grep 'python' | awk '{ print $3 }' | xargs -n1 kill -9
 
 
-SRC=data
-TGT=en
-CORPUS_PATH=~/fairseq_test_data
+SRC=src
+TGT=tgt
+CORPUS_PATH=~/cycle_data
 
 # create result dir
 mkdir -p results
