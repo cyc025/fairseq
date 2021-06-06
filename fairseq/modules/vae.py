@@ -112,7 +112,7 @@ class VAE(nn.Module):
         mask_distribution = torch.abs(m2(mask_distribution)*100.-1)
 
         import torch.distributions as tdist
-        n = tdist.Normal(mu, z)
+        n = tdist.Normal(mu, mask_distribution)
         mask_distribution = m1(n.sample(mask_distribution.size()))
 
         # from fairseq import pdb; pdb.set_trace()
