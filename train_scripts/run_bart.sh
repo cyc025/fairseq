@@ -131,7 +131,7 @@ train_translate() {
     --task $TASK \
     --criterion nat_loss \
     --arch $ARCH \
-    --noise no_noise \
+    --noise random_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
     --lr 0.0005 --lr-scheduler inverse_sqrt \
@@ -148,7 +148,7 @@ train_translate() {
     --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
-    --max-update 10;
+    --max-update 100;
 }
 
 
