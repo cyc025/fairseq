@@ -146,7 +146,7 @@ class TranslationLevenshteinTask(TranslationTask):
             _, target_rank = target_score.sort(1)
             target_cutoff = new_arange(target_rank) < target_length[:, None].long()
             start_cutoff = new_arange(target_rank) > start_point[:, None].long()
-            final_cutoff = start_cutoff | target_cutoff
+            final_cutoff = start_cutoff & target_cutoff
             prev_target_tokens = target_tokens.masked_fill(
                 final_cutoff.scatter(1, target_rank, final_cutoff), unk
             )
