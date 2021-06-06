@@ -115,6 +115,6 @@ class VAE(nn.Module):
         n = tdist.Normal(mu, z)
         mask_distribution = m1(n.sample(mask_distribution.size()))
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, mask_distribution
