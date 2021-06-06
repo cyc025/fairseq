@@ -127,10 +127,19 @@ class TranslationLevenshteinTask(TranslationTask):
             # p defines masking probability
             # p = 0.4
             target_length = target_masks.sum(1).float()
-            target_length = target_length * target_length.clone().uniform_(0.9,0.9)
+
+            # get ratios
+            end_ratio = target_length.clone().uniform_(0.9,0.9)
+            start_ratio = target_length.clone().uniform_()
+            while start_ratio[0]>end_ratio[0]:
+                start_ratio = target_length.clone().uniform_()
+
+            start_point = target_length * start_ratio
+            start_point = start_point + 1  # make sure to mask at least one token.
+            target_length = target_length * end_ratio
             target_length = target_length + 1  # make sure to mask at least one token.
 
-            logger.info(target_length.clone().uniform_())
+            logger.info(end_ratio)
 
             # from fairseq import pdb; pdb.set_trace()
 
@@ -139,7 +148,8 @@ class TranslationLevenshteinTask(TranslationTask):
             # 'target_rank' contains the sequence lengths
             # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
             _, target_rank = target_score.sort(1)
-            target_cutoff = new_arange(target_rank) < target_length[:, None].long()
+            target_cutoff = new_arange(target_rank) < target_length[:, None].long() \
+                            and new_arange(target_rank) > start_point[:, None].long()
             prev_target_tokens = target_tokens.masked_fill(
                 target_cutoff.scatter(1, target_rank, target_cutoff), unk
             )
