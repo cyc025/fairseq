@@ -130,7 +130,7 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_length * target_length.clone().uniform_()
             target_length = target_length + 1  # make sure to mask at least one token.
 
-            logger.info(mask_distribution)
+            logger.info(target_length.clone().uniform_())
 
             # from fairseq import pdb; pdb.set_trace()
 
