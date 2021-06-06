@@ -148,7 +148,7 @@ train_translate() {
     --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
-    --max-update 1000;
+    --max-update 100;
 }
 
 
