@@ -122,7 +122,7 @@ PATIENCE=100;
 TOTAL_EPOCH=300;
 TASK=translation_lev;
 ARCH=nonautoregressive_transformer;
-LR=0.05
+LR=0.005
 #0.0005
 
 train_translate() {
@@ -131,14 +131,14 @@ train_translate() {
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
-    --criterion masked_lm \
+    --criterion nat_loss \
     --arch $ARCH \
     --noise random_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
     --lr $LR --lr-scheduler inverse_sqrt \
     --stop-min-lr '1e-09' --warmup-updates 10000 \
-    --warmup-init-lr '1e-07'  \ 
+    --warmup-init-lr '1e-07' --label-smoothing 0.1 \
     --dropout 0.3 --weight-decay 0.01 \
     --decoder-learned-pos \
     --encoder-learned-pos \
