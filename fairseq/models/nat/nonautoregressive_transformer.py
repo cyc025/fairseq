@@ -83,7 +83,7 @@ class NATransformerModel(FairseqNATModel):
             decoder.apply(init_bert_params)
         return decoder
 
-    def encode_only(self, src_tokens, src_lengths, **kwargs):        
+    def encode_only(self, src_tokens, src_lengths, **kwargs):
         return self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
 
     def forward(
@@ -99,7 +99,7 @@ class NATransformerModel(FairseqNATModel):
         length_tgt = self.decoder.forward_length_prediction(
             length_out, encoder_out, tgt_tokens
         )
-        var_loss,_ = self.decoder.forward_mask_prediction(
+        var_loss,encoder_out,_ = self.decoder.forward_mask_prediction(
             encoder_out
         )
 
@@ -426,8 +426,10 @@ class NATransformerDecoder(FairseqNATDecoder):
         KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
         var_loss = torch.sum(KLD_element).mul_(-0.5)
 
+        encoder_out["encoder_out"][0] = enc_feats
+
         # from fairseq import pdb; pdb.set_trace()
-        return var_loss,mask_distribution
+        return var_loss,encoder_out,mask_distribution
 
 
 @register_model_architecture(

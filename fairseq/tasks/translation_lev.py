@@ -208,7 +208,7 @@ class TranslationLevenshteinTask(TranslationTask):
             sample["net_input"]["src_tokens"],
             sample["net_input"]["src_lengths"]
         )
-        _,mask_distribution = model.decoder.forward_mask_prediction(encoder_out)
+        _,_,mask_distribution = model.decoder.forward_mask_prediction(encoder_out)
         return mask_distribution
 
     def train_step(
