@@ -147,7 +147,7 @@ train_translate() {
     --apply-bert-init \
     --log-format 'tqdm' --log-interval 100 \
     --fixed-validation-seed 7 \
-    --max-tokens 200 \
+    --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
     --max-update 1000;
