@@ -122,6 +122,8 @@ PATIENCE=100;
 TOTAL_EPOCH=300;
 TASK=translation_lev;
 ARCH=nonautoregressive_transformer;
+LR=0.05
+#0.0005
 
 train_translate() {
     python3 train.py $1 \
@@ -134,7 +136,7 @@ train_translate() {
     --noise random_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
-    --lr 0.0005 --lr-scheduler inverse_sqrt \
+    --lr $LR --lr-scheduler inverse_sqrt \
     --stop-min-lr '1e-09' --warmup-updates 10000 \
     --warmup-init-lr '1e-07' --label-smoothing 0.1 \
     --dropout 0.3 --weight-decay 0.01 \
