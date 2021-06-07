@@ -129,7 +129,7 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_masks.sum(1).float()
 
             # get ratios
-            end_ratio = target_length.clone().uniform_()
+            end_ratio = target_length.clone().uniform_(0.8,1.0)
             start_ratio = mask_distribution #target_length.clone().uniform_(0.,0.2)
             #
             start_point = target_length * start_ratio
@@ -148,7 +148,7 @@ class TranslationLevenshteinTask(TranslationTask):
             start_cutoff = new_arange(target_rank) > start_point[:, None].long()
             final_cutoff = start_cutoff & target_cutoff
             prev_target_tokens = target_tokens.masked_fill(
-                target_cutoff.scatter(1, target_rank, target_cutoff), unk
+                final_cutoff.scatter(1, target_rank, final_cutoff), unk
             )
             # from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens

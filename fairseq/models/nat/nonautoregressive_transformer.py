@@ -99,7 +99,7 @@ class NATransformerModel(FairseqNATModel):
         length_tgt = self.decoder.forward_length_prediction(
             length_out, encoder_out, tgt_tokens
         )
-        var_loss,_,_ = self.decoder.forward_mask_prediction(
+        var_loss,encoder_out,_ = self.decoder.forward_mask_prediction(
             encoder_out
         )
 
