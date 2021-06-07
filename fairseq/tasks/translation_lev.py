@@ -129,12 +129,12 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_masks.sum(1).float()
 
             # get ratios
-            end_ratio = target_length.clone().uniform_(0.9,1.)
-            start_ratio = target_length.clone().uniform_(0.,0.1)
+            end_ratio = target_length.clone().uniform_(0.8,1.)
+            start_ratio = mask_distribution #target_length.clone().uniform_(0.,0.2)
             #
             start_point = target_length * start_ratio
             start_point = start_point + 1  # make sure to mask at least one token.
-            target_length = target_length * mask_distribution
+            target_length = target_length * end_ratio
             target_length = target_length + 1  # make sure to mask at least one token.
 
             # logger.info(end_ratio)
@@ -145,12 +145,12 @@ class TranslationLevenshteinTask(TranslationTask):
             # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
             _, target_rank = target_score.sort(1)
             target_cutoff = new_arange(target_rank) < target_length[:, None].long()
-            # start_cutoff = new_arange(target_rank) > start_point[:, None].long()
-            # final_cutoff = start_cutoff & target_cutoff
+            start_cutoff = new_arange(target_rank) > start_point[:, None].long()
+            final_cutoff = start_cutoff & target_cutoff
             prev_target_tokens = target_tokens.masked_fill(
-                target_cutoff.scatter(1, target_rank, target_cutoff), unk
+                final_cutoff.scatter(1, target_rank, final_cutoff), unk
             )
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens
 
         def _full_mask(target_tokens):
