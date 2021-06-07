@@ -426,7 +426,7 @@ class NATransformerDecoder(FairseqNATDecoder):
         KLD_element = mu.pow(2).add_(logvar.exp()).mul_(-1).add_(1).add_(logvar)
         var_loss = torch.sum(KLD_element).mul_(-0.5)
 
-        encoder_out["encoder_out"][0] = enc_feats
+        # encoder_out["encoder_out"][0] = enc_feats
 
         # from fairseq import pdb; pdb.set_trace()
         return var_loss,encoder_out,mask_distribution
