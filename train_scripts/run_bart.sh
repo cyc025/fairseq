@@ -122,7 +122,7 @@ PATIENCE=100;
 TOTAL_EPOCH=300;
 TASK=translation_lev;
 ARCH=nonautoregressive_transformer;
-LR=0.005
+LR=0.5
 #0.0005
 
 train_translate() {
