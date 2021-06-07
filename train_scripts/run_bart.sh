@@ -123,7 +123,6 @@ TOTAL_EPOCH=300;
 TASK=translation_lev;
 ARCH=nonautoregressive_transformer;
 LR=0.0005
-#0.0005
 
 train_translate() {
     python3 train.py $1 \
