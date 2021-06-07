@@ -131,9 +131,9 @@ train_translate() {
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
-    --criterion nat_loss \
+    --criterion masked_lm \
     --arch $ARCH \
-    --noise no_noise \
+    --noise random_mask \
     --share-all-embeddings \
     --optimizer adam --adam-betas '(0.9,0.98)' \
     --lr $LR --lr-scheduler inverse_sqrt \
@@ -150,7 +150,7 @@ train_translate() {
     --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
-    --max-update 20;
+    --max-update 100;
 }
 
 
