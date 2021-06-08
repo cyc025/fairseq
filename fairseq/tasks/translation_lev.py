@@ -129,7 +129,7 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_masks.sum(1).float()
 
             # get ratios
-            end_ratio = target_length.clone().uniform_(0.8,1.0)
+            end_ratio = target_length.clone().uniform_(p,p) #target_length.clone().uniform_(0.8,1.0)
             start_ratio = mask_distribution#target_length.clone().uniform_(0.,0.8)
             # start_ratio[1:] = start_ratio[0] # temp
             #
