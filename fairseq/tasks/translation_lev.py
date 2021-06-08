@@ -131,14 +131,13 @@ class TranslationLevenshteinTask(TranslationTask):
 
             ####################################################################
             ### min-max ratio method
-            ratios = (mask_distribution,torch.abs(mask_distribution-1))
-            end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
-            start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
+            # ratios = (mask_distribution,torch.abs(mask_distribution-1))
+            # end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
+            # start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
 
             ### DyMask-v1 (predict start, uniform end positions)
-            # ratios = (mask_distribution,torch.abs(mask_distribution-1))
-            # end_ratio = target_length.clone().uniform_(0.8,1.0)
-            # start_ratio = mask_distribution
+            end_ratio = target_length.clone().uniform_(0.8,1.0)
+            start_ratio = mask_distribution
 
             ### uniform start and end
             # end_ratio = target_length.clone().uniform_(0.8,1.0)
