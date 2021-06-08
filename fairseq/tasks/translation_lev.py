@@ -128,6 +128,7 @@ class TranslationLevenshteinTask(TranslationTask):
             p = 0.9
             target_length = target_masks.sum(1).float()
 
+
             ### min-max ratio method
             # ratios = (mask_distribution,torch.abs(mask_distribution-1))
             # end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
@@ -167,8 +168,8 @@ class TranslationLevenshteinTask(TranslationTask):
             # prev_target_tokens = target_tokens.masked_fill(
             #     mask_distribution, unk
             # )
-
             from fairseq import pdb; pdb.set_trace()
+
             return prev_target_tokens
 
         def _full_mask(target_tokens):
