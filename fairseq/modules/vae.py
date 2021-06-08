@@ -114,11 +114,11 @@ class VAE(nn.Module):
         # mask_distribution = torch.abs(m2(mask_distribution) * 100. - 1.)
 
         mask_distribution -= mask_distribution.min(0, keepdim=True)[0]
-        norm_mask_distribution /= mask_distribution.max(0, keepdim=True)[0]
+        mask_distribution /= mask_distribution.max(0, keepdim=True)[0]
 
         ### DyMask predict all mask positions method
         # mask_distribution = torch.round(m1(torch.mean(x,dim=2)))==0.
 
         # from fairseq import pdb; pdb.set_trace()
 
-        return new_x, mu, logvar, norm_mask_distribution
+        return new_x, mu, logvar, mask_distribution
