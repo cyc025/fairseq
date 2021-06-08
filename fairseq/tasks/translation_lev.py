@@ -140,14 +140,18 @@ class TranslationLevenshteinTask(TranslationTask):
             # start_ratio = mask_distribution
 
             ### DyMask-v1 (predict variable start, uniform end positions)
-            end_ratio = target_length.clone().uniform_(1.0,1.0)
-            start_ratio = mask_distribution
-
-            logger.info(mask_distribution)
+            # end_ratio = target_length.clone().uniform_(1.0,1.0)
+            # start_ratio = mask_distribution
+            #
+            # logger.info(mask_distribution)
 
             ### uniform start and end
             # end_ratio = target_length.clone().uniform_(0.8,1.0)
             # start_ratio = target_length.clone().uniform_(0.,0.8)
+
+            ### uniform original
+            end_ratio = target_length.clone().uniform_()
+            start_ratio = target_length.clone().uniform_(0.,0.8)
 
             ####################################################################
 
@@ -166,6 +170,9 @@ class TranslationLevenshteinTask(TranslationTask):
             target_cutoff = new_arange(target_rank) < target_length[:, None].long()
             start_cutoff = new_arange(target_rank) > start_point[:, None].long()
             final_cutoff = start_cutoff & target_cutoff
+
+            ## original
+            final_cutoff = target_cutoff
 
             ### based on start-end method
             prev_target_tokens = target_tokens.masked_fill(
