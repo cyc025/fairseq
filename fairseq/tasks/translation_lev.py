@@ -134,8 +134,7 @@ class TranslationLevenshteinTask(TranslationTask):
             start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
             # start_ratio[1:] = start_ratio[0] # temp
             #
-            logger.info(start_ratio)
-            logger.info(end_ratio)
+
 
             start_point = target_length * start_ratio
             start_point = start_point + 1  # make sure to mask at least one token.
