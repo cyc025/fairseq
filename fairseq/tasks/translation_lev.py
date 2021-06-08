@@ -129,10 +129,11 @@ class TranslationLevenshteinTask(TranslationTask):
             target_length = target_masks.sum(1).float()
 
 
+            ####################################################################
             ### min-max ratio method
-            # ratios = (mask_distribution,torch.abs(mask_distribution-1))
-            # end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
-            # start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
+            ratios = (mask_distribution,torch.abs(mask_distribution-1))
+            end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
+            start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
 
             ### DyMask-v1 (predict start, uniform end positions)
             # ratios = (mask_distribution,torch.abs(mask_distribution-1))
@@ -140,8 +141,11 @@ class TranslationLevenshteinTask(TranslationTask):
             # start_ratio = mask_distribution
 
             ### uniform start and end
-            end_ratio = target_length.clone().uniform_(0.8,1.0)
-            start_ratio = target_length.clone().uniform_(0.,0.8)
+            # end_ratio = target_length.clone().uniform_(0.8,1.0)
+            # start_ratio = target_length.clone().uniform_(0.,0.8)
+
+            ####################################################################
+
 
             # convert to length-wise
             start_point = target_length * start_ratio
@@ -158,17 +162,12 @@ class TranslationLevenshteinTask(TranslationTask):
             start_cutoff = new_arange(target_rank) > start_point[:, None].long()
             final_cutoff = start_cutoff & target_cutoff
 
-
             ### based on start-end method
             prev_target_tokens = target_tokens.masked_fill(
                 final_cutoff.scatter(1, target_rank, final_cutoff), unk
             )
 
-            ### predict all mask positions
-            # prev_target_tokens = target_tokens.masked_fill(
-            #     mask_distribution, unk
-            # )
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
 
             return prev_target_tokens
 
