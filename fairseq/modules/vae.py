@@ -120,6 +120,6 @@ class VAE(nn.Module):
         # beta_dist = dist.beta.Beta(torch.tensor([_alpha_]), torch.tensor([_beta_]))
         # mask_distribution = torch.squeeze(beta_dist.rsample(mask_distribution.size()).to(mask_distribution.get_device()),-1)
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, mask_distribution
