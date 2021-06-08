@@ -136,7 +136,11 @@ class TranslationLevenshteinTask(TranslationTask):
             # start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
 
             ### DyMask-v1 (predict start, uniform end positions)
-            end_ratio = target_length.clone().uniform_(0.8,1.0)
+            # end_ratio = target_length.clone().uniform_(0.8,1.0)
+            # start_ratio = mask_distribution
+
+            ### DyMask-v1 (predict variable start, uniform end positions)
+            end_ratio = target_length.clone().uniform_(1.0,1.0)
             start_ratio = mask_distribution
 
             ### uniform start and end
