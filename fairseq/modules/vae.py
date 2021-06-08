@@ -109,18 +109,20 @@ class VAE(nn.Module):
         m1 = nn.Sigmoid()
         m2 = nn.Softmax()
 
-        from fairseq import pdb; pdb.set_trace()
-
         ### DyMask start-end positions method
-        mask_distribution = torch.squeeze(torch.max(x.view(x.size()[1],-1), 1, True),-1)
-        # mask_distribution = torch.abs(m2(mask_distribution) * 100. - 1.)
 
+        ## mean
+        # mask_distribution = torch.squeeze(torch.mean(x.view(x.size()[1],-1), 1, True),-1)
+        ## max
+        mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
+
+        # normalize
         mask_distribution -= mask_distribution.min(0, keepdim=True)[0]
         mask_distribution /= mask_distribution.max(0, keepdim=True)[0]
 
         ### DyMask predict all mask positions method
         # mask_distribution = torch.round(m1(torch.mean(x,dim=2)))==0.
 
-
+        # from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, mask_distribution

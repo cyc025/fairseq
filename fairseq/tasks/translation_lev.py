@@ -143,6 +143,8 @@ class TranslationLevenshteinTask(TranslationTask):
             end_ratio = target_length.clone().uniform_(1.0,1.0)
             start_ratio = mask_distribution
 
+            logger.info(mask_distribution)
+
             ### uniform start and end
             # end_ratio = target_length.clone().uniform_(0.8,1.0)
             # start_ratio = target_length.clone().uniform_(0.,0.8)
