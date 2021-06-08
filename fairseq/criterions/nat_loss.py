@@ -12,6 +12,10 @@ from fairseq.criterions import FairseqCriterion, register_criterion
 from torch import Tensor
 
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 @register_criterion("nat_loss")
 class LabelSmoothedDualImitationCriterion(FairseqCriterion):
     def __init__(self, task, label_smoothing):
@@ -122,6 +126,8 @@ class LabelSmoothedDualImitationCriterion(FairseqCriterion):
 
         loss = sum(l["loss"] for l in losses)+outputs["var_loss"]
         nll_loss = sum(l for l in nll_loss)+outputs["var_loss"] if len(nll_loss) > 0 else loss.new_tensor(0)
+
+        logger.info(outputs["var_loss"])
 
         # NOTE:
         # we don't need to use sample_size as denominator for the gradient
