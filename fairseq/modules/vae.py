@@ -119,6 +119,6 @@ class VAE(nn.Module):
         ### DyMask predict all mask positions method
         # mask_distribution = torch.round(m1(torch.mean(x,dim=2)))==0.
 
-        # from fairseq import pdb; pdb.set_trace()
+        from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, mask_distribution
