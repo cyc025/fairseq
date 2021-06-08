@@ -111,7 +111,7 @@ class VAE(nn.Module):
         mask_distribution = torch.squeeze(torch.mean(x.view(x.size()[1],-1), 1, True),-1)
         # mask_distribution = torch.abs(m2(mask_distribution) * 100. - 1.)
 
-        mask_distribution = torch.round(m2(mask_distribution)) == 1
+        mask_distribution = torch.round(m2(mask_distribution)) == 0
 
 
         from fairseq import pdb; pdb.set_trace()

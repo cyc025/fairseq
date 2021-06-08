@@ -113,51 +113,62 @@ class TranslationLevenshteinTask(TranslationTask):
             eos = self.tgt_dict.eos()
             unk = self.tgt_dict.unk()
 
-            # target_masks = (
-            #     target_tokens.ne(pad) & target_tokens.ne(bos) & target_tokens.ne(eos)
-            # )
-            #
-            # # convert target indices to floats to be sorted
-            # target_score = target_tokens.clone().float().uniform_()
-            # target_score.masked_fill_(~target_masks, 2.0)
-            #
-            # # from fairseq import pdb; pdb.set_trace()
-            #
-            # # define mask length
-            # # p defines masking probability
-            # p = 0.9
-            # target_length = target_masks.sum(1).float()
-            #
-            # # get ratios
+            target_masks = (
+                target_tokens.ne(pad) & target_tokens.ne(bos) & target_tokens.ne(eos)
+            )
+
+            # convert target indices to floats to be sorted
+            target_score = target_tokens.clone().float().uniform_()
+            target_score.masked_fill_(~target_masks, 2.0)
+
+            # from fairseq import pdb; pdb.set_trace()
+
+            # define mask length
+            # p defines masking probability
+            p = 0.9
+            target_length = target_masks.sum(1).float()
+
+            ### min-max ratio method
             # ratios = (mask_distribution,torch.abs(mask_distribution-1))
             # end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
             # start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
-            # # start_ratio[1:] = start_ratio[0] # temp
-            # #
-            #
-            #
-            # start_point = target_length * start_ratio
-            # start_point = start_point + 1  # make sure to mask at least one token.
-            # target_length = target_length * end_ratio
-            # target_length = target_length + 1  # make sure to mask at least one token.
-            #
-            # # logger.info(mask_distribution[:10])
-            #
-            # # masking by checking if each index is smaller than target mask length,
-            # # then use scatter to reset the respective indices boolean values
-            # # 'target_rank' contains the sequence lengths
-            # # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
-            # _, target_rank = target_score.sort(1)
-            # target_cutoff = new_arange(target_rank) < target_length[:, None].long()
-            # start_cutoff = new_arange(target_rank) > start_point[:, None].long()
-            # final_cutoff = start_cutoff & target_cutoff
-            # prev_target_tokens = target_tokens.masked_fill(
-            #     final_cutoff.scatter(1, target_rank, final_cutoff), unk
-            # )
+
+            ### DyMask-v1 (predict start, uniform end positions)
+            # ratios = (mask_distribution,torch.abs(mask_distribution-1))
+            # end_ratio = target_length.clone().uniform_(0.8,1.0)
+            # start_ratio = mask_distribution
+
+            ### uniform start and end
+            end_ratio = target_length.clone().uniform_(0.8,1.0)
+            start_ratio = target_length.clone().uniform_(0.,0.8)
+
+            # convert to length-wise
+            start_point = target_length * start_ratio
+            start_point = start_point + 1  # make sure to mask at least one token.
+            target_length = target_length * end_ratio
+            target_length = target_length + 1  # make sure to mask at least one token.
+
+            # masking by checking if each index is smaller than target mask length,
+            # then use scatter to reset the respective indices boolean values
+            # 'target_rank' contains the sequence lengths
+            # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
+            _, target_rank = target_score.sort(1)
+            target_cutoff = new_arange(target_rank) < target_length[:, None].long()
+            start_cutoff = new_arange(target_rank) > start_point[:, None].long()
+            final_cutoff = start_cutoff & target_cutoff
+
+
+            ### based on start-end method
             prev_target_tokens = target_tokens.masked_fill(
-                mask_distribution, unk
+                final_cutoff.scatter(1, target_rank, final_cutoff), unk
             )
-            # from fairseq import pdb; pdb.set_trace()
+
+            ### predict all mask positions
+            # prev_target_tokens = target_tokens.masked_fill(
+            #     mask_distribution, unk
+            # )
+
+            from fairseq import pdb; pdb.set_trace()
             return prev_target_tokens
 
         def _full_mask(target_tokens):
