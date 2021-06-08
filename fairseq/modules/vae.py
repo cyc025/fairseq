@@ -110,7 +110,7 @@ class VAE(nn.Module):
         m2 = nn.Softmax()
 
         ### DyMask start-end positions method
-        mask_distribution = torch.squeeze(torch.mean(x.view(x.size()[1],-1), 1, True),-1)
+        mask_distribution = torch.squeeze(torch.max(x.view(x.size()[1],-1), 1, True),-1)
         # mask_distribution = torch.abs(m2(mask_distribution) * 100. - 1.)
 
         mask_distribution -= mask_distribution.min(0, keepdim=True)[0]
