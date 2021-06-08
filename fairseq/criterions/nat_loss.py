@@ -124,8 +124,8 @@ class LabelSmoothedDualImitationCriterion(FairseqCriterion):
             if outputs[obj].get("nll_loss", False):
                 nll_loss += [_losses.get("nll_loss", 0.0)]
 
-        loss = sum(l["loss"] for l in losses)+outputs["var_loss"]
-        nll_loss = sum(l for l in nll_loss)+outputs["var_loss"] if len(nll_loss) > 0 else loss.new_tensor(0)
+        loss = sum(l["loss"] for l in losses)#+outputs["var_loss"]
+        nll_loss = sum(l for l in nll_loss) if len(nll_loss) > 0 else loss.new_tensor(0)
 
         # logger.info(outputs["var_loss"])
 
