@@ -126,7 +126,7 @@ LR=0.0005
 
 train_translate() {
     python3 train.py $1 \
-    --batch-size 64 \
+    --batch-size 128 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
@@ -140,7 +140,6 @@ train_translate() {
     --warmup-init-lr '1e-07' --label-smoothing 0.1 \
     --dropout 0.3 --weight-decay 0.01 \
     --decoder-learned-pos \
-    --maximize-best-checkpoint-metric bleu \
     --encoder-learned-pos \
     --pred-length-offset \
     --length-loss-factor 0.1 \
