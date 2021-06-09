@@ -183,6 +183,7 @@ class TranslationLevenshteinTask(TranslationTask):
                     # random_prob 21.58
                     booleans = np.where(prob > np.random.rand(seq_len), 1, 0)
                     final_cutoff[i,:] = torch.from_numpy(booleans)
+                from fairseq import pdb; pdb.set_trace()
                 return final_cutoff
 
             def map_single_segment(start_ratio,end_ratio):
