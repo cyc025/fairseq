@@ -121,39 +121,37 @@ class TranslationLevenshteinTask(TranslationTask):
             target_score = target_tokens.clone().float().uniform_()
             target_score.masked_fill_(~target_masks, 2.0)
 
-            # from fairseq import pdb; pdb.set_trace()
-
             # define mask length
             target_length = target_masks.sum(1).float()
 
             def min_max_method():
-                ### min-max ratio method
+                """ min-max ratio method """
                 ratios = (mask_distribution,torch.abs(mask_distribution-1))
                 end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
                 start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
                 return map_single_segment(start_ratio,end_ratio)
 
             def predict_start_uniform_end():
-                ### DyMask-v1 (predict start, uniform end positions)
+                """ DyMask-v1 (predict start, uniform end positions) """
                 end_ratio = target_length.clone().uniform_(0.8,1.0)
                 start_ratio = mask_distribution
                 return map_single_segment(start_ratio,end_ratio)
 
             def variable_start_fixed_end():
-                ### DyMask-v2 (predict variable start, uniform end positions)
+                """ DyMask-v2 (predict variable start, uniform end positions) """
                 end_ratio = target_length.clone().uniform_(1.0,1.0)
                 start_ratio = mask_distribution
                 # logger.info(mask_distribution)
                 return map_single_segment(start_ratio,end_ratio)
 
             def uniform_start_end():
-                ### uniform start and end
+                """ uniform start and end """
                 end_ratio = target_length.clone().uniform_(0.8,1.0)
                 start_ratio = target_length.clone().uniform_(0.,0.8)
                 return map_single_segment(start_ratio,end_ratio)
 
             def uniform_original():
-                ### uniform original
+                """ uniform original """
                 end_ratio = target_length.clone().uniform_()
                 # convert to length-wise
                 target_length = target_length * end_ratio
