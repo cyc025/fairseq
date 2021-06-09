@@ -207,7 +207,7 @@ class TranslationLevenshteinTask(TranslationTask):
                 return final_cutoff.scatter(1, target_rank, final_cutoff)
 
             ## choose mask distribution
-            mask_patterns = multi_segment()
+            mask_patterns = uniform_original()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
