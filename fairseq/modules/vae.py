@@ -133,6 +133,6 @@ class VAE(nn.Module):
 
         mask_distribution = get_seq_mask_dist(x,'max')
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, mask_distribution
