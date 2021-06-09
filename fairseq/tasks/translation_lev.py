@@ -180,8 +180,8 @@ class TranslationLevenshteinTask(TranslationTask):
                     random_prob = random.uniform(0, 1)
                     # (1,0) 22.34
                     # (0,1) 23.81
-                    # random_prob ?
-                    booleans = np.where(random_prob > np.random.rand(seq_len), 0, 1)
+                    # random_prob 21.58
+                    booleans = np.where(prob > np.random.rand(seq_len), 1, 0)
                     final_cutoff[i,:] = torch.from_numpy(booleans)
                 return final_cutoff
 
