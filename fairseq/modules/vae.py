@@ -131,7 +131,7 @@ class VAE(nn.Module):
             b = nn.BatchNorm1d(x.size()[1]).cuda()
             # from fairseq import pdb; pdb.set_trace()
             norm_x = s(b(x))
-            mask_distribution = torch.mean(norm_x.view(norm_x.size()[1],-1),dim=1)
+            mask_distribution = torch.max(norm_x.view(norm_x.size()[1],-1),dim=1)
             return mask_distribution
 
         mask_distribution = batch_norm_softmax(x)
