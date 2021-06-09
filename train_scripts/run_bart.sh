@@ -126,7 +126,7 @@ LR=0.0005
 
 train_translate() {
     python3 train.py $1 \
-    --batch-size 16 \
+    --batch-size 32 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
