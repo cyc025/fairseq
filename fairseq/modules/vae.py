@@ -126,7 +126,7 @@ class VAE(nn.Module):
             mask_distribution /= mask_distribution.max(0, keepdim=True)[0]
             return mask_distribution
 
-        def batchnorm_softmax(x):
+        def batch_norm_softmax(x):
 
             from fairseq import pdb; pdb.set_trace()
 
@@ -134,7 +134,7 @@ class VAE(nn.Module):
             b = nn.BatchNorm1d(x.size()[1], affine=False)
             return s(b(x))
 
-        mask_distribution = batchnorm_softmax()
+        mask_distribution = batch_norm_softmax(x)
 
         ### DyMask predict all mask positions method
         # mask_distribution = torch.round(m1(torch.mean(x,dim=2)))==0.
