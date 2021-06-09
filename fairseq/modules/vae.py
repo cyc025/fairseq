@@ -111,14 +111,30 @@ class VAE(nn.Module):
 
         ### DyMask start-end positions method
 
-        ## mean
-        # mask_distribution = torch.squeeze(torch.mean(x.view(x.size()[1],-1), 1, True),-1)
-        ## max
-        mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
+        def get_seq_mask_dist(x,method):
+            if method=='mean':
+                mask_distribution = torch.squeeze(torch.mean(x.view(x.size()[1],-1), 1, True),-1)
+            elif method=='max':
+                mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
+            else: # sum to be implemented
+                mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
+            return mask_distribution
 
-        # normalize
-        mask_distribution -= mask_distribution.min(0, keepdim=True)[0]
-        mask_distribution /= mask_distribution.max(0, keepdim=True)[0]
+        def normalize_features(x):
+            mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
+            mask_distribution -= mask_distribution.min(0, keepdim=True)[0]
+            mask_distribution /= mask_distribution.max(0, keepdim=True)[0]
+            return mask_distribution
+
+        def batchnorm_softmax(x):
+
+            from fairseq import pdb; pdb.set_trace()
+
+            s = nn.Softmax()
+            b = nn.BatchNorm1d(x.size()[1], affine=False)
+            return s(b(x))
+
+        mask_distribution = batchnorm_softmax()
 
         ### DyMask predict all mask positions method
         # mask_distribution = torch.round(m1(torch.mean(x,dim=2)))==0.
