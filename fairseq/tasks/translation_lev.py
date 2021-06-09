@@ -175,7 +175,8 @@ class TranslationLevenshteinTask(TranslationTask):
                 batch_size = mask_distribution.size()[0]
                 for i in range(batch_size):
                     prob = mask_distribution[i].clone().cpu().data.numpy()
-                    booleans = np.where(prob > np.random.rand(seq_len), 1, 0)
+                    # (1,0) 22.34
+                    booleans = np.where(prob > np.random.rand(seq_len), 0, 1)
                     final_cutoff[i,:] = torch.from_numpy(booleans)
                 return final_cutoff
 
@@ -208,7 +209,6 @@ class TranslationLevenshteinTask(TranslationTask):
             )
 
             # from fairseq import pdb; pdb.set_trace()
-
             return prev_target_tokens
 
         def _full_mask(target_tokens):
