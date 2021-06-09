@@ -168,14 +168,14 @@ class TranslationLevenshteinTask(TranslationTask):
             def multi_segment():
                 ### DyMask-v3: multi-segment, self-supervising masking mechanism
                 nonlocal target_rank, target_length
-
-                from fairseq import pdb; pdb.set_trace()
-
+                import numpy as np
+                # from fairseq import pdb; pdb.set_trace()
                 seq_len = target_rank.size()[1]
                 final_cutoff = target_rank.clone().type(torch.bool)
-                for i in range(mask_distribution.size()[0]):
-                    prob = mask_distribution[i]
-                    booleans = np.where(p > np.random.rand(seq_len), 1, 0)
+                batch_size = mask_distribution.size()[0]
+                for i in range(batch_size):
+                    prob = mask_distribution[i].clone().cpu().data.numpy()
+                    booleans = np.where(prob > np.random.rand(seq_len), 1, 0)
                     final_cutoff[i,:] = torch.from_numpy(booleans)
                 return final_cutoff
 
