@@ -118,10 +118,7 @@ class VAE(nn.Module):
                 mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
             else: # sum to be implemented
                 mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
-            return mask_distribution
-
-        def normalize_features(x):
-            mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
+            # mask_distribution = torch.max(x.view(x.size()[1],-1),dim=1)[0]
             mask_distribution -= mask_distribution.min(0, keepdim=True)[0]
             mask_distribution /= mask_distribution.max(0, keepdim=True)[0]
             return mask_distribution
