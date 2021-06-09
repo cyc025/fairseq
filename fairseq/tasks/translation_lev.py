@@ -181,7 +181,7 @@ class TranslationLevenshteinTask(TranslationTask):
                     # (1,0) 22.34
                     # (0,1) 23.81
                     # random_prob 21.58
-                    booleans = np.where(prob > np.random.rand(seq_len), 1, 0)
+                    booleans = np.where(prob > np.random.rand(seq_len), 0, 1)
                     final_cutoff[i,:] = torch.from_numpy(booleans)
                 from fairseq import pdb; pdb.set_trace()
                 return final_cutoff
