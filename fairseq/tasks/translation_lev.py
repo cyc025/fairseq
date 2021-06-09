@@ -120,6 +120,7 @@ class TranslationLevenshteinTask(TranslationTask):
             # convert target indices to floats to be sorted
             target_score = target_tokens.clone().float().uniform_()
             target_score.masked_fill_(~target_masks, 2.0)
+            _, target_rank = target_score.sort(1)
 
             # define mask length
             target_length = target_masks.sum(1).float()
@@ -156,12 +157,11 @@ class TranslationLevenshteinTask(TranslationTask):
 
             def uniform_original():
                 """ uniform original """
-                nonlocal target_length, target_score
+                nonlocal target_length
                 end_ratio = target_length.clone().uniform_()
                 # convert to length-wise
                 target_length = target_length * end_ratio
                 target_length = target_length + 1  # make sure to mask at least one token.
-                _, target_rank = target_score.sort(1)
                 target_cutoff = new_arange(target_rank) < target_length[:, None].long()
                 return target_cutoff
 
@@ -178,7 +178,7 @@ class TranslationLevenshteinTask(TranslationTask):
 
             def map_single_segment(start_ratio,end_ratio):
 
-                nonlocal target_length, target_score
+                nonlocal target_length, target_rank
 
                 # convert to length-wise
                 start_point = target_length * start_ratio
@@ -190,7 +190,6 @@ class TranslationLevenshteinTask(TranslationTask):
                 # then use scatter to reset the respective indices boolean values
                 # 'target_rank' contains the sequence lengths
                 # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
-                _, target_rank = target_score.sort(1)
                 target_cutoff = new_arange(target_rank) < target_length[:, None].long()
                 start_cutoff = new_arange(target_rank) > start_point[:, None].long()
                 final_cutoff = start_cutoff & target_cutoff
