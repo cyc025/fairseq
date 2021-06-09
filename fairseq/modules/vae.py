@@ -131,7 +131,7 @@ class VAE(nn.Module):
             from fairseq import pdb; pdb.set_trace()
 
             s = nn.Softmax()
-            b = nn.BatchNorm1d(x.size()[1], affine=False)
+            b = nn.BatchNorm1d(x.size()[1]).cuda()
             return s(b(x))
 
         mask_distribution = batch_norm_softmax(x)
