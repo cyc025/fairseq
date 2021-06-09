@@ -126,6 +126,7 @@ class TranslationLevenshteinTask(TranslationTask):
 
             def min_max_method():
                 """ min-max ratio method """
+                nonlocal target_length
                 ratios = (mask_distribution,torch.abs(mask_distribution-1))
                 end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
                 start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
@@ -133,12 +134,14 @@ class TranslationLevenshteinTask(TranslationTask):
 
             def predict_start_uniform_end():
                 """ DyMask-v1 (predict start, uniform end positions) """
+                nonlocal target_length
                 end_ratio = target_length.clone().uniform_(0.8,1.0)
                 start_ratio = mask_distribution
                 return map_single_segment(start_ratio,end_ratio)
 
             def variable_start_fixed_end():
                 """ DyMask-v2 (predict variable start, uniform end positions) """
+                nonlocal target_length
                 end_ratio = target_length.clone().uniform_(1.0,1.0)
                 start_ratio = mask_distribution
                 # logger.info(mask_distribution)
@@ -146,12 +149,14 @@ class TranslationLevenshteinTask(TranslationTask):
 
             def uniform_start_end():
                 """ uniform start and end """
+                nonlocal target_length
                 end_ratio = target_length.clone().uniform_(0.8,1.0)
                 start_ratio = target_length.clone().uniform_(0.,0.8)
                 return map_single_segment(start_ratio,end_ratio)
 
             def uniform_original():
                 """ uniform original """
+                nonlocal target_length, target_score
                 end_ratio = target_length.clone().uniform_()
                 # convert to length-wise
                 target_length = target_length * end_ratio
@@ -172,6 +177,8 @@ class TranslationLevenshteinTask(TranslationTask):
             #         torch.from_numpy(booleans)
 
             def map_single_segment(start_ratio,end_ratio):
+
+                nonlocal target_length, target_score
 
                 # convert to length-wise
                 start_point = target_length * start_ratio
