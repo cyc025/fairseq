@@ -206,6 +206,8 @@ class TranslationLevenshteinTask(TranslationTask):
 
                 return final_cutoff.scatter(1, target_rank, final_cutoff)
 
+            logger.info(mask_distribution)
+
             ## choose mask distribution
             mask_patterns = variable_start_fixed_end()
 
