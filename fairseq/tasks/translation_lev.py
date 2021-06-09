@@ -157,24 +157,27 @@ class TranslationLevenshteinTask(TranslationTask):
 
             def uniform_original():
                 """ uniform original """
-                nonlocal target_length
+                nonlocal target_length, target_rank
                 end_ratio = target_length.clone().uniform_()
                 # convert to length-wise
                 target_length = target_length * end_ratio
                 target_length = target_length + 1  # make sure to mask at least one token.
                 target_cutoff = new_arange(target_rank) < target_length[:, None].long()
-                return target_cutoff
+                return target_cutoff.scatter(1, target_rank, target_cutoff)
 
-            # def multi_segment():
-            #     ### DyMask-v3: multi-segment, self-supervising
-            #     _, target_rank = target_score.sort(1)
-            #     seq_len = target_rank.size()[1]
-            #     end_ratio = target_length.clone().uniform_(1.0,1.0)
-            #     start_ratio = mask_distribution
-            #     for i in range(mask_distribution.size()[0]):
-            #         prob = mask_distribution[i]
-            #         booleans = np.where(p > np.random.rand(seq_len), 1, 0)
-            #         torch.from_numpy(booleans)
+            def multi_segment():
+                ### DyMask-v3: multi-segment, self-supervising masking mechanism
+                nonlocal target_rank, target_length
+
+                from fairseq import pdb; pdb.set_trace()
+
+                seq_len = target_rank.size()[1]
+                final_cutoff = target_rank.clone().type(torch.bool)
+                for i in range(mask_distribution.size()[0]):
+                    prob = mask_distribution[i]
+                    booleans = np.where(p > np.random.rand(seq_len), 1, 0)
+                    final_cutoff[i,:] = torch.from_numpy(booleans)
+                return final_cutoff
 
             def map_single_segment(start_ratio,end_ratio):
 
@@ -194,14 +197,14 @@ class TranslationLevenshteinTask(TranslationTask):
                 start_cutoff = new_arange(target_rank) > start_point[:, None].long()
                 final_cutoff = start_cutoff & target_cutoff
 
-                return final_cutoff
+                return final_cutoff.scatter(1, target_rank, final_cutoff)
 
             ## choose mask distribution
-            final_cutoff = uniform_original()
+            mask_patterns = uniform_original()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
-                final_cutoff.scatter(1, target_rank, final_cutoff), unk
+                mask_patterns, unk
             )
 
             # from fairseq import pdb; pdb.set_trace()
