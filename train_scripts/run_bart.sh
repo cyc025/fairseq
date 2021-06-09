@@ -140,6 +140,7 @@ train_translate() {
     --warmup-init-lr '1e-07' --label-smoothing 0.1 \
     --dropout 0.3 --weight-decay 0.01 \
     --decoder-learned-pos \
+    --maximize-best-checkpoint-metric bleu \
     --encoder-learned-pos \
     --pred-length-offset \
     --length-loss-factor 0.1 \
@@ -149,7 +150,7 @@ train_translate() {
     --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
-    --max-update 6000;
+    --max-update 5000;
 }
 
 
