@@ -124,55 +124,76 @@ class TranslationLevenshteinTask(TranslationTask):
             # from fairseq import pdb; pdb.set_trace()
 
             # define mask length
-            # p defines masking probability
-            p = 0.9
             target_length = target_masks.sum(1).float()
 
+            def min_max_method():
+                ### min-max ratio method
+                ratios = (mask_distribution,torch.abs(mask_distribution-1))
+                end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
+                start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
+                return map_single_segment(start_ratio,end_ratio)
 
-            ####################################################################
-            ### min-max ratio method
-            # ratios = (mask_distribution,torch.abs(mask_distribution-1))
-            # end_ratio = max(ratios, key=lambda p: p[0]) #target_length.clone().uniform_(0.8,1.0)
-            # start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
+            def predict_start_uniform_end():
+                ### DyMask-v1 (predict start, uniform end positions)
+                end_ratio = target_length.clone().uniform_(0.8,1.0)
+                start_ratio = mask_distribution
+                return map_single_segment(start_ratio,end_ratio)
 
-            ### DyMask-v1 (predict start, uniform end positions)
-            # end_ratio = target_length.clone().uniform_(0.8,1.0)
-            # start_ratio = mask_distribution
+            def variable_start_fixed_end():
+                ### DyMask-v2 (predict variable start, uniform end positions)
+                end_ratio = target_length.clone().uniform_(1.0,1.0)
+                start_ratio = mask_distribution
+                # logger.info(mask_distribution)
+                return map_single_segment(start_ratio,end_ratio)
 
-            ### DyMask-v1 (predict variable start, uniform end positions)
-            # end_ratio = target_length.clone().uniform_(1.0,1.0)
-            # start_ratio = mask_distribution
-            #
-            # logger.info(mask_distribution)
+            def uniform_start_end():
+                ### uniform start and end
+                end_ratio = target_length.clone().uniform_(0.8,1.0)
+                start_ratio = target_length.clone().uniform_(0.,0.8)
+                return map_single_segment(start_ratio,end_ratio)
 
-            ### uniform start and end
-            # end_ratio = target_length.clone().uniform_(0.8,1.0)
-            # start_ratio = target_length.clone().uniform_(0.,0.8)
+            def uniform_original():
+                ### uniform original
+                end_ratio = target_length.clone().uniform_()
+                # convert to length-wise
+                target_length = target_length * end_ratio
+                target_length = target_length + 1  # make sure to mask at least one token.
+                _, target_rank = target_score.sort(1)
+                target_cutoff = new_arange(target_rank) < target_length[:, None].long()
+                return target_cutoff
 
-            ### uniform original
-            end_ratio = target_length.clone().uniform_()
-            start_ratio = target_length.clone().uniform_(0.,0.8)
+            # def multi_segment():
+            #     ### DyMask-v3: multi-segment, self-supervising
+            #     _, target_rank = target_score.sort(1)
+            #     seq_len = target_rank.size()[1]
+            #     end_ratio = target_length.clone().uniform_(1.0,1.0)
+            #     start_ratio = mask_distribution
+            #     for i in range(mask_distribution.size()[0]):
+            #         prob = mask_distribution[i]
+            #         booleans = np.where(p > np.random.rand(seq_len), 1, 0)
+            #         torch.from_numpy(booleans)
 
-            ####################################################################
+            def map_single_segment(start_ratio,end_ratio):
 
+                # convert to length-wise
+                start_point = target_length * start_ratio
+                start_point = start_point + 1  # make sure to mask at least one token.
+                target_length = target_length * end_ratio
+                target_length = target_length + 1  # make sure to mask at least one token.
 
-            # convert to length-wise
-            start_point = target_length * start_ratio
-            start_point = start_point + 1  # make sure to mask at least one token.
-            target_length = target_length * end_ratio
-            target_length = target_length + 1  # make sure to mask at least one token.
+                # masking by checking if each index is smaller than target mask length,
+                # then use scatter to reset the respective indices boolean values
+                # 'target_rank' contains the sequence lengths
+                # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
+                _, target_rank = target_score.sort(1)
+                target_cutoff = new_arange(target_rank) < target_length[:, None].long()
+                start_cutoff = new_arange(target_rank) > start_point[:, None].long()
+                final_cutoff = start_cutoff & target_cutoff
 
-            # masking by checking if each index is smaller than target mask length,
-            # then use scatter to reset the respective indices boolean values
-            # 'target_rank' contains the sequence lengths
-            # 'new_arange(target_rank)' contains the iteration of indices (zero-index)
-            _, target_rank = target_score.sort(1)
-            target_cutoff = new_arange(target_rank) < target_length[:, None].long()
-            start_cutoff = new_arange(target_rank) > start_point[:, None].long()
-            final_cutoff = start_cutoff & target_cutoff
+                return final_cutoff
 
-            ## original
-            final_cutoff = target_cutoff
+            ## choose mask distribution
+            final_cutoff = uniform_original()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
