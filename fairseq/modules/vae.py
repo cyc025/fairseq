@@ -134,8 +134,8 @@ class VAE(nn.Module):
             mask_distribution = torch.max(norm_x.view(norm_x.size()[1],-1),dim=1)[0]
             return mask_distribution
 
-        mask_distribution = normalize_features(x)
+        mask_distribution = get_seq_mask_dist(x,'max')
 
-        # from fairseq import pdb; pdb.set_trace()
+        from fairseq import pdb; pdb.set_trace()
 
         return new_x, mu, logvar, mask_distribution
