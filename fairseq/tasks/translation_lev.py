@@ -165,7 +165,7 @@ class TranslationLevenshteinTask(TranslationTask):
                 target_cutoff = new_arange(target_rank) < target_length[:, None].long()
                 return target_cutoff.scatter(1, target_rank, target_cutoff)
 
-            def multi_segment(): # 15.39
+            def multi_segment(): # 16.71
                 ### DyMask-v3: multi-segment, self-supervising masking mechanism
                 nonlocal target_rank, target_length
                 import numpy as np
@@ -209,7 +209,7 @@ class TranslationLevenshteinTask(TranslationTask):
             logger.info(mask_distribution)
 
             ## choose mask distribution
-            mask_patterns = multi_segment()
+            mask_patterns = uniform_start_end()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
