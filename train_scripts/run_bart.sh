@@ -126,7 +126,7 @@ LR=0.0005
 
 train_translate() {
     python3 train.py $1 \
-    --batch-size 32 \
+    --batch-size 128 \
     --save-dir checkpoints \
     --ddp-backend=no_c10d \
     --task $TASK \
@@ -149,7 +149,7 @@ train_translate() {
     --max-tokens 8000 \
     --no-epoch-checkpoints \
     --save-interval-updates 10000 \
-    --max-update 5000;
+    --max-update 2000;
 }
 
 

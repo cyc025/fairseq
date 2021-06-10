@@ -209,7 +209,7 @@ class TranslationLevenshteinTask(TranslationTask):
             logger.info(mask_distribution)
 
             ## choose mask distribution
-            mask_patterns = multi_segment()
+            mask_patterns = uniform_start_end()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
