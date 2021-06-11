@@ -140,10 +140,10 @@ class TranslationLevenshteinTask(TranslationTask):
                 start_ratio = mask_distribution
                 return map_single_segment(start_ratio,end_ratio)
 
-            def predict_start_uniform_end_relaxed(): # 
+            def predict_start_uniform_end_relaxed(): #
                 """ DyMask-v1 (predict start, uniform end positions) """
                 nonlocal target_length
-                end_ratio = target_length.clone().uniform_(0.7,1.0)
+                end_ratio = target_length.clone().uniform_(0.9,1.0)
                 start_ratio = mask_distribution
                 return map_single_segment(start_ratio,end_ratio)
 
