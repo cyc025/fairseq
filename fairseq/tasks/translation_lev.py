@@ -133,10 +133,17 @@ class TranslationLevenshteinTask(TranslationTask):
                 start_ratio = min(ratios, key=lambda p: p[0])#target_length.clone().uniform_(0.,0.8)
                 return map_single_segment(start_ratio,end_ratio)
 
-            def predict_start_uniform_end():
+            def predict_start_uniform_end(): # 23.49
                 """ DyMask-v1 (predict start, uniform end positions) """
                 nonlocal target_length
                 end_ratio = target_length.clone().uniform_(0.8,1.0)
+                start_ratio = mask_distribution
+                return map_single_segment(start_ratio,end_ratio)
+
+            def predict_start_uniform_end_relaxed(): # 
+                """ DyMask-v1 (predict start, uniform end positions) """
+                nonlocal target_length
+                end_ratio = target_length.clone().uniform_(0.7,1.0)
                 start_ratio = mask_distribution
                 return map_single_segment(start_ratio,end_ratio)
 
@@ -209,7 +216,7 @@ class TranslationLevenshteinTask(TranslationTask):
             logger.info(mask_distribution)
 
             ## choose mask distribution
-            mask_patterns = predict_start_uniform_end()
+            mask_patterns = predict_start_uniform_end_relaxed()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
