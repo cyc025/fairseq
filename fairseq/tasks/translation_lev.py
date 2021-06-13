@@ -183,6 +183,14 @@ class TranslationLevenshteinTask(TranslationTask):
                 start_ratio = target_length.clone().uniform_() #target_length.clone().uniform_(0.,0.8)
                 return map_single_segment(start_ratio,end_ratio)
 
+            def fixed_start_variable_end(): # 21.62 / 18.61
+                """ DyMask-v2 (predict variable start, uniform end positions) """
+                nonlocal target_length
+                end_ratio = mask_distribution
+                start_ratio = target_length.clone().uniform_(0.0,0.0)
+                # logger.info(mask_distribution)
+                return map_single_segment(start_ratio,end_ratio)
+
             def uniform_original(): # 19.97 / 28.85
                 """ uniform original """
                 nonlocal target_length, target_rank
@@ -214,7 +222,7 @@ class TranslationLevenshteinTask(TranslationTask):
                 # from fairseq import pdb; pdb.set_trace()
                 return final_cutoff
 
-            def multi_segment_flip(): # x / ?
+            def multi_segment_flip(): # x / 22.64
                 ### DyMask-v3: multi-segment, self-supervising masking mechanism
                 nonlocal target_rank, target_length
                 import numpy as np
