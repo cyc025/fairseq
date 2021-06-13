@@ -176,14 +176,14 @@ class TranslationLevenshteinTask(TranslationTask):
                 # logger.info(mask_distribution)
                 return map_single_segment(start_ratio,end_ratio)
 
-            def uniform_start_end(): # 19.54
+            def uniform_start_end(): # 19.54 / ?
                 """ uniform start and end """
                 nonlocal target_length
                 end_ratio = target_length.clone().uniform_(0.8,1.0)
                 start_ratio = target_length.clone().uniform_() #target_length.clone().uniform_(0.,0.8)
                 return map_single_segment(start_ratio,end_ratio)
 
-            def uniform_original(): # 19.97
+            def uniform_original(): # 19.97 / 28.85
                 """ uniform original """
                 nonlocal target_length, target_rank
                 end_ratio = target_length.clone().uniform_()
@@ -237,7 +237,7 @@ class TranslationLevenshteinTask(TranslationTask):
             logger.info(mask_distribution)
 
             ## choose mask distribution
-            mask_patterns = uniform_original()
+            mask_patterns = uniform_start_end()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
