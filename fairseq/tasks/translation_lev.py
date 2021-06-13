@@ -193,7 +193,7 @@ class TranslationLevenshteinTask(TranslationTask):
                 target_cutoff = new_arange(target_rank) < target_length[:, None].long()
                 return target_cutoff.scatter(1, target_rank, target_cutoff)
 
-            def multi_segment(): # 16.44 / ?
+            def multi_segment(): # 16.44 / 24.86
                 ### DyMask-v3: multi-segment, self-supervising masking mechanism
                 nonlocal target_rank, target_length
                 import numpy as np
@@ -213,6 +213,28 @@ class TranslationLevenshteinTask(TranslationTask):
                     final_cutoff[i,:] = torch.from_numpy(booleans)
                 # from fairseq import pdb; pdb.set_trace()
                 return final_cutoff
+
+            def multi_segment_flip(): # x / ?
+                ### DyMask-v3: multi-segment, self-supervising masking mechanism
+                nonlocal target_rank, target_length
+                import numpy as np
+                import random
+
+                # from fairseq import pdb; pdb.set_trace()
+                seq_len = target_rank.size()[1]
+                final_cutoff = target_rank.clone().type(torch.bool)
+                batch_size = mask_distribution.size()[0]
+                for i in range(batch_size):
+                    prob = mask_distribution[i].clone().cpu().data.numpy()
+                    random_prob = random.uniform(0, 1)
+                    # (1,0) 22.34
+                    # (0,1) 23.81
+                    # random_prob 21.58
+                    booleans = np.where(prob < np.random.rand(seq_len), 1, 0)
+                    final_cutoff[i,:] = torch.from_numpy(booleans)
+                # from fairseq import pdb; pdb.set_trace()
+                return final_cutoff
+
 
             def map_single_segment(start_ratio,end_ratio):
 
@@ -237,7 +259,7 @@ class TranslationLevenshteinTask(TranslationTask):
             logger.info(mask_distribution)
 
             ## choose mask distribution
-            mask_patterns = multi_segment()
+            mask_patterns = multi_segment_flip()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
