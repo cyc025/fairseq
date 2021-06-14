@@ -191,11 +191,19 @@ class TranslationLevenshteinTask(TranslationTask):
                 # logger.info(mask_distribution)
                 return map_single_segment(start_ratio,end_ratio)
 
-            def variable_start_variable_end(): # x / ?
+            def variable_start_variable_end(): # x / 26.38
                 """ DyMask (predict fixed start, variable end positions) """
                 nonlocal target_length
                 end_ratio = mask_distribution
                 start_ratio = target_length.clone().uniform_(0.0,0.2)
+                # logger.info(mask_distribution)
+                return map_single_segment(start_ratio,end_ratio)
+
+            def variable_start_variable_end_v2(): # x / ?
+                """ DyMask (predict fixed start, variable end positions) """
+                nonlocal target_length
+                end_ratio = mask_distribution
+                start_ratio = target_length.clone().uniform_(0.0,0.1)
                 # logger.info(mask_distribution)
                 return map_single_segment(start_ratio,end_ratio)
 
@@ -291,7 +299,7 @@ class TranslationLevenshteinTask(TranslationTask):
             logger.info(mask_distribution)
 
             ## choose mask distribution
-            mask_patterns = variable_start_variable_end()
+            mask_patterns = variable_start_variable_end_v2()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
