@@ -202,7 +202,7 @@ class TranslationLevenshteinTask(TranslationTask):
             def fixed_start_fixed_end_v2(): # x / ?
                 """ DyMask (predict fixed start, variable end positions) """
                 nonlocal target_length
-                end_ratio = target_length.clone().uniform_(0.95,1.0)
+                end_ratio = target_length.clone().uniform_(1.0,1.0)
                 start_ratio = target_length.clone().uniform_(0.0,0.0)
                 # logger.info(mask_distribution)
                 return map_single_segment(start_ratio,end_ratio)
