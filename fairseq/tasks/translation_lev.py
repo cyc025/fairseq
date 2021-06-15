@@ -246,7 +246,7 @@ class TranslationLevenshteinTask(TranslationTask):
             def uniform_original_no_mask(): # x / ?
                 """ uniform original """
                 nonlocal target_length, target_rank
-                end_ratio = target_length.clone().uniform_(0.,0.)
+                end_ratio = target_length.clone().uniform_(1.,1.)
                 # convert to length-wise
                 target_length = target_length * end_ratio
                 target_length = target_length + 1  # make sure to mask at least one token.
