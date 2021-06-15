@@ -233,7 +233,7 @@ class TranslationLevenshteinTask(TranslationTask):
                 target_cutoff = new_arange(target_rank) < target_length[:, None].long()
                 return target_cutoff.scatter(1, target_rank, target_cutoff)
 
-            def uniform_original_fixed(): # x / ?
+            def uniform_original_fixed(): # x / 28.01
                 """ uniform original """
                 nonlocal target_length, target_rank
                 end_ratio = mask_distribution
@@ -241,6 +241,16 @@ class TranslationLevenshteinTask(TranslationTask):
                 target_length = target_length * end_ratio
                 target_length = target_length + 1  # make sure to mask at least one token.
                 target_cutoff = new_arange(target_rank) < target_length[:, None].long()
+                return target_cutoff.scatter(1, target_rank, target_cutoff)
+
+            def uniform_original_fixed_flip(): # x / ?
+                """ uniform original """
+                nonlocal target_length, target_rank
+                end_ratio = mask_distribution
+                # convert to length-wise
+                target_length = target_length * end_ratio
+                target_length = target_length + 1  # make sure to mask at least one token.
+                target_cutoff = new_arange(target_rank) > target_length[:, None].long()
                 return target_cutoff.scatter(1, target_rank, target_cutoff)
 
             def multi_segment(): # 16.44 / 24.86
@@ -309,7 +319,7 @@ class TranslationLevenshteinTask(TranslationTask):
             logger.info(mask_distribution)
 
             ## choose mask distribution
-            mask_patterns = uniform_original_fixed()
+            mask_patterns = uniform_original_fixed_flip()
 
             # masking
             prev_target_tokens = target_tokens.masked_fill(
