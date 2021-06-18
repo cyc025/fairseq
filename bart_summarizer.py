@@ -24,11 +24,11 @@ def inference(max_length):
 # open file for profiling
 profile_log = open('profile.log','a')
 
-for ml in range(1,2):
+for ml in range(2,4):
     # with profile(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
     with profile(use_cuda=False) as prof:
         with record_function("model_inference"):
             inference(ml)
-    profile_log.write(prof+'\n')
+    profile_log.write(prof.split('\n')[-1]+'\n')
 
 profile_log.close()
