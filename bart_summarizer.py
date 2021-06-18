@@ -20,7 +20,7 @@ def inference():
 
 
 # with profile(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
-with profile(use_cuda=True) as prof:
+with profile(use_cuda=False) as prof:
     with record_function("model_inference"):
         inference()
 print(prof)
