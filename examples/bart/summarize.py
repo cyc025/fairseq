@@ -7,6 +7,12 @@ import torch
 from fairseq.models.bart import BARTModel
 import argparse
 
+
+import torch
+from torch.autograd.profiler import profile, record_function
+
+
+
 XSUM_KWARGS = dict(beam=6, lenpen=1.0, max_len_b=60, min_len=10, no_repeat_ngram_size=3)
 CNN_KWARGS = dict(beam=4, lenpen=2.0, max_len_b=140, min_len=55, no_repeat_ngram_size=3)
 
@@ -91,9 +97,14 @@ def main():
     bart = bart.eval()
     if torch.cuda.is_available():
         bart = bart.cuda().half()
-    generate(
-        bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
-    )
+
+    profile_log = open('profile.log','a')
+    with profile(use_cuda=False) as prof:
+        with record_function("model_inference"):
+            generate(
+                bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
+            )
+    profile_log.write(extract_time(str(prof))+'\n')
 
 
 if __name__ == "__main__":
