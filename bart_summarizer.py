@@ -30,7 +30,7 @@ def extract_time(s):
     result = re.search(' (.*)ms', s)
     return (result.group(1).split('        ')[-1])
 
-for ml in range(2,4):
+for ml in range(2,500):
     # with profile(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
     with profile(use_cuda=False) as prof:
         with record_function("model_inference"):
