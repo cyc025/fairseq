@@ -23,3 +23,4 @@ def inference():
 with profile(use_cuda=True) as prof:
     with record_function("model_inference"):
         inference()
+print(prof)
