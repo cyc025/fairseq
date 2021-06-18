@@ -45,6 +45,11 @@ def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_k
                 fout.write(hypothesis + "\n")
                 fout.flush()
 
+import re
+def extract_time(s):
+    result = re.search(' (.*)ms', s)
+    return (result.group(1).split('        ')[-1])
+    
 
 def main():
     """
