@@ -2,7 +2,7 @@
 
 import torch
 import torchvision.models as models
-from torch.autograd.profiler import profile, record_function, ProfilerActivity
+from torch.autograd.profiler import profile, record_function
 
 from transformers import BartTokenizer, BartForConditionalGeneration, BartConfig
 
