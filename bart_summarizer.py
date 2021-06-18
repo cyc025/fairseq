@@ -28,7 +28,7 @@ profile_log = open('profile.log','a')
 import re
 def extract_time(s):
     result = re.search(' (.*)ms', s)
-    return (result.group(1).split('\t')[-1])
+    return (result.group(1).split('        ')[-1])
 
 for ml in range(2,4):
     # with profile(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
