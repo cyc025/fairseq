@@ -17,7 +17,7 @@ inputs = tokenizer([ARTICLE_TO_SUMMARIZE], max_length=1024, return_tensors='pt')
 
 def inference(max_length):
     # Generate Summary
-    summary_ids = model.generate(inputs['input_ids'], num_beams=4, max_length=max_length, early_stopping=True)
+    summary_ids = model.generate(inputs['input_ids'], num_beams=4, max_length=max_length, truncation=True, early_stopping=True)
     # print([tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in summary_ids])
 
 
