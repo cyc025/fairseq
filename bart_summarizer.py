@@ -2,7 +2,7 @@
 
 import torch
 import torchvision.models as models
-from torch.profiler import profile, record_function, ProfilerActivity
+from torch.autograd.profiler import profile, record_function, ProfilerActivity
 
 from transformers import BartTokenizer, BartForConditionalGeneration, BartConfig
 
@@ -19,6 +19,7 @@ def inference():
     # print([tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in summary_ids])
 
 
-with profile(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
+# with profile(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
+with profile(use_cuda=True) as prof:
     with record_function("model_inference"):
         inference()
