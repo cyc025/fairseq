@@ -29,6 +29,6 @@ for ml in range(2,4):
     with profile(use_cuda=False) as prof:
         with record_function("model_inference"):
             inference(ml)
-    profile_log.write(str(prof).split('\n')[-1]+'\n')
+    profile_log.write(str(prof).split('\n')[-2]+'\n')
 
 profile_log.close()
