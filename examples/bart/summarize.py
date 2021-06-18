@@ -49,7 +49,7 @@ import re
 def extract_time(s):
     result = re.search(' (.*)ms', s)
     return (result.group(1).split('        ')[-1])
-    
+
 
 def main():
     """
@@ -109,6 +109,7 @@ def main():
             generate(
                 bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
             )
+    print(prof)
     profile_log.write(extract_time(str(prof))+'\n')
 
 
