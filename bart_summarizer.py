@@ -24,11 +24,17 @@ def inference(max_length):
 # open file for profiling
 profile_log = open('profile.log','a')
 
+
+import re
+def extract_time(s):
+    result = re.search(' (.*)ms', s)
+    return (result.group(1))
+
 for ml in range(2,4):
     # with profile(activities=[ProfilerActivity.CPU], record_shapes=True) as prof:
     with profile(use_cuda=False) as prof:
         with record_function("model_inference"):
             inference(ml)
-    profile_log.write(str(prof).split('\n')[-2]+'\n')
+    profile_log.write(extract_time(str(prof))+'\n')
 
 profile_log.close()
