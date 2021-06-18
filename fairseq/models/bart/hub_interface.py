@@ -29,6 +29,7 @@ class BARTHubInterface(GeneratorHubInterface):
     def __init__(self, cfg, task, model):
         super().__init__(cfg, task, [model])
         self.model = self.models[0]
+        self.max_positions = 2
 
     def encode(
         self, sentence: str, *addl_sentences, no_separator=True
