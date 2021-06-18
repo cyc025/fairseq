@@ -47,7 +47,7 @@ def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_k
 
 import re
 def extract_time(s):
-    result = re.search(' (.*)ms', s)
+    result = re.search(' (.*)s', s)
     return (result.group(1).split('        ')[-1])
 
 
@@ -115,3 +115,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# taskset --cpu-list 1 python examples/bart/summarize.py   --model-dir .   --model-file checkpoints/bart.large.cnn/model.pt   --src ~/fairseq_cnn_data/cnn_cln/toy_test.source   --out ~/fairseq_cnn_data/cnn_cln/test.hypo
