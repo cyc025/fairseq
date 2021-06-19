@@ -341,6 +341,8 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
+            from fairseq import pdb; pdb.set_trace()
+
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
