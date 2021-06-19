@@ -86,7 +86,7 @@ class SequenceGenerator(nn.Module):
         self.max_len = max_len or self.model.max_decoder_positions()
 
         # for testing only
-        force_length = 6
+        force_length = 2
         self.max_len_a = force_length
         self.max_len_b = force_length
         self.min_len = 0
