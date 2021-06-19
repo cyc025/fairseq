@@ -47,7 +47,7 @@ def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_k
 
 import re
 def extract_time(s):
-    result = re.search('CUDA time total: (.*)s', s)
+    result = re.search('Self CPU time total: (.*)s', s)
     return (result.group(1).split('        ')[-1])
 
 
@@ -104,7 +104,7 @@ def main():
         bart = bart.cuda().half()
 
     profile_log = open('profile.log','a')
-    with profile(use_cuda=True) as prof:
+    with profile(use_cuda=False) as prof:
         with record_function("model_inference"):
             generate(
                 bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
