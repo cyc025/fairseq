@@ -85,6 +85,13 @@ class SequenceGenerator(nn.Module):
         self.min_len = min_len
         self.max_len = max_len or self.model.max_decoder_positions()
 
+        # for testing only
+        force_length = 2
+        self.max_len_a = force_length
+        self.max_len_b = force_length
+        self.min_len = force_length
+        self.max_len = force_length
+
         self.normalize_scores = normalize_scores
         self.len_penalty = len_penalty
         self.unk_penalty = unk_penalty
@@ -311,7 +318,7 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
         # max_len = 4
 
         for step in range(max_len + 1):  # one extra step for EOS marker
