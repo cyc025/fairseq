@@ -89,7 +89,7 @@ class SequenceGenerator(nn.Module):
         force_length = 2
         self.max_len_a = force_length
         self.max_len_b = force_length
-        self.min_len = force_length
+        self.min_len = 0
         self.max_len = force_length
 
         self.normalize_scores = normalize_scores
