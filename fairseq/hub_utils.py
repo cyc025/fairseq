@@ -153,7 +153,8 @@ class GeneratorHubInterface(nn.Module):
         inference_step_args=None,
         prefix_allowed_tokens_fn=None,
         **kwargs
-    ) -> List[List[Dict[str, torch.Tensor]]]:
+    ) -> List[List[Dict[str, torch.Tensor]]]:        
+
         if torch.is_tensor(tokenized_sentences) and tokenized_sentences.dim() == 1:
             return self.generate(
                 tokenized_sentences.unsqueeze(0), beam=beam, verbose=verbose, **kwargs

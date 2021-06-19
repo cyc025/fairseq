@@ -7,7 +7,7 @@ import math
 from typing import List, Optional
 
 import torch
-import torch.nn as nn
+import torch.nn as nn 
 from fairseq.token_generation_constraints import (
     ConstraintState,
     OrderedConstraintState,
@@ -523,7 +523,7 @@ class LexicallyConstrainedBeamSearch(Search):
         return scores_buf, indices_buf, beams_buf, constraint_states
 
 
-class LengthConstrainedBeamSearch(Search): 
+class LengthConstrainedBeamSearch(Search):
     def __init__(self, tgt_dict, min_len_a, min_len_b, max_len_a, max_len_b):
         super().__init__(tgt_dict)
         self.min_len_a = min_len_a
