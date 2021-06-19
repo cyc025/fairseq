@@ -311,13 +311,10 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-        # from fairseq import pdb; pdb.set_trace()
-        max_len = 4
+        from fairseq import pdb; pdb.set_trace()
+        # max_len = 4
 
         for step in range(max_len + 1):  # one extra step for EOS marker
-
-            if step==max_len:
-                break
 
             # from fairseq import pdb; pdb.set_trace()
 
