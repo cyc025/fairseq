@@ -104,7 +104,7 @@ def main():
         bart = bart.cuda().half()
 
     profile_log = open('profile.log','a')
-    with profile(use_cuda=False) as prof:
+    with profile(use_cuda=True) as prof:
         with record_function("model_inference"):
             generate(
                 bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
