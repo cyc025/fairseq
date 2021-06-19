@@ -21,7 +21,7 @@ CNN_KWARGS = dict(beam=4, lenpen=2.0, max_len_b=140, min_len=55, no_repeat_ngram
 def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_kwargs):
     count = 1
 
-    # if n_obs is not None: bsz = min(bsz, n_obs)    
+    # if n_obs is not None: bsz = min(bsz, n_obs)
 
     with open(infile) as source, open(outfile, "w") as fout:
         sline = source.readline().strip()
@@ -47,7 +47,7 @@ def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_k
 
 import re
 def extract_time(s):
-    result = re.search(' (.*)s', s)
+    result = re.search('CUDA time total: (.*)s', s)
     return (result.group(1).split('        ')[-1])
 
 
