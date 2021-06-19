@@ -35,7 +35,7 @@ class BARTModel(TransformerModel):
             "bart.large.mnli": "http://dl.fbaipublicfiles.com/fairseq/models/bart.large.mnli.tar.gz",
             "bart.large.cnn": "http://dl.fbaipublicfiles.com/fairseq/models/bart.large.cnn.tar.gz",
             "bart.large.xsum": "http://dl.fbaipublicfiles.com/fairseq/models/bart.large.xsum.tar.gz",
-        } 
+        }
 
     def __init__(self, args, encoder, decoder):
         super().__init__(args, encoder, decoder)
@@ -85,6 +85,8 @@ class BARTModel(TransformerModel):
     ):
         if classification_head_name is not None:
             features_only = True
+
+        from fairseq import pdb; pdb.set_trace()
 
         encoder_out = self.encoder(
             src_tokens,
