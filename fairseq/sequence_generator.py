@@ -313,9 +313,11 @@ class SequenceGenerator(nn.Module):
 
         # from fairseq import pdb; pdb.set_trace()
         max_len = 4
-        self.search.stop_on_max_len = True
 
         for step in range(max_len + 1):  # one extra step for EOS marker
+
+            if step==max_len:
+                break
 
             # from fairseq import pdb; pdb.set_trace()
 
