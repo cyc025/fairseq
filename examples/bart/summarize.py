@@ -105,6 +105,7 @@ def main():
             if 'model_inference' in line:
                 print(line)
                 result = re.search('%     (.*)ms', s)
+                print(result,result.group(1))
                 return (result.group(1)[-1])
 
 
