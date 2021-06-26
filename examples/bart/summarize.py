@@ -103,9 +103,10 @@ def main():
     def extract_time(s):
         for line in str(prof).split('\n'):
             if 'model_inference' in line:
-                result = re.search('%     \n(.*)ms', s)
+                print(line)
+                result = re.search('%     (.*)ms', s)
                 return (result.group(1)[-1])
-                
+
 
     profile_log = open('profile.log','a')
     with profile(use_cuda=False) as prof:
