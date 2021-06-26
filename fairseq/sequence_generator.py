@@ -86,11 +86,11 @@ class SequenceGenerator(nn.Module):
         self.max_len = max_len or self.model.max_decoder_positions()
 
         # for testing only
-        force_length = int(open('.max.len','r').read().strip().replace('\n',''))
-        self.max_len_a = force_length
-        self.max_len_b = force_length
-        self.min_len = 0
-        self.max_len = force_length
+        # force_length = int(open('.max.len','r').read().strip().replace('\n',''))
+        # self.max_len_a = force_length
+        # self.max_len_b = force_length
+        # self.min_len = 0
+        # self.max_len = force_length
 
         self.normalize_scores = normalize_scores
         self.len_penalty = len_penalty
