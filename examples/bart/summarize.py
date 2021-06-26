@@ -45,11 +45,6 @@ def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_k
                 fout.write(hypothesis + "\n")
                 fout.flush()
 
-import re
-def extract_time(s):
-    result = re.search('Self CPU time total: (.*)s', s)
-    return (result.group(1).split('        ')[-1])
-
 
 def main():
     """
@@ -102,6 +97,15 @@ def main():
     bart = bart.eval()
     if torch.cuda.is_available():
         bart = bart.cuda().half()
+
+    # time extractor
+    import re
+    def extract_time(s):
+        for line in str(prof).split('\n'):
+            if 'model_inference' in line:
+                result = re.search('%     \n(.*)ms', s)
+                return (result.group(1)[-1])
+                
 
     profile_log = open('profile.log','a')
     with profile(use_cuda=False) as prof:
