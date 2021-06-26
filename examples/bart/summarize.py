@@ -108,8 +108,9 @@ def main():
                 return (result.group(1))
 
 
+    curr_length = int(open('.curr_index', 'r').read().strip())
     profile_log = open('profile.log','a')
-    with profile(use_cuda=False) as prof:
+    with open(f'results/profile_{curr_length}.log', 'a') as profile_log:
         with record_function("model_inference"):
             generate(
                 bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
