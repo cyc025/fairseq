@@ -12,8 +12,9 @@
 # to be deleted
 # alias with-proxy='env http_proxy=fwdproxy:8080 https_proxy=fwdproxy:8080 no_proxy=.fbcdn.net,.facebook.com,.thefacebook.com,.tfbnw.net,.fb.com,.fburl.com,.facebook.net,.sb.fbsbx.com,localhost RSYNC_PROXY=fwdproxy:8080 HTTP_PROXY=http://fwdproxy:8080 HTTPS_PROXY=http://fwdproxy:8080'
 
-upperlim=50
-for ((i=2; i<=upperlim; i++)); do
+upperlim=150
+startlen=51
+for ((i=startlen; i<=upperlim; i++)); do
     for ((j=1; j<=10; j++)); do
         echo $i > .curr_index
         echo $i > .max.len
