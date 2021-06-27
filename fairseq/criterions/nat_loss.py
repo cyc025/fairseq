@@ -90,7 +90,7 @@ class LabelSmoothedDualImitationCriterion(FairseqCriterion):
         """
         nsentences, ntokens = sample["nsentences"], sample["ntokens"]
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         # B x T
         src_tokens, src_lengths = (
