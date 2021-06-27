@@ -110,7 +110,7 @@ def main():
                     cpu_time = float(cpu_time.replace('s',''))*1000
                 else:
                     cpu_time = float(cpu_time.replace('ms',''))
-                return cpu_time
+                return str(cpu_time)
 
 
     curr_length = int(open('.curr_index', 'r').read().strip())
