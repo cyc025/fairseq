@@ -193,6 +193,8 @@ class SequenceGenerator(nn.Module):
         """
         return self._generate(sample, **kwargs)
 
+    # def _nar_generate()
+
     def _generate(
         self,
         sample: Dict[str, Dict[str, Tensor]],
