@@ -321,11 +321,13 @@ class SequenceGenerator(nn.Module):
         # from fairseq import pdb; pdb.set_trace()
         # max_len = 4
 
-        max_len = self.max_len-1
 
         for step in range(max_len + 1):  # one extra step for EOS marker
 
             # from fairseq import pdb; pdb.set_trace()
+
+            if step==self.max_len-1:
+                break
 
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
