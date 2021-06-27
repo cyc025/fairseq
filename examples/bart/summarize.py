@@ -106,6 +106,7 @@ def main():
                 print(line)
                 cpu_time = line.split('         ')[2]
                 if 'ms' not in cpu_time:
+                    print(cpu_time.replace('s',''))
                     cpu_time = float(cpu_time.replace('s',''))*1000
                 else:
                     cpu_time = float(cpu_time.replace('ms',''))
