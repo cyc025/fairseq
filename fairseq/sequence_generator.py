@@ -247,7 +247,7 @@ class SequenceGenerator(nn.Module):
 
         max_len: int = -1
         if self.match_source_len:
-            max_len = 1000#src_lengths.max().item()
+            max_len = src_lengths.max().item()
         else:
             max_len = min(
                 int(self.max_len_a * src_len + self.max_len_b),
@@ -258,6 +258,8 @@ class SequenceGenerator(nn.Module):
         ), "min_len cannot be larger than max_len, please adjust these!"
         # compute the encoder output for each beam
         encoder_outs = self.model.forward_encoder(net_input)
+
+        max_len = 1000
 
         # placeholder of indices for bsz * beam_size to hold tokens and accumulative scores
         new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
