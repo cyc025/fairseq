@@ -105,7 +105,7 @@ def main():
             if 'model_inference' in line:
                 print(line)
                 from fairseq import pdb; pdb.set_trace()
-                cpu_time = line.split('        ')[7].split('       ')[0]
+                cpu_time = line.split('model_inference')[1].split('      ')[2]
                 if 'ms' not in cpu_time:
                     cpu_time = float(cpu_time.replace('s',''))*1000
                 else:
