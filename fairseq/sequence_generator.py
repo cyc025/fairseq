@@ -259,8 +259,6 @@ class SequenceGenerator(nn.Module):
         # compute the encoder output for each beam
         encoder_outs = self.model.forward_encoder(net_input)
 
-        max_len = self.max_len
-
         # placeholder of indices for bsz * beam_size to hold tokens and accumulative scores
         new_order = torch.arange(bsz).view(-1, 1).repeat(1, beam_size).view(-1)
         new_order = new_order.to(src_tokens.device).long()
@@ -453,8 +451,8 @@ class SequenceGenerator(nn.Module):
                 num_remaining_sent -= len(finalized_sents)
 
             assert num_remaining_sent >= 0
-            if num_remaining_sent == 0:
-                break
+            # if num_remaining_sent == 0:
+            #     break
             if self.search.stop_on_max_len and step >= max_len:
                 break
             assert step < max_len, f"{step} < {max_len}"
