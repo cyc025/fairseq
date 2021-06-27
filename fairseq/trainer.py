@@ -115,7 +115,7 @@ class Trainer(object):
 
         self._dummy_batch = None  # indicates we don't have a dummy batch at first
         self._lr_scheduler = None
-        self._num_updates = 0
+        self._num_updates = 0 
         self._num_xla_compiles = 0  # for TPUs
         self._optim_history = None
         self._optimizer = None
