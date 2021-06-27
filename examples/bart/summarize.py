@@ -104,11 +104,15 @@ def main():
         for line in str(prof).split('\n'):
             if 'model_inference' in line:
                 print(line)
-
-                result = re.search('%     (.*)ms', s)
-                if result==None:
-                    result = re.search('%     (.*)s', s)
-                return (result.group(1))
+                cpu_time = line.split('         ')[2]
+                if 'ms' not in cpu_time:
+                    cpu_time = float(cpu_time.replace('s',''))*1000
+                else:
+                    cpu_time = float(cpu_time.replace('ms',''))
+                # result = re.search('%     (.*)ms', s)
+                # if result==None:
+                #     result = re.search('%     (.*)s', s)
+                return cpu_time
 
 
     curr_length = int(open('.curr_index', 'r').read().strip())
