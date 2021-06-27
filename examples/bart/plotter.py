@@ -17,7 +17,10 @@ std_dict = {}
 directory = "results"
 for filename in os.listdir(directory):
     index = re.search('profile_(.*).log', filename).group(1)
-    values = [float(value.strip().split('ms')[0]) for value in open(f'results/{filename}','r')]
+    try:
+        values = [float(value.strip().split('ms')[0]) for value in open(f'results/{filename}','r')]
+    except:
+        values = [float(value.strip().split('s')[0]) for value in open(f'results/{filename}','r')]
     indices.append(int(index))
     values_dict[index] = np.array(values)
     mean_dict[index] = np.mean(values_dict[index])
