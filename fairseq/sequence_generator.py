@@ -86,11 +86,11 @@ class SequenceGenerator(nn.Module):
         self.max_len = max_len or self.model.max_decoder_positions()
 
         # for testing only
-        # force_length = int(open('.max.len','r').read().strip().replace('\n',''))
-        # self.max_len_a = force_length
-        # self.max_len_b = force_length
-        # self.min_len = 0
-        # self.max_len = force_length
+        force_length = int(open('.max.len','r').read().strip().replace('\n',''))
+        self.max_len_a = force_length
+        self.max_len_b = force_length
+        self.min_len = 0
+        self.max_len = force_length
 
         self.normalize_scores = normalize_scores
         self.len_penalty = len_penalty
@@ -451,15 +451,15 @@ class SequenceGenerator(nn.Module):
                 num_remaining_sent -= len(finalized_sents)
 
             assert num_remaining_sent >= 0
-            # if num_remaining_sent == 0:
-            #     break
+            if num_remaining_sent == 0:
+                break
             if self.search.stop_on_max_len and step >= max_len:
                 break
             assert step < max_len, f"{step} < {max_len}"
 
             # Remove finalized sentences (ones for which {beam_size}
             # finished hypotheses have been generated) from the batch.
-            if len(finalized_sents) > 0 and False:
+            if len(finalized_sents) > 0:
                 new_bsz = bsz - len(finalized_sents)
 
                 # construct batch_idxs which holds indices of batches to keep for the next pass
