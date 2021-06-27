@@ -392,7 +392,7 @@ class TranslationLevenshteinTask(TranslationTask):
     ):
         model.train()
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         mask_distribution = self.get_mask_distribution(sample,model)
         sample["prev_target"] = self.inject_noise(sample["target"],mask_distribution)
