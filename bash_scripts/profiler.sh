@@ -15,7 +15,7 @@
 upperlim=150
 startlen=2
 for ((i=startlen; i<=upperlim; i++)); do
-    for ((j=1; j<=10; j++)); do
+    for ((j=1; j<=1; j++)); do
         echo $i > .curr_index
         echo $i > .max.len
         # taskset --cpu-list 1 python examples/bart/summarize.py   --model-dir data-bin/cnn_dm --model-file ~/checkpoints/bart.large.cnn/model.pt   --src data-bin/cnn_dm/toy_test.source   --out data-bin/cnn_dm/test.hypo;
