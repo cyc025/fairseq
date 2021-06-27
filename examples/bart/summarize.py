@@ -108,6 +108,7 @@ def main():
                     result = re.search('%     (.*)ms', s)
                 except:
                     result = re.search('%     (.*)s', s)
+                print(result)
                 return (result.group(1))
 
 
