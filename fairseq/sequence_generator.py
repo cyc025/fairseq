@@ -247,7 +247,7 @@ class SequenceGenerator(nn.Module):
 
         max_len: int = -1
         if self.match_source_len:
-            max_len = src_lengths.max().item()
+            max_len = 1000#src_lengths.max().item()
         else:
             max_len = min(
                 int(self.max_len_a * src_len + self.max_len_b),
