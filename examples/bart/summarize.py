@@ -104,11 +104,10 @@ def main():
         for line in str(prof).split('\n'):
             if 'model_inference' in line:
                 print(line)
-                try:
-                    result = re.search('%     (.*)ms', s)
-                except:
+
+                result = re.search('%     (.*)ms', s)
+                if result==None:
                     result = re.search('%     (.*)s', s)
-                print(result)
                 return (result.group(1))
 
 
