@@ -13,7 +13,7 @@
 # alias with-proxy='env http_proxy=fwdproxy:8080 https_proxy=fwdproxy:8080 no_proxy=.fbcdn.net,.facebook.com,.thefacebook.com,.tfbnw.net,.fb.com,.fburl.com,.facebook.net,.sb.fbsbx.com,localhost RSYNC_PROXY=fwdproxy:8080 HTTP_PROXY=http://fwdproxy:8080 HTTPS_PROXY=http://fwdproxy:8080'
 
 upperlim=150
-startlen=50
+startlen=2
 for ((i=startlen; i<=upperlim; i++)); do
     for ((j=1; j<=1; j++)); do
         echo $i > .curr_index
