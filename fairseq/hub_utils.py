@@ -75,7 +75,7 @@ def from_pretrained(
         arg_overrides=kwargs,
     )
 
-    return { 
+    return {
         "args": args,
         "task": task,
         "models": models,
