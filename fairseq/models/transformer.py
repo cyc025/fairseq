@@ -766,7 +766,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 self.output_projection.weight, mean=0, std=self.output_embed_dim ** -0.5
             )
         num_base_layers = getattr(args, "base_layers", 0)
-        for i in range(num_base_layers)[:1]:
+        for i in range(num_base_layers):
             self.layers.insert(
                 ((i + 1) * args.decoder_layers) // (num_base_layers + 1),
                 BaseLayer(args),
@@ -939,7 +939,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
-        for idx, layer in enumerate(self.layers):
+        for idx, layer in enumerate(self.layers)[:1]:
             if incremental_state is None and not full_context_alignment:
                 self_attn_mask = self.buffered_future_mask(x)
             else:
