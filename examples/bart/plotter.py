@@ -17,6 +17,8 @@ std_dict = {}
 directory = "results"
 for filename in os.listdir(directory):
     index = re.search('profile_(.*).log', filename).group(1)
+    if int(index)%2!=0:
+        continue
     try:
         values = [float(value.strip().split('ms')[0]) for value in open(f'results/{filename}','r')]
     except:

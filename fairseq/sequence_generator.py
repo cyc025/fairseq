@@ -92,7 +92,7 @@ class SequenceGenerator(nn.Module):
         self.min_len = 0
         self.max_len = force_length
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         self.normalize_scores = normalize_scores
         self.len_penalty = len_penalty
@@ -350,7 +350,7 @@ class SequenceGenerator(nn.Module):
 
             # from fairseq import pdb; pdb.set_trace()
 
-            lprobs, avg_attn_scores = self.model.forward_decoder(
+            lprobs, avg_attn_scores = self.model.forward_decoder( 
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
