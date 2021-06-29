@@ -286,7 +286,8 @@ class TransformerModel(FairseqEncoderDecoderModel):
 
     @classmethod
     def build_decoder(cls, args, tgt_dict, embed_tokens):
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
+        args.decoder_layers = 1
         return TransformerDecoder(
             args,
             tgt_dict,
