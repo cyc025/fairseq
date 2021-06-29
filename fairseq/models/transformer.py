@@ -717,7 +717,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         self.layers.extend(
             [
                 self.build_decoder_layer(args, no_encoder_attn)
-                for _ in range(args.decoder_layers)
+                for _ in range(args.decoder_layers)[:1]
             ]
         )
         self.num_layers = len(self.layers)
@@ -766,7 +766,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 self.output_projection.weight, mean=0, std=self.output_embed_dim ** -0.5
             )
         num_base_layers = getattr(args, "base_layers", 0)
-        for i in range(num_base_layers)[:1]:
+        for i in range(num_base_layers):
             self.layers.insert(
                 ((i + 1) * args.decoder_layers) // (num_base_layers + 1),
                 BaseLayer(args),
