@@ -665,10 +665,12 @@ def prune_state_dict(state_dict, model_cfg: Optional[DictConfig]):
         # args should not be none, but don't crash if it is.
         return state_dict
 
-    from fairseq import pdb; pdb.set_trace()
+    # from fairseq import pdb; pdb.set_trace()
 
     encoder_layers_to_keep = getattr(model_cfg, "encoder_layers_to_keep", None)
     decoder_layers_to_keep = getattr(model_cfg, "decoder_layers_to_keep", None)
+
+    decoder_layers_to_keep.decoder_layers = 1
 
     if not encoder_layers_to_keep and not decoder_layers_to_keep:
         return state_dict
