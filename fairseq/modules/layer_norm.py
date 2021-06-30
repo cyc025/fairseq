@@ -27,6 +27,18 @@ except ImportError:
     has_fused_layernorm = False
 
 
+def ZenLayerNorm(x):
+    """ Dimensions (L,N,C)
+        return: (x,sigma)
+    """
+    eps = 0.00001
+    # import pdb; pdb.set_trace()
+    mean = torch.mean(x, dim=2, keepdim=True)
+    var = torch.square(x - mean).mean(dim=2, keepdim=True)
+    sigma = var.view(-1)
+    return (x - mean) / torch.sqrt(var + self.eps), sigma
+
+
 def LayerNorm(normalized_shape, eps=1e-5, elementwise_affine=True, export=False):
     if torch.jit.is_scripting():
         export = True
