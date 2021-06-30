@@ -937,9 +937,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.cross_self_attention or prev_output_tokens.eq(self.padding_idx).any():
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
 
-        # to compute expressivity
-        x_grad = Variable(x.data,requires_grad=True)
-
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
@@ -964,7 +961,10 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 attn = layer_attn.float().to(x)
 
 
-        # for grad purpose only
+        ######### for grad purpose only #########
+        # to compute expressivity
+        from torch.autograd import Variable
+        x_grad = Variable(x.data,requires_grad=True)
         # decoder layers
         attn_grad: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x_grad]
