@@ -8,11 +8,8 @@ import torch
 import sys
 from fairseq import utils
 from fairseq.distributed import utils as distributed_utils
-from fairseq.modules.layer_norm import LayerNorm
+from fairseq.modules.layer_norm import LayerNorm, ZenLayerNorm
 
-from fairseq.modules import (
-    ZenLayerNorm
-)
 
 class BaseLayer(nn.Module):
 
