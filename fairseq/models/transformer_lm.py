@@ -291,7 +291,7 @@ class TransformerLanguageModel(FairseqLanguageModel):
     def build_embedding(cls, args, dictionary, embed_dim, path=None):
         embed_tokens = Embedding(len(dictionary), embed_dim, dictionary.pad())
         return embed_tokens
- 
+
 
 def base_lm_architecture(args):
     # backward compatibility for older model checkpoints

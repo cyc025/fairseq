@@ -40,7 +40,7 @@ class Trainer(object):
     """
 
     def __init__(self, cfg: FairseqConfig, task, model, criterion, quantizer=None):
- 
+
         if isinstance(cfg, Namespace):
             logger.warning(
                 "argparse.Namespace configuration is deprecated! Automatically converting to OmegaConf"
