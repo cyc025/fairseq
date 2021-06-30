@@ -413,7 +413,7 @@ class TransformerDecoderLayer(nn.Module):
         # from fairseq import pdb; pdb.set_trace()
 
         ### sigmas ###
-        with open('.sigma.log','a') as sigma:
+        with open('.sigma.log','w') as sigma:
             _s_ = '\n'.join([str(s.mean().item()) for s in sigmas])
             sigma.write(f'{_s_}')
 
