@@ -998,6 +998,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             C_dim = sigma.size()[0]
             new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
 
+        from fairseq import pdb; pdb.set_trace()
         x = torch.tensor(new_sigmas)
         final_sigma = torch.sum(torch.log(x))
 
