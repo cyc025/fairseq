@@ -992,7 +992,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         x_grad.mean().backward()
 
 
-        sigmas = [float(layer_sigma) for layer_sigma in open('.sigma.log','r')]
+        sigmas = [float(layer_sigma.strip()) for layer_sigma in open('.sigma.log','r').read()]
         new_sigmas = []
         for sigma in sigmas:
             C_dim = sigma.size()[0]
