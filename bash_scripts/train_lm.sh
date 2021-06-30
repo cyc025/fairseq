@@ -26,7 +26,7 @@
 
 
 rm .sigma.log
-fairseq-train --task language_modeling \
+python train.py --task language_modeling \
   data-bin/wikitext-103 \
   --save-dir checkpoints/transformer_wikitext-103 \
   --arch transformer_lm --share-decoder-input-output-embed \
