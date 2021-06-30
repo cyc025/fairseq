@@ -116,6 +116,7 @@ class BaseSublayer(nn.Module):
         self.ff2.weight.data.uniform_(norm_0, norm_1)
 
     def forward(self, xs):
+        from fairseq import pdb; pdb.set_trace()
         xs, sigma = self.norm(xs)
         with open('.sigma.log','a') as sigma:
             sigma.write(f'{sigma}\n')
