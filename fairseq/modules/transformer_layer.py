@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 import torch
 import torch.nn as nn
 from fairseq import utils
-from fairseq.modules import LayerNorm, MultiheadAttention
+from fairseq.modules import LayerNorm, MultiheadAttention, ZenLayerNorm
 from fairseq.modules.fairseq_dropout import FairseqDropout
 from fairseq.modules.quant_noise import quant_noise
 from torch import Tensor
@@ -177,6 +177,9 @@ class TransformerDecoderLayer(nn.Module):
         self, args, no_encoder_attn=False, add_bias_kv=False, add_zero_attn=False
     ):
         super().__init__()
+
+        self.ZenLayerNorm = ZenLayerNorm
+
         self.embed_dim = args.decoder_embed_dim
         self.dropout_module = FairseqDropout(
             args.dropout, module_name=self.__class__.__name__
@@ -305,9 +308,13 @@ class TransformerDecoderLayer(nn.Module):
         if need_head_weights:
             need_attn = True
 
+        sigmas = []
+
         residual = x
         if self.normalize_before:
-            x = self.self_attn_layer_norm(x)
+            x, sigma = self.ZenLayerNorm(x)
+            sigmas.append(sigma)
+
         if prev_self_attn_state is not None:
             prev_key, prev_value = prev_self_attn_state[:2]
             saved_state: Dict[str, Optional[Tensor]] = {
@@ -355,12 +362,14 @@ class TransformerDecoderLayer(nn.Module):
         x = self.dropout_module(x)
         x = self.residual_connection(x, residual)
         if not self.normalize_before:
-            x = self.self_attn_layer_norm(x)
+            x, sigma = self.ZenLayerNorm(x)
+            sigmas.append(sigma)
 
         if self.encoder_attn is not None and encoder_out is not None:
             residual = x
             if self.normalize_before:
-                x = self.encoder_attn_layer_norm(x)
+                x,sigma = self.ZenLayerNorm(x)
+                sigmas.append(sigma)
             if prev_attn_state is not None:
                 prev_key, prev_value = prev_attn_state[:2]
                 saved_state: Dict[str, Optional[Tensor]] = {
@@ -389,7 +398,8 @@ class TransformerDecoderLayer(nn.Module):
 
         residual = x
         if self.normalize_before:
-            x = self.final_layer_norm(x)
+            x, sigma = self.ZenLayerNorm(x)
+            sigmas.append(sigma)
 
         x = self.activation_fn(self.fc1(x))
         x = self.activation_dropout_module(x)
@@ -397,7 +407,14 @@ class TransformerDecoderLayer(nn.Module):
         x = self.dropout_module(x)
         x = self.residual_connection(x, residual)
         if not self.normalize_before:
-            x = self.final_layer_norm(x)
+            x, sigma = self.ZenLayerNorm(x)
+            sigmas.append(sigma)
+
+        ### sigmas ###
+        with open('.sigma.log','a') as sigma:
+            _s_ = '\n'.join([s for s in sigmas])
+            sigma.write(f'{_s_}')
+
         if self.onnx_trace and incremental_state is not None:
             saved_state = self.self_attn._get_input_buffer(incremental_state)
             assert saved_state is not None
