@@ -1008,7 +1008,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # from fairseq import pdb; pdb.set_trace()
         zen_score = final_sigma + init_x.grad.mean().cpu().numpy()
         with open('.zen_score.log','w') as zen_log:
-            zen_log.write(zen_score)
+            zen_log.write(str(zen_score))
 
         if attn is not None:
             if alignment_heads is not None:
