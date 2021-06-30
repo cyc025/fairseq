@@ -999,15 +999,15 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
 
         from fairseq import pdb; pdb.set_trace()
+        ### to compute model expressivity
+        import numpy as np
         x = torch.tensor(new_sigmas)
-        final_sigma = torch.sum(torch.log(x))
+        final_sigma = np.sum(np.log(x.numpy()))
 
-        # to compute model expressivity
-        final_sigma = None
-        if self.training:
-            x_grad.backward()
-            from fairseq import pdb; pdb.set_trace()
-            self.zen_score = final_sigma + init_x.grad.mean()
+        # take derivative
+        x_grad.backward()
+        from fairseq import pdb; pdb.set_trace()
+        self.zen_score = final_sigma + init_x.grad.mean().numpy()
 
         if attn is not None:
             if alignment_heads is not None:
