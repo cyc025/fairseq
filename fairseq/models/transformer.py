@@ -975,6 +975,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             else:
                 self_attn_mask = None
 
+            from fairseq import pdb; pdb.set_trace()
             x_grad, layer_attn_grad, _ = layer(
                 x_grad,
                 enc,
