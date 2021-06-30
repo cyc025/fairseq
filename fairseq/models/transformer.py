@@ -1006,7 +1006,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         # take derivative
         from fairseq import pdb; pdb.set_trace()
-        self.zen_score = final_sigma + init_x.grad.mean().numpy()
+        self.zen_score = final_sigma + init_x.grad.mean().cpu().numpy()
 
         if attn is not None:
             if alignment_heads is not None:
