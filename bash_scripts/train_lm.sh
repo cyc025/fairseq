@@ -25,7 +25,6 @@
 # done
 
 
-rm .sigma.log
 python train.py --task language_modeling \
   data-bin/wikitext-103 \
   --save-dir checkpoints/transformer_wikitext-103 \
