@@ -1005,7 +1005,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         final_sigma = np.sum(np.log(x.numpy()))
 
         # take derivative
-        x_grad.backward()
         from fairseq import pdb; pdb.set_trace()
         self.zen_score = final_sigma + init_x.grad.mean().numpy()
 
