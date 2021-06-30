@@ -410,11 +410,11 @@ class TransformerDecoderLayer(nn.Module):
             x, sigma = self.ZenLayerNorm(x)
             sigmas.append(sigma)
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         ### sigmas ###
         with open('.sigma.log','a') as sigma:
-            _s_ = '\n'.join([s.data for s in sigmas])
+            _s_ = '\n'.join([str(s.mean().item()) for s in sigmas])
             sigma.write(f'{_s_}')
 
         if self.onnx_trace and incremental_state is not None:
