@@ -988,7 +988,10 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             if layer_attn_grad is not None and idx == alignment_layer:
                 attn_grad = layer_attn_grad.float().to(x_grad)
 
+        from fairseq import pdb; pdb.set_trace()
         x_grad.mean().backward()
+
+
         sigmas = [float(layer_sigma) for layer_sigma in open('.sigma.log','r')]
         new_sigmas = []
         for sigma in sigmas:
@@ -997,8 +1000,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         x = torch.tensor(new_sigmas)
         final_sigma = torch.sum(torch.log(x))
-
-        from fairseq import pdb; pdb.set_trace()
 
         # to compute model expressivity
         final_sigma = None
