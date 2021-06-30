@@ -414,7 +414,7 @@ class TransformerDecoderLayer(nn.Module):
 
         ### sigmas ###
         with open('.sigma.log','a') as sigma:
-            _s_ = '\n'.join([s for s in sigmas])
+            _s_ = '\n'.join([s.data for s in sigmas])
             sigma.write(f'{_s_}')
 
         if self.onnx_trace and incremental_state is not None:
