@@ -410,6 +410,8 @@ class TransformerDecoderLayer(nn.Module):
             x, sigma = self.ZenLayerNorm(x)
             sigmas.append(sigma)
 
+        from fairseq import pdb; pdb.set_trace()
+
         ### sigmas ###
         with open('.sigma.log','a') as sigma:
             _s_ = '\n'.join([s for s in sigmas])
