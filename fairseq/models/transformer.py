@@ -938,9 +938,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
 
         # to compute expressivity
-        # x_grad = Variable(x.data,requires_grad=True)
-        x.requires_grad=True
-        init_x = x
+        x_grad = Variable(x.data,requires_grad=True)
 
         # decoder layers
         attn: Optional[Tensor] = None
@@ -966,6 +964,31 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 attn = layer_attn.float().to(x)
 
 
+        # for grad purpose only
+        # decoder layers
+        attn_grad: Optional[Tensor] = None
+        inner_states: List[Optional[Tensor]] = [x_grad]
+        for idx, layer in enumerate(self.layers): # change_here
+            if incremental_state is None and not full_context_alignment:
+                self_attn_mask = self.buffered_future_mask(x_grad)
+            else:
+                self_attn_mask = None
+
+            x_grad, layer_attn_grad, _ = layer(
+                x_grad,
+                enc,
+                padding_mask,
+                incremental_state,
+                self_attn_mask=self_attn_mask,
+                self_attn_padding_mask=self_attn_padding_mask,
+                need_attn=bool((idx == alignment_layer)),
+                need_head_weights=bool((idx == alignment_layer)),
+            )
+            inner_states.append(x_grad)
+            if layer_attn_grad is not None and idx == alignment_layer:
+                attn_grad = layer_attn_grad.float().to(x_grad)
+
+
         sigmas = [float(layer_sigma) for layer_sigma in open('.sigma.log','r')]
         new_sigmas = []
         for sigma in sigmas:
@@ -980,6 +1003,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # to compute model expressivity
         final_sigma = None
         if self.training:
+            x_grad.backward()
             self.zen_score = final_sigma + init_x.grad.mean()
 
         if attn is not None:
