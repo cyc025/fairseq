@@ -413,9 +413,7 @@ class TransformerDecoderLayer(nn.Module):
         # from fairseq import pdb; pdb.set_trace()
 
         ### sigmas ###
-        with open('.sigma.log','w') as sigma:
-            _s_ = '\n'.join([str(s.mean().item()) for s in sigmas])
-            sigma.write(f'{_s_}')
+        torch.save(sigmas,'sigmas.pt')
 
         if self.onnx_trace and incremental_state is not None:
             saved_state = self.self_attn._get_input_buffer(incremental_state)
