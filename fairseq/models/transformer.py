@@ -965,6 +965,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # to compute expressivity
         from torch.autograd import Variable
         x_grad = Variable(x.data,requires_grad=True)
+        init_x = x_grad
         # decoder layers
         attn_grad: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x_grad]
