@@ -990,7 +990,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         #     if layer_attn_grad is not None and idx == alignment_layer:
         #         attn_grad = layer_attn_grad.float().to(x_grad)
 
-        # from fairseq import pdb; pdb.set_trace()
+        from fairseq import pdb; pdb.set_trace()
         x.mean().backward(retain_graph=True)
 
         sigmas = torch.load('sigmas.pt')
