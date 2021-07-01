@@ -79,7 +79,7 @@ with open('search.log','w') as search_log:
         for decoder_layers in decoder_layerss:
             for decoder_attention_heads in decoder_attention_headss:
                 zen_score = search(decoder_embed_dim,decoder_layers,decoder_attention_heads)
-                zen_scores_tups.append( (zen_score,f'zen_score: {zen_score}, decoder_embed_dim: {nhdecoder_embed_dimid}, decoder_layers: {decoder_layers}, decoder_attention_heads: {decoder_attention_heads}') )
+                zen_scores_tups.append( (zen_score,f'zen_score: {zen_score}, decoder_embed_dim: {decoder_embed_dim}, decoder_layers: {decoder_layers}, decoder_attention_heads: {decoder_attention_heads}') )
 
 max_zen_tup = max(zen_scores_tups,key=lambda item:item[0])
 print(max_zen_tup)
