@@ -973,7 +973,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             sigmas = torch.load('sigmas.pt')
             new_sigmas = []
             buffer_val = 100
-            print(init_x.grad.mean().cpu().numpy())
+            # print(init_x.grad.mean().cpu().numpy())
             for sigma in sigmas:
                 C_dim = sigma.size()[0]
                 new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
