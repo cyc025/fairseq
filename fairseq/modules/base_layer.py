@@ -8,7 +8,7 @@ import torch
 import sys
 from fairseq import utils
 from fairseq.distributed import utils as distributed_utils
-from fairseq.modules.layer_norm import LayerNorm, ZenLayerNorm
+from fairseq.modules.layer_norm import LayerNorm
 
 
 class BaseLayer(nn.Module):
@@ -105,22 +105,13 @@ class BaseSublayer(nn.Module):
         self.activation_fn = utils.get_activation_fn(
             activation=getattr(args, 'activation_fn', 'relu') or "relu"
         )
-        self.norm = LayerNorm(args.decoder_embed_dim, export=False) # change_here
-        self.norm = ZenLayerNorm # for expressivity
+        self.norm = LayerNorm(args.decoder_embed_dim, export=False)
         self.ff1 = torch.nn.Linear(args.decoder_embed_dim, args.decoder_ffn_embed_dim)
         self.ff2 = torch.nn.Linear(args.decoder_ffn_embed_dim, args.decoder_embed_dim)
         self.ff2.weight.data.zero_()
-        # initialize to norm here
-        norm_0,norm_1 = 0.,1.
-        self.ff1.weight.data.uniform_(norm_0, norm_1)
-        self.ff2.weight.data.uniform_(norm_0, norm_1)
 
     def forward(self, xs):
-
-        xs, sigma = self.norm(xs)
-        with open('.sigma.log','a') as sigma:
-            sigma.write(f'{sigma}\n')
-        return xs + self.ff2(self.activation_fn(self.ff1( xs )))
+        return xs + self.ff2(self.activation_fn(self.ff1(self.norm(xs))))
 
 
 # Wraps torch.distributed.all_to_all_single as a function that supports autograd
