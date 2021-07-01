@@ -39,6 +39,7 @@ parameters = f"--decoder-embed-dim {decoder_embed_dim} \
 
 search_command = f"python train.py --task language_modeling \
           data-bin/wikitext-2 \
+          --decoder_normalize_before True \
           --save-dir checkpoints/transformer_wikitext-2 \
           --arch transformer_lm --share-decoder-input-output-embed \
           --dropout 0.1 \
