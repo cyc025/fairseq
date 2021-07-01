@@ -23,7 +23,6 @@ from fairseq.modules import (
     FairseqDropout,
     LayerDropModuleList,
     LayerNorm,
-    ZenLayerNorm,
     PositionalEmbedding,
     SinusoidalPositionalEmbedding,
     TransformerDecoderLayer,
@@ -404,7 +403,7 @@ class TransformerEncoder(FairseqEncoder):
         self.num_layers = len(self.layers)
 
         if args.encoder_normalize_before:
-            self.layer_norm = LayerNorm(embed_dim) #change_norm
+            self.layer_norm = LayerNorm(embed_dim)
         else:
             self.layer_norm = None
 
@@ -726,7 +725,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if args.decoder_normalize_before and not getattr(
             args, "no_decoder_final_norm", False
         ):
-            self.layer_norm = LayerNorm(embed_dim) # change_norm
+            self.layer_norm = LayerNorm(embed_dim)
         else:
             self.layer_norm = None
 
@@ -940,7 +939,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
-        for idx, layer in enumerate(self.layers): # change_here
+        for idx, layer in enumerate(self.layers):
             if incremental_state is None and not full_context_alignment:
                 self_attn_mask = self.buffered_future_mask(x)
             else:
@@ -959,55 +958,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             inner_states.append(x)
             if layer_attn is not None and idx == alignment_layer:
                 attn = layer_attn.float().to(x)
-        #
-        # # to compute expressivity
-        # from torch.autograd import Variable
-        # x_grad = Variable(x.data,requires_grad=True)
-        # init_x = x_grad
-        # # decoder layers
-        # attn_grad: Optional[Tensor] = None
-        # inner_states: List[Optional[Tensor]] = [x_grad]
-        # for idx, layer in enumerate(self.layers): # change_here
-        #     if incremental_state is None and not full_context_alignment:
-        #         self_attn_mask = self.buffered_future_mask(x_grad)
-        #     else:
-        #         self_attn_mask = None
-        #     x_grad, layer_attn_grad, _ = layer(
-        #         x_grad,
-        #         enc,
-        #         padding_mask,
-        #         incremental_state,
-        #         self_attn_mask=self_attn_mask,
-        #         self_attn_padding_mask=self_attn_padding_mask,
-        #         need_attn=bool((idx == alignment_layer)),
-        #         need_head_weights=bool((idx == alignment_layer)),
-        #     )
-        #     inner_states.append(x_grad)
-        #     if layer_attn_grad is not None and idx == alignment_layer:
-        #         attn_grad = layer_attn_grad.float().to(x_grad)
-        #
-        # # from fairseq import pdb; pdb.set_trace()
-        # x_grad.mean().backward()
-        #
-        # sigmas = torch.load('sigmas.pt')
-        # new_sigmas = []
-        # buffer_val = 100
-        # for sigma in sigmas:
-        #     C_dim = sigma.size()[0]
-        #     new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
-        #
-        # # from fairseq import pdb; pdb.set_trace()
-        # ### to compute model expressivity
-        # import numpy as np
-        # x = torch.tensor(new_sigmas)
-        # final_sigma = np.sum(np.log(x.numpy()))
-        #
-        # # take derivative
-        # # from fairseq import pdb; pdb.set_trace()
-        # zen_score = final_sigma + init_x.grad.mean().cpu().numpy()
-        # with open('.zen_score.log','w') as zen_log:
-        #     zen_log.write(str(zen_score))
-        from fairseq import pdb; pdb.set_trace()
 
         if attn is not None:
             if alignment_heads is not None:
