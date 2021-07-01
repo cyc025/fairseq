@@ -742,7 +742,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             self.build_output_projection(args, dictionary, embed_tokens)
 
         # initialize to normal dist. for expressivity
-        init_weights_normal(self)
+        self.apply(init_weights_normal)
 
     def build_output_projection(self, args, dictionary, embed_tokens):
         if args.adaptive_softmax_cutoff is not None:
