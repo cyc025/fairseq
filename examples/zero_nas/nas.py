@@ -30,7 +30,10 @@ import os
     # [--quant-noise-pq-block-size D] [--quant-noise-scalar D]
 
 
-decoder_embed_dim = 1000
+# clear checkpoints
+rm checkpoints/transformer_wikitext-2/*
+
+decoder_embed_dim = 200
 decoder_layers = 8
 decoder_attention_heads = 2
 parameters = f"--decoder-embed-dim {decoder_embed_dim} \
