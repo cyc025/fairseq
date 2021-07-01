@@ -5,7 +5,7 @@
 
 
 import os
-
+import math
     #
     #
     # [--arch {transformer,transformer_iwslt_de_en,transformer_wmt_en_de,transformer_vaswani_wmt_en_de_big,transformer_vaswani_wmt_en_fr_big,transformer_wmt_en_de_big,transformer_wmt_en_de_big_t2t}]
@@ -69,9 +69,9 @@ decoder_embed_dims = range(50,2000,50)
 decoder_layerss = range(1,10)
 decoder_attention_headss = range(1,10)
 
-# decoder_embed_dims = range(100,200,50)
-# decoder_layerss = range(2,3)
-# decoder_attention_headss = range(2,3)
+decoder_embed_dims = range(100,200,50)
+decoder_layerss = range(2,3)
+decoder_attention_headss = range(2,3)
 
 zen_scores_tups = []
 with open('search.log','w') as search_log:
