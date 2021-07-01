@@ -318,7 +318,7 @@ class SequenceGenerator(nn.Module):
                     # update beam indices to take into account removed sentences
                     corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
                         batch_idxs
-                    )
+                    ) 
                     reorder_state.view(-1, beam_size).add_(
                         corr.unsqueeze(-1) * beam_size
                     )
