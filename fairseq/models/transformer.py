@@ -938,6 +938,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
 
         # decoder layers
+        from torch.autograd import Variable
         x = Variable(x.data,requires_grad=True)
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
