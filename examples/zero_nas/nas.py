@@ -54,6 +54,7 @@ search_command = f"python train.py --task language_modeling \
           --max-tokens 2048 --update-freq 16 \
           --disable-validation \
           --fp16 \
+          --batch-size 1024 \
           {parameters} \
           --max-update 1"
 os.system(search_command)
