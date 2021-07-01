@@ -186,7 +186,7 @@ class LanguageModelingTask(LegacyFairseqTask):
         return cls(args, dictionary, output_dictionary, targets=targets)
 
     def build_model(self, args):
-        print(args)
+        from fairseq import pdb; pdb.set_trace()
         model = super().build_model(args)
         for target in self.targets:
             if target not in model.supported_targets:
