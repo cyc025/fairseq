@@ -963,7 +963,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # to compute expressivity
         from torch.autograd import Variable
         x_grad = Variable(x.data,requires_grad=True)
-        init_x = x_grad
+        init_x = x_grad.clone()
         incremental_state_grad = incremental_state
         # decoder layers
         attn_grad: Optional[Tensor] = None
@@ -987,7 +987,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             if layer_attn_grad is not None and idx == alignment_layer:
                 attn_grad = layer_attn_grad.float().to(x_grad)
 
-        x_grad.mean().backward()
+        x_grad.mean().clone().detach().backward()
 
         sigmas = torch.load('sigmas.pt')
         new_sigmas = []
