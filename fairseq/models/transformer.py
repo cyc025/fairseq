@@ -741,6 +741,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.output_projection is None:
             self.build_output_projection(args, dictionary, embed_tokens)
 
+        # initialize to normal dist. for expressivity
         init_weights_normal(self)
 
     def build_output_projection(self, args, dictionary, embed_tokens):
@@ -1085,6 +1086,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
 def init_weights_normal(m):
     if type(m) == nn.Linear:
+        print('here')
         torch.nn.init.normal_(m.weight)
         m.bias.data.fill_(0.)
 
