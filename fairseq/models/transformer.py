@@ -939,7 +939,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
-        for idx, layer in enumerate(self.layers):
+        for idx, layer in enumerate(self.layers)[:1]:
             if incremental_state is None and not full_context_alignment:
                 self_attn_mask = self.buffered_future_mask(x)
             else:
