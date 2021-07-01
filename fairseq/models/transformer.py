@@ -991,7 +991,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         #         attn_grad = layer_attn_grad.float().to(x_grad)
 
         from fairseq import pdb; pdb.set_trace()
-        x.mean().detach().backward(retain_graph=True)
+        x.mean().backward(retain_graph=True)
 
         sigmas = torch.load('sigmas.pt')
         new_sigmas = []
