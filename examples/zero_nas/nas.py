@@ -69,9 +69,9 @@ decoder_embed_dims = range(50,2000,50)
 decoder_layerss = range(1,10)
 decoder_attention_headss = range(1,10)
 
-decoder_embed_dims = range(100,200,50)
-decoder_layerss = range(2,3)
-decoder_attention_headss = range(2,3)
+# decoder_embed_dims = range(100,200,50)
+# decoder_layerss = range(2,3)
+# decoder_attention_headss = range(2,3)
 
 zen_scores_tups = []
 with open('search.log','w') as search_log:
@@ -86,14 +86,12 @@ with open('search.log','w') as search_log:
 
 sorted_max_zen_tup = sorted(zen_scores_tups, key=lambda tup: tup[0])
 print(sorted_max_zen_tup[-1])
-print(sorted_max_zen_tup)
-
 
 import pickle
 with open('expressivity.pkl', 'wb') as handle:
     pickle.dump(sorted_max_zen_tup, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-with open('expressivity.pkl', 'rb') as handle:
-    b = pickle.load(handle)
-
-print(b)
+# with open('expressivity.pkl', 'rb') as handle:
+#     b = pickle.load(handle)
+#
+# print(b)
