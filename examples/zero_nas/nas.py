@@ -69,9 +69,9 @@ decoder_embed_dims = range(50,2000,50)
 decoder_layerss = range(1,10)
 decoder_attention_headss = range(1,10)
 
-decoder_embed_dims = range(100,200,50)
-decoder_layerss = range(2,3)
-decoder_attention_headss = range(2,3)
+# decoder_embed_dims = range(100,200,50)
+# decoder_layerss = range(2,3)
+# decoder_attention_headss = range(2,3)
 
 zen_scores_tups = []
 with open('search.log','w') as search_log:
@@ -79,7 +79,10 @@ with open('search.log','w') as search_log:
         for decoder_layers in decoder_layerss:
             for decoder_attention_heads in decoder_attention_headss:
                 zen_score = search(decoder_embed_dim,decoder_layers,decoder_attention_heads)
+                if math.isinf(zen_score):
+                    zen_score = 1000
                 zen_scores_tups.append( (zen_score,f'zen_score: {zen_score}, decoder_embed_dim: {decoder_embed_dim}, decoder_layers: {decoder_layers}, decoder_attention_heads: {decoder_attention_heads}') )
 
-max_zen_tup = max(zen_scores_tups,key=lambda item:item[0])
-print(max_zen_tup)
+sorted_max_zen_tup = sorted(zen_scores_tups, key=lambda tup: tup[0])
+print(sorted_max_zen_tup[0])
+print(sorted_max_zen_tup)
