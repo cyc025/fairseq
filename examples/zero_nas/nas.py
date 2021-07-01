@@ -31,7 +31,7 @@ import os
 
 
 decoder_embed_dim = 200
-decoder_layers = 4
+decoder_layers = 8
 decoder_attention_heads = 2
 parameters = f"--decoder-embed-dim {decoder_embed_dim} \
                --decoder-layers {decoder_layers} \
