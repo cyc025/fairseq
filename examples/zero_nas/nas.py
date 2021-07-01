@@ -18,3 +18,6 @@ search_command = f"python train.py --task language_modeling \
           --fp16 \
           --max-update 1"
 os.system(search_command)
+
+zen_score = float(open('.zen_score.log','r').read().strip())
+print(zen_score)
