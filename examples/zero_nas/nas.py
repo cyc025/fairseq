@@ -33,9 +33,9 @@ import os
 # clear checkpoints
 os.system("rm checkpoints/transformer_wikitext-2/*")
 
-decoder_embed_dim = 200
+decoder_embed_dim = 1
 decoder_layers = 1
-decoder_attention_heads = 2
+decoder_attention_heads = 1
 parameters = f"--decoder-embed-dim {decoder_embed_dim} \
                --decoder-layers {decoder_layers} \
                --decoder-attention-heads {decoder_attention_heads} "
