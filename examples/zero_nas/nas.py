@@ -78,6 +78,7 @@ with open('search.log','w') as search_log:
     for decoder_embed_dim in decoder_embed_dims:
         for decoder_layers in decoder_layerss:
             for decoder_attention_heads in decoder_attention_headss:
+                if decoder_embed_dim%decoder_attention_heads!=0: continue
                 zen_score = search(decoder_embed_dim,decoder_layers,decoder_attention_heads)
                 if math.isinf(zen_score):
                     zen_score = 1000
