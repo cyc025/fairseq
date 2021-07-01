@@ -24,6 +24,15 @@
 #     done
 # done
 
+TEXT=examples/zero_nas/wikitext-2
+fairseq-preprocess \
+    --only-source \
+    --trainpref $TEXT/wiki.train.tokens \
+    --validpref $TEXT/wiki.valid.tokens \
+    --testpref $TEXT/wiki.test.tokens \
+    --destdir data-bin/wikitext-2 \
+    --workers 20
+
 
 python train.py --task language_modeling \
   data-bin/wikitext-103 \

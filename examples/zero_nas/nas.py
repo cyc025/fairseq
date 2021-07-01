@@ -7,8 +7,8 @@
 import os
 
 search_command = f"python train.py --task language_modeling \
-          data-bin/wikitext-103 \
-          --save-dir checkpoints/transformer_wikitext-103 \
+          data-bin/wikitext-2 \
+          --save-dir checkpoints/transformer_wikitext-2 \
           --arch transformer_lm --share-decoder-input-output-embed \
           --dropout 0.1 \
           --optimizer adam --adam-betas '(0.9, 0.98)' --weight-decay 0.01 --clip-norm 0.0 \
@@ -16,5 +16,5 @@ search_command = f"python train.py --task language_modeling \
           --tokens-per-sample 512 --sample-break-mode none \
           --max-tokens 2048 --update-freq 16 \
           --fp16 \
-          --max-update 50000"
+          --max-update 1"
 os.system(search_command)
