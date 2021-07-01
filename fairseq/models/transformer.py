@@ -1088,7 +1088,7 @@ def init_weights_normal(m):
     if type(m) == nn.Linear:
         print('----------------------------------------here------------------------')
         torch.nn.init.normal_(m.weight)
-        m.bias.data.fill_(0.)
+        # m.bias.data.fill_(0.)
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
     m = nn.Embedding(num_embeddings, embedding_dim, padding_idx=padding_idx)
