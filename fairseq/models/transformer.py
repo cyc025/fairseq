@@ -1086,7 +1086,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
 def init_weights_normal(m):
     if type(m) == nn.Linear:
-        torch.nn.init.normal_(m.weight)
+        torch.nn.init.uniform_(m.weight)
         print(m.weight)
         # m.bias.data.fill_(0.)
 
