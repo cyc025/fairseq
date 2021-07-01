@@ -16,5 +16,5 @@ search_command = f"python train.py --task language_modeling \
           --tokens-per-sample 512 --sample-break-mode none \
           --max-tokens 2048 --update-freq 16 \
           --fp16 \
-          --max-update 1"
+          --max-update 2"
 os.system(search_command)
