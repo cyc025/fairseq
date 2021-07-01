@@ -67,11 +67,11 @@ def search(decoder_embed_dim,decoder_layers,decoder_attention_heads):
 
 decoder_embed_dims = range(50,2000,50)
 decoder_layerss = range(1,10)
-decoder_attention_heads = range(1,10)
+decoder_attention_headss = range(1,10)
 
 decoder_embed_dims = range(50,100,50)
 decoder_layerss = range(1,2)
-decoder_attention_heads = range(1,2)
+decoder_attention_headss = range(1,2)
 
 zen_scores_tups = []
 with open('search.log','w') as search_log:
