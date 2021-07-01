@@ -990,29 +990,30 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         #     if layer_attn_grad is not None and idx == alignment_layer:
         #         attn_grad = layer_attn_grad.float().to(x_grad)
 
-        # from fairseq import pdb; pdb.set_trace()
-        x.mean().backward(retain_graph=True)
+        if self.training:
+            # from fairseq import pdb; pdb.set_trace()
+            x.mean().backward(retain_graph=True)
 
-        sigmas = torch.load('sigmas.pt')
-        new_sigmas = []
-        buffer_val = 100
-        for sigma in sigmas:
-            C_dim = sigma.size()[0]
-            new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
+            sigmas = torch.load('sigmas.pt')
+            new_sigmas = []
+            buffer_val = 100
+            for sigma in sigmas:
+                C_dim = sigma.size()[0]
+                new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
 
-        ### to compute model expressivity
-        import numpy as np
-        sigma_inter = torch.tensor(new_sigmas)
-        sigma_sum = np.sum(np.log(sigma_inter.numpy()))
+            ### to compute model expressivity
+            import numpy as np
+            sigma_inter = torch.tensor(new_sigmas)
+            sigma_sum = np.sum(np.log(sigma_inter.numpy()))
 
-        # take derivative
-        # from fairseq import pdb; pdb.set_trace()
-        zen_score = sigma_sum + init_x.grad.mean().cpu().numpy()
-        with open('.zen_score.log','w') as zen_log:
-            zen_log.write(str(zen_score))
-        # from fairseq import pdb; pdb.set_trace()
+            # take derivative
+            # from fairseq import pdb; pdb.set_trace()
+            zen_score = sigma_sum + init_x.grad.mean().cpu().numpy()
+            with open('.zen_score.log','w') as zen_log:
+                zen_log.write(str(zen_score))
+            # from fairseq import pdb; pdb.set_trace()
 
-        self.zero_grad()
+            self.zero_grad()
 
         if attn is not None:
             if alignment_heads is not None:
