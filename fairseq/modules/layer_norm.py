@@ -32,7 +32,7 @@ def ZenLayerNorm(x):
         return: (x,sigma)
     """
     eps = 0.00001
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     mean = torch.mean(x, dim=2, keepdim=True)
     var = torch.square(x - mean).mean(dim=2, keepdim=True)
     sigma = var.view(-1)
