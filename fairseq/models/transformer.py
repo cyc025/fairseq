@@ -937,12 +937,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.cross_self_attention or prev_output_tokens.eq(self.padding_idx).any():
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
 
-
-        # to compute expressivity
-        from torch.autograd import Variable
-        x = Variable(x.data,requires_grad=True)
-        init_x = x
-
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
@@ -966,34 +960,34 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             if layer_attn is not None and idx == alignment_layer:
                 attn = layer_attn.float().to(x)
 
-        # # to compute expressivity
-        # from torch.autograd import Variable
-        # x_grad = Variable(x.data,requires_grad=True)
-        # init_x = x_grad
-        # incremental_state_grad = incremental_state
-        # # decoder layers
-        # attn_grad: Optional[Tensor] = None
-        # inner_states: List[Optional[Tensor]] = [x_grad]
-        # for idx, layer in enumerate(self.layers): # change_here
-        #     if incremental_state_grad is None and not full_context_alignment:
-        #         self_attn_mask_grad = self.buffered_future_mask(x_grad)
-        #     else:
-        #         self_attn_mask_grad = None
-        #     x_grad, layer_attn_grad, _ = layer(
-        #         x_grad,
-        #         enc,
-        #         padding_mask,
-        #         incremental_state_grad,
-        #         self_attn_mask=self_attn_mask_grad,
-        #         self_attn_padding_mask=self_attn_padding_mask,
-        #         need_attn=bool((idx == alignment_layer)),
-        #         need_head_weights=bool((idx == alignment_layer)),
-        #     )
-        #     inner_states.append(x_grad)
-        #     if layer_attn_grad is not None and idx == alignment_layer:
-        #         attn_grad = layer_attn_grad.float().to(x_grad)
+        # to compute expressivity
+        from torch.autograd import Variable
+        x_grad = Variable(x.data,requires_grad=True)
+        init_x = x_grad
+        incremental_state_grad = incremental_state
+        # decoder layers
+        attn_grad: Optional[Tensor] = None
+        inner_states: List[Optional[Tensor]] = [x_grad]
+        for idx, layer in enumerate(self.layers): # change_here
+            if incremental_state_grad is None and not full_context_alignment:
+                self_attn_mask_grad = self.buffered_future_mask(x_grad)
+            else:
+                self_attn_mask_grad = None
+            x_grad, layer_attn_grad, _ = layer(
+                x_grad,
+                enc,
+                padding_mask,
+                incremental_state_grad,
+                self_attn_mask=self_attn_mask_grad,
+                self_attn_padding_mask=self_attn_padding_mask,
+                need_attn=bool((idx == alignment_layer)),
+                need_head_weights=bool((idx == alignment_layer)),
+            )
+            inner_states.append(x_grad)
+            if layer_attn_grad is not None and idx == alignment_layer:
+                attn_grad = layer_attn_grad.float().to(x_grad)
 
-        x.mean().backward()
+        x_grad.mean().backward()
 
         sigmas = torch.load('sigmas.pt')
         new_sigmas = []
@@ -1004,12 +998,12 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         ### to compute model expressivity
         import numpy as np
-        sigma_value = torch.tensor(new_sigmas)
-        final_sigma = np.sum(np.log(sigma_value.numpy()))
+        sigma_inter = torch.tensor(new_sigmas)
+        sigma_sum = np.sum(np.log(sigma_inter.numpy()))
 
         # take derivative
         # from fairseq import pdb; pdb.set_trace()
-        zen_score = final_sigma + init_x.grad.mean().cpu().numpy()
+        zen_score = sigma_sum + init_x.grad.mean().cpu().numpy()
         with open('.zen_score.log','w') as zen_log:
             zen_log.write(str(zen_score))
         # from fairseq import pdb; pdb.set_trace()
