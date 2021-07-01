@@ -30,34 +30,56 @@ import os
     # [--quant-noise-pq-block-size D] [--quant-noise-scalar D]
 
 
-# clear checkpoints
-os.system("rm checkpoints/transformer_wikitext-2/*")
+def search(decoder_embed_dim,decoder_layers,decoder_attention_heads):
+    # clear checkpoints
+    os.system("rm checkpoints/transformer_wikitext-2/*")
 
-params = {
-    'decoder_embed_dim': 200,
-    'decoder_layers': 6,
-    'decoder_attention_heads': 1,
-}
-parameters = f"--decoder-embed-dim {params['decoder_embed_dim']} \
-               --decoder-layers {params['decoder_layers']} \
-               --decoder-attention-heads {params['decoder_attention_heads']} "
+    params = {
+        'decoder_embed_dim': decoder_embed_dim,
+        'decoder_layers': decoder_layers,
+        'decoder_attention_heads': decoder_attention_heads,
+    }
+    parameters = f"--decoder-embed-dim {params['decoder_embed_dim']} \
+                   --decoder-layers {params['decoder_layers']} \
+                   --decoder-attention-heads {params['decoder_attention_heads']} "
 
-search_command = f"python train.py --task language_modeling \
-          data-bin/wikitext-2 \
-          --decoder-normalize-before \
-          --save-dir checkpoints/transformer_wikitext-2 \
-          --arch transformer_lm --share-decoder-input-output-embed \
-          --dropout 0.1 \
-          --optimizer adam --adam-betas '(0.9, 0.98)' --weight-decay 0.01 --clip-norm 0.0 \
-          --lr 0.0005 --lr-scheduler inverse_sqrt --warmup-updates 4000 --warmup-init-lr 1e-07 \
-          --tokens-per-sample 512 --sample-break-mode none \
-          --max-tokens 2048 --update-freq 16 \
-          --disable-validation \
-          --fp16 \
-          --batch-size 1024 \
-          {parameters} \
-          --max-update 1"
-os.system(search_command)
+    search_command = f"python train.py --task language_modeling \
+              data-bin/wikitext-2 \
+              --decoder-normalize-before \
+              --save-dir checkpoints/transformer_wikitext-2 \
+              --arch transformer_lm --share-decoder-input-output-embed \
+              --dropout 0.1 \
+              --optimizer adam --adam-betas '(0.9, 0.98)' --weight-decay 0.01 --clip-norm 0.0 \
+              --lr 0.0005 --lr-scheduler inverse_sqrt --warmup-updates 4000 --warmup-init-lr 1e-07 \
+              --tokens-per-sample 512 --sample-break-mode none \
+              --max-tokens 2048 --update-freq 16 \
+              --disable-validation \
+              --fp16 \
+              --batch-size 1024 \
+              {parameters} \
+              --max-update 1"
+    os.system(search_command)
 
-zen_score = float(open('.zen_score.log','r').read().strip())
-print(zen_score)
+    zen_score = float(open('.zen_score.log','r').read().strip())
+    return zen_score
+
+
+
+decoder_embed_dims = range(50,2000,50)
+decoder_layerss = range(1,10)
+decoder_attention_heads = range(1,10)
+
+decoder_embed_dims = range(50,100,50)
+decoder_layerss = range(1,2)
+decoder_attention_heads = range(1,2)
+
+zen_scores_tups = []
+with open('search.log','w') as search_log:
+    for decoder_embed_dim in decoder_embed_dims:
+        for decoder_layers in decoder_layerss:
+            for decoder_attention_heads in decoder_attention_headss:
+                zen_score = search(decoder_embed_dim,decoder_layers,decoder_attention_heads)
+                zen_scores_tups.append( (zen_score,f'zen_score: {zen_score}, decoder_embed_dim: {nhdecoder_embed_dimid}, decoder_layers: {decoder_layers}, decoder_attention_heads: {decoder_attention_heads}') )
+
+max_zen_tup = max(zen_scores_tups,key=lambda item:item[0])
+print(max_zen_tup)
