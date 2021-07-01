@@ -978,6 +978,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 C_dim = sigma.size()[0]
                 new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
 
+            print(new_sigmas)
+
             import numpy as np
             sigma_inter = torch.tensor(new_sigmas)
             sigma_sum = np.sum(np.log(sigma_inter.numpy()))
@@ -1087,7 +1089,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 def init_weights_normal(m):
     if type(m) == nn.Linear:
         torch.nn.init.uniform_(m.weight)
-        print(m.weight)
         # m.bias.data.fill_(0.)
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
