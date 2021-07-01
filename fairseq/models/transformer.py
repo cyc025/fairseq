@@ -978,11 +978,12 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 C_dim = sigma.size()[0]
                 new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
 
-            print(new_sigmas)
 
             import numpy as np
             sigma_inter = torch.tensor(new_sigmas)
             sigma_sum = np.sum(np.log(sigma_inter.numpy()))
+
+            print(sigma_inter.numpy())
 
             # take derivative
             zen_score = sigma_sum + init_x.grad.mean().cpu().numpy()
