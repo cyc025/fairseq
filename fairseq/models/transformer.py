@@ -741,6 +741,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.output_projection is None:
             self.build_output_projection(args, dictionary, embed_tokens)
 
+        init_weights_normal(self)
+
     def build_output_projection(self, args, dictionary, embed_tokens):
         if args.adaptive_softmax_cutoff is not None:
             self.adaptive_softmax = AdaptiveSoftmax(
@@ -1081,6 +1083,10 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         return state_dict
 
+def init_weights_normal(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.normal_(m.weight)
+        m.bias.data.fill_(0.)
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
     m = nn.Embedding(num_embeddings, embedding_dim, padding_idx=padding_idx)
