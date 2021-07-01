@@ -962,46 +962,19 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             inner_states.append(x)
             if layer_attn is not None and idx == alignment_layer:
                 attn = layer_attn.float().to(x)
-        #
-        # # to compute expressivity
-        # from torch.autograd import Variable
-        # x_grad = Variable(x.data,requires_grad=True)
-        # init_x = x_grad.clone()
-        # incremental_state_grad = incremental_state
-        # # decoder layers
-        # attn_grad: Optional[Tensor] = None
-        # inner_states: List[Optional[Tensor]] = [x_grad]
-        # for idx, layer in enumerate(self.layers): # change_here
-        #     if incremental_state_grad is None and not full_context_alignment:
-        #         self_attn_mask_grad = self.buffered_future_mask(x_grad)
-        #     else:
-        #         self_attn_mask_grad = None
-        #     x_grad, layer_attn_grad, _ = layer(
-        #         x_grad,
-        #         enc,
-        #         padding_mask,
-        #         incremental_state_grad,
-        #         self_attn_mask=self_attn_mask_grad,
-        #         self_attn_padding_mask=self_attn_padding_mask,
-        #         need_attn=bool((idx == alignment_layer)),
-        #         need_head_weights=bool((idx == alignment_layer)),
-        #     )
-        #     inner_states.append(x_grad)
-        #     if layer_attn_grad is not None and idx == alignment_layer:
-        #         attn_grad = layer_attn_grad.float().to(x_grad)
 
+        ### to compute model expressivity
         if self.training:
-            # from fairseq import pdb; pdb.set_trace()
             x.mean().backward(retain_graph=True)
 
             sigmas = torch.load('sigmas.pt')
             new_sigmas = []
             buffer_val = 100
+            print(len(sigmas))
             for sigma in sigmas:
                 C_dim = sigma.size()[0]
                 new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
 
-            ### to compute model expressivity
             import numpy as np
             sigma_inter = torch.tensor(new_sigmas)
             sigma_sum = np.sum(np.log(sigma_inter.numpy()))
@@ -1013,6 +986,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             # from fairseq import pdb; pdb.set_trace()
 
             self.zero_grad()
+
 
         if attn is not None:
             if alignment_heads is not None:
