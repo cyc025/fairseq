@@ -31,7 +31,7 @@ import os
 
 
 # clear checkpoints
-rm checkpoints/transformer_wikitext-2/*
+os.system("rm checkpoints/transformer_wikitext-2/*") 
 
 decoder_embed_dim = 200
 decoder_layers = 8
