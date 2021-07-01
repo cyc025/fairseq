@@ -36,6 +36,7 @@ def ZenLayerNorm(x):
     mean = torch.mean(x, dim=2, keepdim=True)
     var = torch.square(x - mean).mean(dim=2, keepdim=True)
     sigma = var.view(-1)
+    print(sigma)
     return (x - mean) / torch.sqrt(var + eps), sigma
 
 
