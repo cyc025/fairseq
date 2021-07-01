@@ -33,12 +33,14 @@ import os
 # clear checkpoints
 os.system("rm checkpoints/transformer_wikitext-2/*")
 
-decoder_embed_dim = 1
-decoder_layers = 1
-decoder_attention_heads = 1
-parameters = f"--decoder-embed-dim {decoder_embed_dim} \
-               --decoder-layers {decoder_layers} \
-               --decoder-attention-heads {decoder_attention_heads} "
+params = {
+    'decoder_embed_dim': 1,
+    'decoder_layers': 1,
+    'decoder_attention_heads': 1,
+}
+parameters = f"--decoder-embed-dim {params['decoder_embed_dim']} \
+               --decoder-layers {params['decoder_layers']} \
+               --decoder-attention-heads {params['decoder_attention_heads']} "
 
 search_command = f"python train.py --task language_modeling \
           data-bin/wikitext-2 \
