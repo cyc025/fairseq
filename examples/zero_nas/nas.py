@@ -81,8 +81,19 @@ with open('search.log','w') as search_log:
                 zen_score = search(decoder_embed_dim,decoder_layers,decoder_attention_heads)
                 if math.isinf(zen_score):
                     zen_score = 1000
-                zen_scores_tups.append( (zen_score,f'zen_score: {zen_score}, decoder_embed_dim: {decoder_embed_dim}, decoder_layers: {decoder_layers}, decoder_attention_heads: {decoder_attention_heads}') )
+                num_params = float(open('params.log','r'))
+                zen_scores_tups.append( (zen_score,num_params,f'zen_score: {zen_score}, decoder_embed_dim: {decoder_embed_dim}, decoder_layers: {decoder_layers}, decoder_attention_heads: {decoder_attention_heads}') )
 
 sorted_max_zen_tup = sorted(zen_scores_tups, key=lambda tup: tup[0])
-print(sorted_max_zen_tup[0])
+print(sorted_max_zen_tup[-1])
 print(sorted_max_zen_tup)
+
+
+import pickle
+with open('expressivity.pkl', 'wb') as handle:
+    pickle.dump(sorted_max_zen_tup, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+with open('expressivity.pkl', 'rb') as handle:
+    b = pickle.load(handle)
+
+print(b)
