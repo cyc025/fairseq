@@ -81,7 +81,7 @@ with open('search.log','w') as search_log:
                 zen_score = search(decoder_embed_dim,decoder_layers,decoder_attention_heads)
                 if math.isinf(zen_score):
                     zen_score = 1000
-                num_params = float(open('params.log','r'))
+                num_params = float(open('params.log','r').read())
                 zen_scores_tups.append( (zen_score,num_params,f'zen_score: {zen_score}, decoder_embed_dim: {decoder_embed_dim}, decoder_layers: {decoder_layers}, decoder_attention_heads: {decoder_attention_heads}') )
 
 sorted_max_zen_tup = sorted(zen_scores_tups, key=lambda tup: tup[0])
