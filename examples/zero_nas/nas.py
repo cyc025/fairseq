@@ -34,7 +34,7 @@ import os
 os.system("rm checkpoints/transformer_wikitext-2/*")
 
 params = {
-    'decoder_embed_dim': 100,
+    'decoder_embed_dim': 1000,
     'decoder_layers': 2,
     'decoder_attention_heads': 2,
 }
