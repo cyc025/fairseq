@@ -937,6 +937,12 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.cross_self_attention or prev_output_tokens.eq(self.padding_idx).any():
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
 
+
+        # to compute expressivity
+        from torch.autograd import Variable
+        x = Variable(x.data,requires_grad=True)
+        init_x = x
+
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
@@ -960,32 +966,32 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             if layer_attn is not None and idx == alignment_layer:
                 attn = layer_attn.float().to(x)
 
-        # to compute expressivity
-        from torch.autograd import Variable
-        x_grad = Variable(x.data,requires_grad=True)
-        init_x = x_grad
-        incremental_state_grad = incremental_state
-        # decoder layers
-        attn_grad: Optional[Tensor] = None
-        inner_states: List[Optional[Tensor]] = [x_grad]
-        for idx, layer in enumerate(self.layers): # change_here
-            if incremental_state_grad is None and not full_context_alignment:
-                self_attn_mask_grad = self.buffered_future_mask(x_grad)
-            else:
-                self_attn_mask_grad = None
-            x_grad, layer_attn_grad, _ = layer(
-                x_grad,
-                enc,
-                padding_mask,
-                incremental_state_grad,
-                self_attn_mask=self_attn_mask_grad,
-                self_attn_padding_mask=self_attn_padding_mask,
-                need_attn=bool((idx == alignment_layer)),
-                need_head_weights=bool((idx == alignment_layer)),
-            )
-            inner_states.append(x_grad)
-            if layer_attn_grad is not None and idx == alignment_layer:
-                attn_grad = layer_attn_grad.float().to(x_grad)
+        # # to compute expressivity
+        # from torch.autograd import Variable
+        # x_grad = Variable(x.data,requires_grad=True)
+        # init_x = x_grad
+        # incremental_state_grad = incremental_state
+        # # decoder layers
+        # attn_grad: Optional[Tensor] = None
+        # inner_states: List[Optional[Tensor]] = [x_grad]
+        # for idx, layer in enumerate(self.layers): # change_here
+        #     if incremental_state_grad is None and not full_context_alignment:
+        #         self_attn_mask_grad = self.buffered_future_mask(x_grad)
+        #     else:
+        #         self_attn_mask_grad = None
+        #     x_grad, layer_attn_grad, _ = layer(
+        #         x_grad,
+        #         enc,
+        #         padding_mask,
+        #         incremental_state_grad,
+        #         self_attn_mask=self_attn_mask_grad,
+        #         self_attn_padding_mask=self_attn_padding_mask,
+        #         need_attn=bool((idx == alignment_layer)),
+        #         need_head_weights=bool((idx == alignment_layer)),
+        #     )
+        #     inner_states.append(x_grad)
+        #     if layer_attn_grad is not None and idx == alignment_layer:
+        #         attn_grad = layer_attn_grad.float().to(x_grad)
 
         x_grad.mean().backward()
 
