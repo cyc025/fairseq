@@ -1004,8 +1004,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         ### to compute model expressivity
         import numpy as np
-        x = torch.tensor(new_sigmas)
-        final_sigma = np.sum(np.log(x.numpy()))
+        sigma_value = torch.tensor(new_sigmas)
+        final_sigma = np.sum(np.log(sigma_value.numpy()))
 
         # take derivative
         # from fairseq import pdb; pdb.set_trace()
