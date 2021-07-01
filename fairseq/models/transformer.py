@@ -930,7 +930,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         x = self.dropout_module(x)
 
         # B x T x C -> T x B x C
-        x = x.transpose(0, 1) 
+        x = x.transpose(0, 1)
 
         self_attn_padding_mask: Optional[Tensor] = None
         if self.cross_self_attention or prev_output_tokens.eq(self.padding_idx).any():
@@ -939,7 +939,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
-        for idx, layer in enumerate(self.layers)[:1]:
+        for idx, layer in enumerate(self.layers)[:3]:
             if incremental_state is None and not full_context_alignment:
                 self_attn_mask = self.buffered_future_mask(x)
             else:
