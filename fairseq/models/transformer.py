@@ -940,7 +940,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # decoder layers
         from torch.autograd import Variable
         x = Variable(x.data,requires_grad=True)
-        init_x = x.clone
+        init_x = x.clone()
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
         for idx, layer in enumerate(self.layers): # change_here
