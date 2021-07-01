@@ -6,6 +6,37 @@
 
 import os
 
+    #
+    #
+    # [--arch {transformer,transformer_iwslt_de_en,transformer_wmt_en_de,transformer_vaswani_wmt_en_de_big,transformer_vaswani_wmt_en_fr_big,transformer_wmt_en_de_big,transformer_wmt_en_de_big_t2t}]
+    # [--activation-fn {relu,gelu,gelu_fast,gelu_accurate,tanh,linear}]
+    # [--dropout D] [--attention-dropout D] [--activation-dropout D]
+    # [--encoder-embed-path STR] [--encoder-embed-dim N]
+    # [--encoder-ffn-embed-dim N] [--encoder-layers N]
+    # [--encoder-attention-heads N] [--encoder-normalize-before]
+    # [--encoder-learned-pos] [--decoder-embed-path STR]
+    # [--decoder-embed-dim N] [--decoder-ffn-embed-dim N]
+    # [--decoder-layers N] [--decoder-attention-heads N]
+    # [--decoder-learned-pos] [--decoder-normalize-before]
+    # [--decoder-output-dim N] [--share-decoder-input-output-embed]
+    # [--share-all-embeddings] [--no-token-positional-embeddings]
+    # [--adaptive-softmax-cutoff EXPR] [--adaptive-softmax-dropout D]
+    # [--layernorm-embedding] [--no-scale-embedding]
+    # [--checkpoint-activations] [--no-cross-attention]
+    # [--cross-self-attention] [--encoder-layerdrop D]
+    # [--decoder-layerdrop D]
+    # [--encoder-layers-to-keep ENCODER_LAYERS_TO_KEEP]
+    # [--decoder-layers-to-keep DECODER_LAYERS_TO_KEEP] [--quant-noise-pq D]
+    # [--quant-noise-pq-block-size D] [--quant-noise-scalar D]
+
+
+decoder_embed_dim = 200
+decoder_layers = 4
+decoder_attention_heads = 2
+parameters = f"--decoder-embed-dim {decoder_embed_dim} \
+               --decoder-layers {decoder_layers} \
+               --decoder-attention-heads {decoder_attention_heads} "
+
 search_command = f"python train.py --task language_modeling \
           data-bin/wikitext-2 \
           --save-dir checkpoints/transformer_wikitext-2 \
