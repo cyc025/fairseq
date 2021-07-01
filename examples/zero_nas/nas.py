@@ -69,8 +69,8 @@ decoder_embed_dims = range(50,2000,50)
 decoder_layerss = range(1,10)
 decoder_attention_headss = range(1,10)
 
-decoder_embed_dims = range(50,200,50)
-decoder_layerss = range(1,4)
+decoder_embed_dims = range(100,200,50)
+decoder_layerss = range(2,4)
 decoder_attention_headss = range(1,3)
 
 zen_scores_tups = []
