@@ -36,7 +36,7 @@ os.system("rm checkpoints/transformer_wikitext-2/*")
 params = {
     'decoder_embed_dim': 1,
     'decoder_layers': 1,
-    'decoder_attention_heads': 100,
+    'decoder_attention_heads': 1,
 }
 parameters = f"--decoder-embed-dim {params['decoder_embed_dim']} \
                --decoder-layers {params['decoder_layers']} \
