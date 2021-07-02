@@ -220,7 +220,7 @@ class SequenceGenerator(nn.Module):
         bsz, src_len = src_tokens.size()
 
         # initialize
-        encoder_out = model.forward_encoder([src_tokens, src_lengths])
+        encoder_out = self.forward_encoder([src_tokens, src_lengths])
         prev_decoder_out = model.initialize_output_tokens(encoder_out, src_tokens)
 
         if self.beam_size > 1:
