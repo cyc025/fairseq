@@ -123,10 +123,7 @@ class BARTModel(TransformerModel):
         sample_break_mode="eos",
         **kwargs,
     ):
-        from fairseq import hub_utils
-
-        from fairseq import pdb; pdb.set_trace()
-
+        from fairseq import hub_utils        
 
         x = hub_utils.from_pretrained(
             model_name_or_path,
