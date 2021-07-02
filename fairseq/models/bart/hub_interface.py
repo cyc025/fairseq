@@ -119,7 +119,7 @@ class BARTHubInterface(GeneratorHubInterface):
     def extract_features(
         self, tokens: torch.LongTensor, return_all_hiddens: bool = False
     ) -> torch.Tensor:
-        if tokens.dim() == 1:
+        if tokens.dim() == 1: 
             tokens = tokens.unsqueeze(0)
         if tokens.size(-1) > min(self.model.max_positions()):
             raise ValueError(

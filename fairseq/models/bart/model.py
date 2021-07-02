@@ -86,6 +86,7 @@ class BARTModel(TransformerModel):
         if classification_head_name is not None:
             features_only = True
 
+        from fairseq import pdb; pdb.set_trace()
 
         encoder_out = self.encoder(
             src_tokens,
