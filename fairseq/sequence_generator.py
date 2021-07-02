@@ -257,9 +257,9 @@ class SequenceGenerator(nn.Module):
                 int(self.max_len_a * src_len + self.max_len_b),
                 self.max_len - 1,
             )
-        # assert (
-        #     self.min_len <= max_len
-        # ), "min_len cannot be larger than max_len, please adjust these!"
+        assert (
+            self.min_len <= max_len
+        ), "min_len cannot be larger than max_len, please adjust these!"
         # compute the encoder output for each beam
         encoder_outs = self.model.forward_encoder(net_input)
 
