@@ -37,8 +37,8 @@ class GPT2BPE(object):
         return " ".join(map(str, self.bpe.encode(x)))
 
     def decode(self, x: str) -> str:
-        print(x.replace(' <pad>',''))
-        x = x.replace(' <pad>','')
+        print(x.replace('<pad>',''))
+        x = x.replace('<pad>','')
         return self.bpe.decode(
             [int(tok) if tok not in {"<unk>", "<mask>"} else tok for tok in x.split()]
         )
