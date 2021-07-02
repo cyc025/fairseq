@@ -327,7 +327,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -781,7 +781,9 @@ class EnsembleModel(nn.Module):
             if self.has_encoder():
                 encoder_out = encoder_outs[i]
             # decode each model
+            from fairseq import pdb; pdb.set_trace()
             if self.has_incremental_states():
+
                 decoder_out = model.decoder.forward(
                     tokens,
                     encoder_out=encoder_out,
