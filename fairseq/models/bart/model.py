@@ -47,8 +47,6 @@ class BARTModel(TransformerModel):
         if hasattr(self.encoder, "dictionary"):
             self.eos: int = self.encoder.dictionary.eos()
 
-
-
     @staticmethod
     def add_args(parser):
         super(BARTModel, BARTModel).add_args(parser)
@@ -85,8 +83,6 @@ class BARTModel(TransformerModel):
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
     ):
-
-
         if classification_head_name is not None:
             features_only = True
 
@@ -129,7 +125,6 @@ class BARTModel(TransformerModel):
         **kwargs,
     ):
         from fairseq import hub_utils
-        from fairseq import pdb; pdb.set_trace()
 
         x = hub_utils.from_pretrained(
             model_name_or_path,
@@ -363,12 +358,11 @@ def bart_large_architecture(args):
 
 @register_model_architecture("bart", "bart_base")
 def bart_base_architecture(args):
-    from fairseq import pdb; pdb.set_trace()
     args.encoder_embed_dim = getattr(args, "encoder_embed_dim", 768)
     args.encoder_ffn_embed_dim = getattr(args, "encoder_ffn_embed_dim", 4 * 768)
     args.encoder_layers = getattr(args, "encoder_layers", 6)
     args.encoder_attention_heads = getattr(args, "encoder_attention_heads", 12)
-    args.decoder_layers = getattr(args, "decoder_layers", 6)
+    args.decoder_layers = getattr(args, "decoder_layers", 1)
     args.decoder_attention_heads = getattr(args, "decoder_attention_heads", 12)
     bart_large_architecture(args)
 
