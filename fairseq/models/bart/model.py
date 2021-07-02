@@ -86,8 +86,6 @@ class BARTModel(TransformerModel):
         if classification_head_name is not None:
             features_only = True
 
-        from fairseq import pdb; pdb.set_trace()
-
         encoder_out = self.encoder(
             src_tokens,
             src_lengths=src_lengths,
@@ -126,6 +124,9 @@ class BARTModel(TransformerModel):
         **kwargs,
     ):
         from fairseq import hub_utils
+
+        from fairseq import pdb; pdb.set_trace()
+
 
         x = hub_utils.from_pretrained(
             model_name_or_path,
