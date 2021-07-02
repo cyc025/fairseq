@@ -717,7 +717,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         self.layers.extend(
             [
                 self.build_decoder_layer(args, no_encoder_attn)
-                for _ in range(args.decoder_layers)
+                for _ in list(range(args.decoder_layers))[:3] # change_here
             ]
         )
         self.num_layers = len(self.layers)
