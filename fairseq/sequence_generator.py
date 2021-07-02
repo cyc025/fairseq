@@ -346,8 +346,6 @@ class SequenceGenerator(nn.Module):
             # if step>=nar_len:
             #     step += nar_size
 
-            print(f'step: {step}')
-
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -564,6 +562,7 @@ class SequenceGenerator(nn.Module):
             tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
                 cand_indices, dim=1, index=active_hypos
             )
+            print(tokens)
             if step > 0:
                 scores[:, :step] = torch.index_select(
                     scores[:, :step], dim=0, index=active_bbsz_idx
