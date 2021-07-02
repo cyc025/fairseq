@@ -104,7 +104,6 @@ class BARTHubInterface(GeneratorHubInterface):
             inference_step_args["prefix_tokens"] =src_tokens.new_full(
                 (src_tokens.size(0), 1), fill_value=self.task.source_dictionary.bos()
             ).to(device=self.device)
-            from fairseq import pdb; pdb.set_trace()
             results = super().generate(
                 src_tokens,
                 *args,

@@ -176,7 +176,8 @@ class GeneratorHubInterface(nn.Module):
         results = []
         for batch in self._build_batches(tokenized_sentences, skip_invalid_size_inputs):
             batch = utils.apply_to_sample(lambda t: t.to(self.device), batch)
-            translations = self.task.inference_step(
+            from fairseq import pdb; pdb.set_trace()
+            translations = self.task.inference_step( 
                 generator, self.models, batch, **inference_step_args
             )
             for id, hypos in zip(batch["id"].tolist(), translations):
