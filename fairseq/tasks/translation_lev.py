@@ -21,7 +21,7 @@ class TranslationLevenshteinConfig(TranslationConfig):
         default="random_delete",
         metadata={
             "help": "type of noise"
-        },
+        }, 
     )
 
 @register_task("translation_lev", dataclass=TranslationLevenshteinConfig)

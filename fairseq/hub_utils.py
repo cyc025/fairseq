@@ -130,7 +130,6 @@ class GeneratorHubInterface(nn.Module):
             return self.sample([sentences], beam=beam, verbose=verbose, **kwargs)[0]
         tokenized_sentences = [self.encode(sentence) for sentence in sentences]
         batched_hypos = self.generate(tokenized_sentences, beam, verbose, **kwargs)
-        # from fairseq import pdb; pdb.set_trace()
         return [self.decode(hypos[0]["tokens"]) for hypos in batched_hypos]
 
     def score(self, sentences: List[str], **kwargs):
@@ -176,8 +175,7 @@ class GeneratorHubInterface(nn.Module):
         results = []
         for batch in self._build_batches(tokenized_sentences, skip_invalid_size_inputs):
             batch = utils.apply_to_sample(lambda t: t.to(self.device), batch)
-            from fairseq import pdb; pdb.set_trace()
-            translations = self.task.inference_step( 
+            translations = self.task.inference_step(
                 generator, self.models, batch, **inference_step_args
             )
             for id, hypos in zip(batch["id"].tolist(), translations):
