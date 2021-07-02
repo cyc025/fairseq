@@ -562,7 +562,6 @@ class SequenceGenerator(nn.Module):
             tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
                 cand_indices, dim=1, index=active_hypos
             )
-            print(tokens.size())
             if step > 0:
                 scores[:, :step] = torch.index_select(
                     scores[:, :step], dim=0, index=active_bbsz_idx
@@ -601,7 +600,7 @@ class SequenceGenerator(nn.Module):
         """Handle prefix tokens"""
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
-        prefix_mask = prefix_toks.ne(self.pad)
+        # prefix_mask = prefix_toks.ne(self.pad)
         lprobs[prefix_mask] = torch.tensor(-math.inf).to(lprobs)
         lprobs[prefix_mask] = lprobs[prefix_mask].scatter(
             -1, prefix_toks[prefix_mask].unsqueeze(-1), prefix_lprobs[prefix_mask]
