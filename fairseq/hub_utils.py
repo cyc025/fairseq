@@ -172,8 +172,6 @@ class GeneratorHubInterface(nn.Module):
             prefix_allowed_tokens_fn=prefix_allowed_tokens_fn,
         )
 
-        from fairseq import pdb; pdb.set_trace()
-
         inference_step_args = inference_step_args or {}
         results = []
         for batch in self._build_batches(tokenized_sentences, skip_invalid_size_inputs):

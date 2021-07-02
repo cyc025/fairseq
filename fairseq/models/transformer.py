@@ -936,6 +936,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.cross_self_attention or prev_output_tokens.eq(self.padding_idx).any():
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
 
+        from fairseq import pdb; pdb.set_trace()
+
         # decoder layers
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
