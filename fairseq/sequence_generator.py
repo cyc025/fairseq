@@ -194,9 +194,9 @@ class SequenceGenerator(nn.Module):
             )
 
         # TODO: iterative refinement generator does not support ensemble for now.
-        if not self.retain_dropout:
-            for model in models:
-                model.eval()
+        # if not self.retain_dropout:
+        #     for model in models:
+        #         model.eval()
 
         model, reranker = models[0], None
         if self.reranking:
