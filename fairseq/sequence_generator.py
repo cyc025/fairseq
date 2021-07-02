@@ -324,8 +324,8 @@ class SequenceGenerator(nn.Module):
 
         # from fairseq import pdb; pdb.set_trace()
         # max_len = 4
-        import time
-        start_time = time.time()
+        # import time
+        # start_time = time.time()
 
         for step in range(max_len + 1):  # one extra step for EOS marker
 
@@ -572,8 +572,8 @@ class SequenceGenerator(nn.Module):
             # reorder incremental state in decoder
             reorder_state = active_bbsz_idx
 
-        end_time = time.time()
-        print(f"Time: {end_time-start_time}")
+        # end_time = time.time()
+        # print(f"Time: {end_time-start_time}")
 
         # sort by score descending
         for sent in range(len(finalized)):
