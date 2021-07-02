@@ -123,7 +123,7 @@ def main():
                     )
                 except:
                     print('has error')
-        print(prof)
+        # print(prof)
         profile_log.write(extract_time(str(prof))+'\n')
 
 
