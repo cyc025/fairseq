@@ -47,7 +47,7 @@ class BARTModel(TransformerModel):
         if hasattr(self.encoder, "dictionary"):
             self.eos: int = self.encoder.dictionary.eos()
 
-        from fairseq import pdb; pdb.set_trace()
+
 
     @staticmethod
     def add_args(parser):
@@ -85,6 +85,8 @@ class BARTModel(TransformerModel):
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
     ):
+        from fairseq import pdb; pdb.set_trace()
+        
         if classification_head_name is not None:
             features_only = True
 
