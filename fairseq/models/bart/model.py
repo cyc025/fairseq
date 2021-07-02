@@ -47,6 +47,8 @@ class BARTModel(TransformerModel):
         if hasattr(self.encoder, "dictionary"):
             self.eos: int = self.encoder.dictionary.eos()
 
+        from fairseq import pdb; pdb.set_trace()
+
     @staticmethod
     def add_args(parser):
         super(BARTModel, BARTModel).add_args(parser)
