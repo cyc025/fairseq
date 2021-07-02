@@ -84,7 +84,7 @@ class BARTModel(TransformerModel):
         alignment_heads: Optional[int] = None,
     ):
         if classification_head_name is not None:
-            features_only = True        
+            features_only = True
 
         encoder_out = self.encoder(
             src_tokens,
@@ -303,6 +303,7 @@ class BARTClassificationHead(nn.Module):
             self.out_proj = torch.nn.utils.spectral_norm(self.out_proj)
 
     def forward(self, features, **kwargs):
+        from fairseq import pdb; pdb.set_trace()
         x = features
         x = self.dropout(x)
         x = self.dense(x)
