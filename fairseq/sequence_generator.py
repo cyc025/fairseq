@@ -388,17 +388,17 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.eos + 1 :] = -math.inf
 
             # handle prefix tokens (possibly with different lengths)
-            if (
-                prefix_tokens is not None
-                and step < prefix_tokens.size(1)
-                and step < max_len
-            ):
-                lprobs, tokens, scores = self._prefix_tokens(
-                    step, lprobs, scores, tokens, prefix_tokens, beam_size
-                )
-            elif step < self.min_len:
-                # minimum length constraint (does not apply if using prefix_tokens)
-                lprobs[:, self.eos] = -math.inf
+            # if (
+            #     prefix_tokens is not None
+            #     and step < prefix_tokens.size(1)
+            #     and step < max_len
+            # ):
+            #     lprobs, tokens, scores = self._prefix_tokens(
+            #         step, lprobs, scores, tokens, prefix_tokens, beam_size
+            #     )
+            # elif step < self.min_len:
+            #     # minimum length constraint (does not apply if using prefix_tokens)
+            #     lprobs[:, self.eos] = -math.inf
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
@@ -600,7 +600,7 @@ class SequenceGenerator(nn.Module):
         """Handle prefix tokens"""
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
-        # prefix_mask = prefix_toks.ne(self.pad)
+        prefix_mask = prefix_toks.ne(self.pad)
         lprobs[prefix_mask] = torch.tensor(-math.inf).to(lprobs)
         lprobs[prefix_mask] = lprobs[prefix_mask].scatter(
             -1, prefix_toks[prefix_mask].unsqueeze(-1), prefix_lprobs[prefix_mask]
