@@ -328,7 +328,7 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
-            print(tokens.size())
+            print(tokens)
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
