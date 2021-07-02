@@ -335,8 +335,6 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
-            print(lprobs)
-
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
@@ -346,6 +344,8 @@ class SequenceGenerator(nn.Module):
                 lprobs += probs
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
+
+            from fairseq import pdb; pdb.set_trace()
 
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
