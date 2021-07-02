@@ -311,7 +311,7 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
+        for step in range(max_len + 1):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -327,8 +327,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-
-            print(tokens)
+            from fairseq import pdb; pdb.set_trace()
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -345,8 +344,6 @@ class SequenceGenerator(nn.Module):
                 lprobs += probs
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
-
-            # from fairseq import pdb; pdb.set_trace()
 
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
@@ -783,9 +780,6 @@ class EnsembleModel(nn.Module):
         for i, model in enumerate(self.models):
             if self.has_encoder():
                 encoder_out = encoder_outs[i]
-
-            # from fairseq import pdb; pdb.set_trace()
-
             # decode each model
             if self.has_incremental_states():
                 decoder_out = model.decoder.forward(
