@@ -38,6 +38,7 @@ class GPT2BPE(object):
 
     def decode(self, x: str) -> str:
         print(x.replace(' <pad>',''))
+        x = x.replace(' <pad>','')
         return self.bpe.decode(
             [int(tok) if tok not in {"<unk>", "<mask>"} else tok for tok in x.split()]
         )
