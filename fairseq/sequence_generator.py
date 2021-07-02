@@ -325,6 +325,8 @@ class SequenceGenerator(nn.Module):
         # from fairseq import pdb; pdb.set_trace()
         # max_len = 4
 
+        start_time = time.time()
+
         for step in range(max_len + 1):  # one extra step for EOS marker
 
             # from fairseq import pdb; pdb.set_trace()
@@ -350,7 +352,7 @@ class SequenceGenerator(nn.Module):
 
             # from fairseq import pdb; pdb.set_trace()
 
-            lprobs, avg_attn_scores = self.model.forward_decoder( 
+            lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
@@ -569,6 +571,9 @@ class SequenceGenerator(nn.Module):
 
             # reorder incremental state in decoder
             reorder_state = active_bbsz_idx
+
+        end_time = time.time()
+        print(f"Time: {end_time-start_time}")
 
         # sort by score descending
         for sent in range(len(finalized)):
