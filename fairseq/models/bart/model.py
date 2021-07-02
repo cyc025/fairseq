@@ -86,6 +86,7 @@ class BARTModel(TransformerModel):
         if classification_head_name is not None:
             features_only = True
 
+
         encoder_out = self.encoder(
             src_tokens,
             src_lengths=src_lengths,
@@ -303,7 +304,6 @@ class BARTClassificationHead(nn.Module):
             self.out_proj = torch.nn.utils.spectral_norm(self.out_proj)
 
     def forward(self, features, **kwargs):
-        from fairseq import pdb; pdb.set_trace()
         x = features
         x = self.dropout(x)
         x = self.dense(x)
@@ -358,6 +358,7 @@ def bart_large_architecture(args):
 
 @register_model_architecture("bart", "bart_base")
 def bart_base_architecture(args):
+    from fairseq import pdb; pdb.set_trace()
     args.encoder_embed_dim = getattr(args, "encoder_embed_dim", 768)
     args.encoder_ffn_embed_dim = getattr(args, "encoder_ffn_embed_dim", 4 * 768)
     args.encoder_layers = getattr(args, "encoder_layers", 6)
