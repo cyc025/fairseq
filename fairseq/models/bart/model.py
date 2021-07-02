@@ -85,8 +85,8 @@ class BARTModel(TransformerModel):
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
     ):
-        from fairseq import pdb; pdb.set_trace()
-        
+
+
         if classification_head_name is not None:
             features_only = True
 
@@ -129,6 +129,7 @@ class BARTModel(TransformerModel):
         **kwargs,
     ):
         from fairseq import hub_utils
+        from fairseq import pdb; pdb.set_trace()
 
         x = hub_utils.from_pretrained(
             model_name_or_path,
