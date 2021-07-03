@@ -379,8 +379,8 @@ class SequenceGenerator(nn.Module):
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            # lprobs[:, self.pad] = -math.inf  # never select pad
-            # lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
+            lprobs[:, self.pad] = -math.inf  # never select pad
+            lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
@@ -388,6 +388,7 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.eos + 1 :] = -math.inf
 
             # handle prefix tokens (possibly with different lengths)
+            from fairseq import pdb; pdb.set_trace()
             if (
                 prefix_tokens is not None
                 and step < prefix_tokens.size(1)
@@ -399,9 +400,6 @@ class SequenceGenerator(nn.Module):
             elif step < self.min_len:
                 # minimum length constraint (does not apply if using prefix_tokens)
                 lprobs[:, self.eos] = -math.inf
-
-            lprobs[:, self.pad] = -math.inf  # never select pad
-            lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty            
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
