@@ -388,7 +388,7 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.eos + 1 :] = -math.inf
 
             # handle prefix tokens (possibly with different lengths)
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
             if (
                 prefix_tokens is not None
                 and step < prefix_tokens.size(1)
