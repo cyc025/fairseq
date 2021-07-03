@@ -6,7 +6,7 @@
 import sys
 import os
 import math
-
+import pickle
 
 def run(decoder_embed_dim,decoder_layers,decoder_attention_heads):
     # clear checkpoints
