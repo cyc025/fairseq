@@ -341,7 +341,7 @@ class SequenceGenerator(nn.Module):
 
         nar_len, nar_size = 2, 2
 
-        for step in range(max_len + 1 + nar_size):  # one extra step for EOS marker
+        for step in range(max_len + 1):  # one extra step for EOS marker
 
             if step>=nar_len:
                 step += nar_size
