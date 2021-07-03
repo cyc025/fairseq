@@ -339,11 +339,11 @@ class SequenceGenerator(nn.Module):
                 history=history,
             )
 
-        nar_len, nar_size = 2, 0
+        nar_len, nar_size = 2, 2
 
         for step in range(max_len + 1 + nar_size):  # one extra step for EOS marker
 
-            if step>=nar_len:
+            if step>=nar_len and step>prefix_tokens.size(1):
                 step += nar_size
 
             # reorder decoder internal states based on the prev choice of beams
@@ -388,17 +388,17 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.eos + 1 :] = -math.inf
 
             # handle prefix tokens (possibly with different lengths)
-            # if (
-            #     prefix_tokens is not None
-            #     and step < prefix_tokens.size(1)
-            #     and step < max_len
-            # ):
-            #     lprobs, tokens, scores = self._prefix_tokens(
-            #         step, lprobs, scores, tokens, prefix_tokens, beam_size
-            #     )
-            # elif step < self.min_len:
-            #     # minimum length constraint (does not apply if using prefix_tokens)
-            #     lprobs[:, self.eos] = -math.inf
+            if (
+                prefix_tokens is not None
+                and step < prefix_tokens.size(1)
+                and step < max_len
+            ):
+                lprobs, tokens, scores = self._prefix_tokens(
+                    step, lprobs, scores, tokens, prefix_tokens, beam_size
+                )
+            elif step < self.min_len:
+                # minimum length constraint (does not apply if using prefix_tokens)
+                lprobs[:, self.eos] = -math.inf
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
