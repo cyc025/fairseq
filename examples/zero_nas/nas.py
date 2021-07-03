@@ -63,6 +63,9 @@ def search(decoder_embed_dim,decoder_layers,decoder_attention_heads):
     zen_score = float(open('.zen_score.log','r').read().strip())
     return zen_score
 
+"""
+    Exhaustive search
+"""
 
 
 decoder_embed_dims = range(50,2000,50)
