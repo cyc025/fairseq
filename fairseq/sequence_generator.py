@@ -393,6 +393,7 @@ class SequenceGenerator(nn.Module):
                 and step < prefix_tokens.size(1)
                 and step < max_len
             ):
+                from fairseq import pdb; pdb.set_trace()
                 lprobs, tokens, scores = self._prefix_tokens(
                     step, lprobs, scores, tokens, prefix_tokens, beam_size
                 )
