@@ -343,7 +343,7 @@ class SequenceGenerator(nn.Module):
 
         for step in range(max_len + 1 + nar_size):  # one extra step for EOS marker
 
-            if step>=nar_len and step>prefix_tokens.size(1):
+            if step>=nar_len:
                 step += nar_size
 
             # reorder decoder internal states based on the prev choice of beams
@@ -379,8 +379,8 @@ class SequenceGenerator(nn.Module):
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            lprobs[:, self.pad] = -math.inf  # never select pad
-            lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
+            # lprobs[:, self.pad] = -math.inf  # never select pad
+            # lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
@@ -393,13 +393,15 @@ class SequenceGenerator(nn.Module):
                 and step < prefix_tokens.size(1)
                 and step < max_len
             ):
-                from fairseq import pdb; pdb.set_trace()
                 lprobs, tokens, scores = self._prefix_tokens(
                     step, lprobs, scores, tokens, prefix_tokens, beam_size
                 )
             elif step < self.min_len:
                 # minimum length constraint (does not apply if using prefix_tokens)
                 lprobs[:, self.eos] = -math.inf
+
+            lprobs[:, self.pad] = -math.inf  # never select pad
+            lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty            
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
