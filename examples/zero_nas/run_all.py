@@ -56,7 +56,6 @@ def postprocess(field):
 
 
 def get_perplexity(s):
-    s = "2021-07-04 10:06:33 | INFO | fairseq_cli.eval_lm | Loss (base 2): 10.0412, Perplexity: 1053.69"
     pp = s.split('Perplexity: ')[-1]
     return pp
 
