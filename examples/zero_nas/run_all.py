@@ -71,3 +71,5 @@ for tups in params_list[:1]:
     perplexity_score = run(decoder_embed_dim,decoder_layers,decoder_attention_heads)
     tups.append(perplexity_score)
     result_list.append(tups)
+
+print(result_list)
