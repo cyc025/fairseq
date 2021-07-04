@@ -37,7 +37,7 @@ def run(decoder_embed_dim,decoder_layers,decoder_attention_heads):
     os.system(train_command)
 
     eval_command = f"fairseq-eval-lm data-bin/wikitext-2 \
-                    --path checkpoints/transformer_wikitext-2/checkpoint_last.pt \
+                    --path checkpoints/transformer_wikitext-2/checkpoint_best.pt \
                     --batch-size 2 \
                     --tokens-per-sample 512 \
                     --context-window 400 | grep \"Perplexity: \" > .pp.log"
