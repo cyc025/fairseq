@@ -36,6 +36,7 @@ def run(decoder_embed_dim,decoder_layers,decoder_attention_heads):
               --batch-size 1024 \
               {parameters} \
               --max-update 10"
+    print(search_command)
     os.system(search_command)
 
     perplexity_score = float(open('.perplexity.log','r').read().strip())
