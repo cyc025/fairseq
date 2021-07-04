@@ -73,3 +73,12 @@ for tups in params_list[:1]:
     result_list.append(tups)
 
 print(result_list)
+
+import pickle
+with open(f'{argv[1]}_results.pkl', 'wb') as handle:
+    pickle.dump(sorted_max_zen_tup, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+with open(f'{argv[1]}_results.pkl', 'rb') as handle:
+    b = pickle.load(handle)
+
+print(b)
