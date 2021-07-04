@@ -69,6 +69,7 @@ for i in range(0,len(params_list),10):
     tups = params_list[i]
     decoder_embed_dim,decoder_layers,decoder_attention_heads = postprocess(tups[0][2])
     perplexity_score = run(decoder_embed_dim,decoder_layers,decoder_attention_heads)
+    os.system('cat .pp.log >> accum.pp')
     tups.append(perplexity_score)
     result_list.append(tups)
 
