@@ -71,13 +71,12 @@ for tups in params_list[:1]:
     tups.append(perplexity_score)
     result_list.append(tups)
 
-print(result_list)
 
 import pickle
 with open(f'{sys.argv[1]}_results.pkl', 'wb') as handle:
     pickle.dump(result_list, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 with open(f'{sys.argv[1]}_results.pkl', 'rb') as handle:
-    b = pickle.load(handle)
+    result_list = pickle.load(handle)
 
-print(b)
+print(result_list)
