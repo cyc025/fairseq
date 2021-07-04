@@ -969,29 +969,29 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 attn = layer_attn.float().to(x)
 
         ### to compute model expressivity
-        if self.training:
-            x.mean().backward(retain_graph=True)
-
-            sigmas = torch.load('sigmas.pt')
-            new_sigmas = []
-            buffer_val = 100
-            # print(init_x.grad.mean().cpu().numpy())
-            for sigma in sigmas:
-                C_dim = sigma.size()[0]
-                new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
-
-            import numpy as np
-            sigma_inter = torch.tensor(new_sigmas)
-            sigma_sum = np.sum(np.log(sigma_inter.numpy()))
-
-            # take derivative
-            # print(init_x.grad.mean().cpu().numpy())
-            zen_score = sigma_sum + init_x.grad.mean().cpu().numpy()
-            with open('.zen_score.log','w') as zen_log:
-                zen_log.write(str(zen_score))
-            # from fairseq import pdb; pdb.set_trace()
-
-            self.zero_grad()
+        # if self.training:
+        #     x.mean().backward(retain_graph=True)
+        #
+        #     sigmas = torch.load('sigmas.pt')
+        #     new_sigmas = []
+        #     buffer_val = 100
+        #     # print(init_x.grad.mean().cpu().numpy())
+        #     for sigma in sigmas:
+        #         C_dim = sigma.size()[0]
+        #         new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
+        #
+        #     import numpy as np
+        #     sigma_inter = torch.tensor(new_sigmas)
+        #     sigma_sum = np.sum(np.log(sigma_inter.numpy()))
+        #
+        #     # take derivative
+        #     # print(init_x.grad.mean().cpu().numpy())
+        #     zen_score = sigma_sum + init_x.grad.mean().cpu().numpy()
+        #     with open('.zen_score.log','w') as zen_log:
+        #         zen_log.write(str(zen_score))
+        #     # from fairseq import pdb; pdb.set_trace()
+        #
+        #     self.zero_grad()
 
 
         if attn is not None:
