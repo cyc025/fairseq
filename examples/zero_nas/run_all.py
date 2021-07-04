@@ -65,7 +65,8 @@ with open(f'{sys.argv[1]}.pkl', 'rb') as handle:
 
 # run all
 result_list = []
-for tups in params_list:
+for i in range(0,len(params_list),10):
+    tups = params_list[i]
     decoder_embed_dim,decoder_layers,decoder_attention_heads = postprocess(tups[0][2])
     perplexity_score = run(decoder_embed_dim,decoder_layers,decoder_attention_heads)
     tups.append(perplexity_score)
