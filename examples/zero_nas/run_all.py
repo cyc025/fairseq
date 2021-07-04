@@ -34,7 +34,7 @@ def run(decoder_embed_dim,decoder_layers,decoder_attention_heads):
               --fp16 \
               --batch-size 1024 \
               {parameters} \
-              --max-update 100 --no-epoch-checkpoints"
+              --max-update 10000 --no-epoch-checkpoints"
     os.system(train_command)
 
     eval_command = f"fairseq-eval-lm data-bin/wikitext-2 \
