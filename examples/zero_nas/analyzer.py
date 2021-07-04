@@ -43,7 +43,7 @@ pp_zen, pp_size, zen_size = [], [], []
 max_len = max( [ len(v) for k,v in num_params_dict.items() ] )
 for k,v in num_params_dict.items():
     if len(v)==max_len:
-        zen_size = v
+        zen_size = [ [i] for i in v]
     pp_zen.append(sample(v,1))
     pp_size.append(sample(v,1))
 
