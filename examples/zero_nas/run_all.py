@@ -32,7 +32,7 @@ def run(decoder_embed_dim,decoder_layers,decoder_attention_heads):
               --max-tokens 2048 --update-freq 16 \
               --disable-validation \
               --fp16 \
-              --batch-size 2048 \
+              --batch-size 1024 \
               {parameters} \
               --max-update 30000 --no-epoch-checkpoints"
     os.system(train_command)
