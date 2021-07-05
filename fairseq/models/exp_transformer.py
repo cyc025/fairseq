@@ -741,7 +741,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.output_projection is None:
             self.build_output_projection(args, dictionary, embed_tokens)
 
-        initialize to normal dist. for expressivity
+        # initialize to normal dist. for expressivity
         self.apply(init_weights_normal)
         with open('params.log','w') as params_log:
             params_log.write(str(count_parameters(self)))
