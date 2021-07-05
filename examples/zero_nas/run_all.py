@@ -33,7 +33,7 @@ def run(decoder_embed_dim,decoder_layers,decoder_attention_heads):
               --fp16 \
               --batch-size 1024 \
               {parameters} \
-              --max-update 20000 --no-epoch-checkpoints --keep-best-checkpoints 1"
+              --max-update 10000 --no-epoch-checkpoints --keep-best-checkpoints 1"
     os.system(train_command)
 
     eval_command = f"fairseq-eval-lm data-bin/wikitext-2 \
@@ -69,6 +69,8 @@ for i in range(0,len(params_list),10):
     decoder_embed_dim,decoder_layers,decoder_attention_heads = postprocess(tups[0][2])
     perplexity_score = run(decoder_embed_dim,decoder_layers,decoder_attention_heads)
     os.system('cat .pp.log >> accum.pp')
+    with open('params.log','a') as t:
+        t.write(f'{tups}\n')
     tups.append(perplexity_score)
     result_list.append(tups)
 
