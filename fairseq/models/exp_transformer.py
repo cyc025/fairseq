@@ -1,4 +1,3 @@
-
 # Copyright (c) Facebook, Inc. and its affiliates.
 #
 # This source code is licensed under the MIT license found in the
@@ -24,6 +23,7 @@ from fairseq.modules import (
     FairseqDropout,
     LayerDropModuleList,
     LayerNorm,
+    ZenLayerNorm,
     PositionalEmbedding,
     SinusoidalPositionalEmbedding,
     TransformerDecoderLayer,
@@ -404,7 +404,7 @@ class TransformerEncoder(FairseqEncoder):
         self.num_layers = len(self.layers)
 
         if args.encoder_normalize_before:
-            self.layer_norm = LayerNorm(embed_dim)
+            self.layer_norm = LayerNorm(embed_dim) #change_norm
         else:
             self.layer_norm = None
 
@@ -726,7 +726,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if args.decoder_normalize_before and not getattr(
             args, "no_decoder_final_norm", False
         ):
-            self.layer_norm = LayerNorm(embed_dim)
+            self.layer_norm = LayerNorm(embed_dim) # change_norm
         else:
             self.layer_norm = None
 
@@ -740,6 +740,11 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         self.output_projection = output_projection
         if self.output_projection is None:
             self.build_output_projection(args, dictionary, embed_tokens)
+
+        initialize to normal dist. for expressivity
+        self.apply(init_weights_normal)
+        with open('params.log','w') as params_log:
+            params_log.write(str(count_parameters(self)))
 
     def build_output_projection(self, args, dictionary, embed_tokens):
         if args.adaptive_softmax_cutoff is not None:
@@ -819,6 +824,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 - the decoder's output of shape `(batch, tgt_len, vocab)`
                 - a dictionary with any model-specific outputs
         """
+
+        # from fairseq import pdb; pdb.set_trace()
 
         x, extra = self.extract_features(
             prev_output_tokens,
@@ -936,9 +943,12 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             self_attn_padding_mask = prev_output_tokens.eq(self.padding_idx)
 
         # decoder layers
+        # from torch.autograd import Variable
+        # x = Variable(x.data,requires_grad=True)
+        # init_x = x
         attn: Optional[Tensor] = None
         inner_states: List[Optional[Tensor]] = [x]
-        for idx, layer in enumerate(self.layers):
+        for idx, layer in enumerate(self.layers): # change_here
             if incremental_state is None and not full_context_alignment:
                 self_attn_mask = self.buffered_future_mask(x)
             else:
@@ -957,6 +967,32 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             inner_states.append(x)
             if layer_attn is not None and idx == alignment_layer:
                 attn = layer_attn.float().to(x)
+
+        ### to compute model expressivity
+        # if self.training:
+        #     x.mean().backward(retain_graph=True)
+        #
+        #     sigmas = torch.load('sigmas.pt')
+        #     new_sigmas = []
+        #     buffer_val = 100
+        #     # print(init_x.grad.mean().cpu().numpy())
+        #     for sigma in sigmas:
+        #         C_dim = sigma.size()[0]
+        #         new_sigmas.append(torch.sqrt( torch.sum(torch.pow(sigma, 2)) / C_dim * buffer_val ))
+        #
+        #     import numpy as np
+        #     sigma_inter = torch.tensor(new_sigmas)
+        #     sigma_sum = np.sum(np.log(sigma_inter.numpy()))
+        #
+        #     # take derivative
+        #     # print(init_x.grad.mean().cpu().numpy())
+        #     zen_score = sigma_sum + init_x.grad.mean().cpu().numpy()
+        #     with open('.zen_score.log','w') as zen_log:
+        #         zen_log.write(str(zen_score))
+        #     # from fairseq import pdb; pdb.set_trace()
+        #
+        #     self.zero_grad()
+
 
         if attn is not None:
             if alignment_heads is not None:
@@ -1050,6 +1086,16 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             state_dict[version_key] = torch.Tensor([1])
 
         return state_dict
+
+
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def init_weights_normal(m):
+    if type(m) == nn.Linear:
+        torch.nn.init.uniform_(m.weight)
+        # m.bias.data.fill_(0.)
 
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
