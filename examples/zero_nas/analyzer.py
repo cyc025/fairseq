@@ -30,7 +30,7 @@ num_params_dict = {}
 for num_params in sorted_by_num_params:
     for fields in sorted_by_zen:
         if fields[1]==num_params:
-            print(postprocess(fields[2]))
+            # print(postprocess(fields[2]))
             if num_params in num_params_dict.keys():
                 num_params_dict[num_params].append(fields)
             else:
