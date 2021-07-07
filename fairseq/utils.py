@@ -526,7 +526,7 @@ def get_activation_fn(activation: str) -> Callable:
     from fairseq.modules import gelu, gelu_accurate
 
     if activation == "relu":
-        return F.relu
+        return F.relu # change_here
     elif activation == "gelu":
         return gelu
     elif activation == "gelu_fast":
@@ -672,7 +672,7 @@ def extract_soft_alignment(attn, src_sent, tgt_sent, pad, eos):
 
 
 def new_arange(x, *size):
-    """ 
+    """
     Return a Tensor of `size` filled with a range function on the device of x.
     If size is empty, using the size of the variable x.
     """
