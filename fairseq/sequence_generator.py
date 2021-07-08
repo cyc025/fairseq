@@ -339,12 +339,12 @@ class SequenceGenerator(nn.Module):
                 history=history,
             )
 
-        nar_len, nar_size = 2, 2
+        # nar_len, nar_size = 2, 2
 
         for step in range(max_len + 1):  # one extra step for EOS marker
 
-            if step>=nar_len:
-                step += nar_size
+            # if step>=nar_len:
+            #     step += nar_size
 
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
