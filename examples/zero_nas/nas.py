@@ -99,3 +99,12 @@ with open('expressivity.pkl', 'wb') as handle:
 #     b = pickle.load(handle)
 #
 # print(b)
+
+# with open('pp_size.pkl', 'rb') as handle:
+#     params_list = pickle.load(handle)
+#
+# for i in range(0,len(params_list)):
+#     tups = params_list[i]
+#     print(tups[0][1])
+#
+#
