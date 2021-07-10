@@ -280,8 +280,6 @@ class SequenceGenerator(nn.Module):
             torch.zeros(bsz, beam_size).to(src_tokens).eq(-1)
         )  # forward and backward-compatible False mask
 
-        from fairseq import pdb; pdb.set_trace()
-
         # list of completed sentences
         finalized = torch.jit.annotate(
             List[List[Dict[str, Tensor]]],
@@ -313,41 +311,7 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-
-        def nat_decoder(decoder_out, encoder_out, decoding_format=None):
-            step = decoder_out.step
-            output_tokens = decoder_out.output_tokens
-            output_scores = decoder_out.output_scores
-            history = decoder_out.history
-
-            # execute the decoder
-            output_masks = output_tokens.ne(self.pad)
-            _scores, _tokens = self.decoder(
-                normalize=True,
-                prev_output_tokens=output_tokens,
-                encoder_out=encoder_out,
-                step=step,
-            ).max(-1)
-
-            output_tokens.masked_scatter_(output_masks, _tokens[output_masks])
-            output_scores.masked_scatter_(output_masks, _scores[output_masks])
-            if history is not None:
-                history.append(output_tokens.clone())
-
-            return decoder_out._replace(
-                output_tokens=output_tokens,
-                output_scores=output_scores,
-                attn=None,
-                history=history,
-            )
-
-        # nar_len, nar_size = 2, 2
-
         for step in range(max_len + 1):  # one extra step for EOS marker
-
-            # if step>=nar_len:
-            #     step += nar_size
-
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -365,7 +329,7 @@ class SequenceGenerator(nn.Module):
                 )
 
             lprobs, avg_attn_scores = self.model.forward_decoder(
-                tokens[:, : step + 3],
+                tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
                 self.temperature,
@@ -390,7 +354,6 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.eos + 1 :] = -math.inf
 
             # handle prefix tokens (possibly with different lengths)
-            # from fairseq import pdb; pdb.set_trace()
             if (
                 prefix_tokens is not None
                 and step < prefix_tokens.size(1)
