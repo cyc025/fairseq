@@ -34,6 +34,7 @@ class GPT2BPE(object):
         self.bpe = get_encoder(encoder_json, vocab_bpe)
 
     def encode(self, x: str) -> str:
+        from fairseq import pdb; pdb.set_trace()
         a = map(str, self.bpe.encode(x))
         return " ".join(a)
 
