@@ -280,6 +280,8 @@ class SequenceGenerator(nn.Module):
             torch.zeros(bsz, beam_size).to(src_tokens).eq(-1)
         )  # forward and backward-compatible False mask
 
+        from fairseq import pdb; pdb.set_trace()
+
         # list of completed sentences
         finalized = torch.jit.annotate(
             List[List[Dict[str, Tensor]]],
@@ -363,7 +365,7 @@ class SequenceGenerator(nn.Module):
                 )
 
             lprobs, avg_attn_scores = self.model.forward_decoder(
-                tokens[:, : step + 1],
+                tokens[:, : step + 3],
                 encoder_outs,
                 incremental_states,
                 self.temperature,
