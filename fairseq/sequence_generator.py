@@ -328,8 +328,6 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
-            # from fairseq import pdb; pdb.set_trace()
-
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -346,6 +344,8 @@ class SequenceGenerator(nn.Module):
                 lprobs += probs
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
+
+            from fairseq import pdb; pdb.set_trace()
 
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
