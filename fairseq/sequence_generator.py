@@ -559,7 +559,7 @@ class SequenceGenerator(nn.Module):
                 List[Dict[str, Tensor]], finalized[sent]
             )
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace() p finalized[0][0]['tokens']
         return finalized
 
     def _prefix_tokens(
