@@ -130,6 +130,8 @@ class BARTHubInterface(GeneratorHubInterface):
         tokens.to(device=self.device),
         prev_output_tokens = tokens.clone()
 
+        # from fairseq import pdb; pdb.set_trace()
+
         prev_output_tokens[:, 0] = tokens.gather(
             1,
             (tokens.ne(self.task.source_dictionary.pad()).sum(dim=1) - 1).unsqueeze(-1),

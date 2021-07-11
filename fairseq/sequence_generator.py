@@ -345,8 +345,6 @@ class SequenceGenerator(nn.Module):
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            from fairseq import pdb; pdb.set_trace()
-
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
@@ -560,6 +558,8 @@ class SequenceGenerator(nn.Module):
             finalized[sent] = torch.jit.annotate(
                 List[Dict[str, Tensor]], finalized[sent]
             )
+
+        from fairseq import pdb; pdb.set_trace()
         return finalized
 
     def _prefix_tokens(
