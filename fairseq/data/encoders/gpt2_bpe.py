@@ -36,7 +36,7 @@ class GPT2BPE(object):
     def encode(self, x: str) -> str:
         # from fairseq import pdb; pdb.set_trace()
         a = list(map(str, self.bpe.encode(x)))[:600]
-        print(len(a))
+        from fairseq import pdb; pdb.set_trace()
         return " ".join(a)
 
     def decode(self, x: str) -> str:
