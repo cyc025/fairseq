@@ -463,7 +463,7 @@ class SequenceGenerator(nn.Module):
                 num_remaining_sent -= len(finalized_sents)
 
             assert num_remaining_sent >= 0
-            if num_remaining_sent == 0:
+            if num_remaining_sent == 0 and False:
                 print('if num_remaining_sent == 0:')
                 break
             if self.search.stop_on_max_len and step >= max_len:
