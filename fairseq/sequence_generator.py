@@ -86,7 +86,7 @@ class SequenceGenerator(nn.Module):
         self.max_len = max_len or self.model.max_decoder_positions()
 
         # for testing only
-        force_length = int(open('.max.len','r').read().strip().replace('\n',''))
+        force_length = int(int(open('.max.len','r').read().strip().replace('\n',''))/2)
         self.max_len_a = force_length
         self.max_len_b = force_length
         self.min_len = 0
@@ -326,7 +326,7 @@ class SequenceGenerator(nn.Module):
         # max_len = 4
         # import time
         # start_time = time.time()
-        max_len = int(self.max_len/2)
+
         for step in range(max_len + 1):  # one extra step for EOS marker
 
             # from fairseq import pdb; pdb.set_trace()
