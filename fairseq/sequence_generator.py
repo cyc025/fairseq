@@ -327,7 +327,7 @@ class SequenceGenerator(nn.Module):
         # import time
         # start_time = time.time()
 
-        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
+        for step in range(max_len + 1):  # one extra step for EOS marker
 
             # from fairseq import pdb; pdb.set_trace()
 
@@ -463,7 +463,7 @@ class SequenceGenerator(nn.Module):
                 num_remaining_sent -= len(finalized_sents)
 
             assert num_remaining_sent >= 0
-            if num_remaining_sent == 0 and False:
+            if num_remaining_sent == 0:
                 print('if num_remaining_sent == 0:')
                 break
             if self.search.stop_on_max_len and step >= max_len:
