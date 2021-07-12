@@ -334,7 +334,7 @@ class SequenceGenerator(nn.Module):
             if step==self.max_len-1:
                 break
 
-            print(step)
+            # print(step)
 
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
