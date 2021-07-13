@@ -331,6 +331,7 @@ class SequenceGenerator(nn.Module):
 
             if step>=2:
                 step = step_size * step
+                print(step)
 
             # from fairseq import pdb; pdb.set_trace()
 
