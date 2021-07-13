@@ -325,7 +325,9 @@ class SequenceGenerator(nn.Module):
         # import time
         # start_time = time.time()
 
-        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
+        step_size = 1
+
+        for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
             # from fairseq import pdb; pdb.set_trace()
 
