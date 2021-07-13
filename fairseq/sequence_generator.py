@@ -195,8 +195,6 @@ class SequenceGenerator(nn.Module):
         """
         return self._generate(sample, **kwargs)
 
-    # def _nar_generate()
-
     def _generate(
         self,
         sample: Dict[str, Dict[str, Tensor]],
@@ -327,14 +325,12 @@ class SequenceGenerator(nn.Module):
         # import time
         # start_time = time.time()
 
-        for step in range(max_len + 1):  # one extra step for EOS marker
+        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
 
             # from fairseq import pdb; pdb.set_trace()
 
             if step==self.max_len-1:
                 break
-
-            # print(step)
 
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
@@ -434,6 +430,8 @@ class SequenceGenerator(nn.Module):
             # hypotheses, with a range of values: [0, bsz*beam_size),
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
+
+            from fairseq import pdb; pdb.set_trace()
 
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)

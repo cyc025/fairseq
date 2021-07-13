@@ -116,7 +116,7 @@ class BeamSearch(Search):
     ):
         bsz, beam_size, vocab_size = lprobs.size()
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         if step == 0:
             # at the first step all hypotheses are equally likely, so use
