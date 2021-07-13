@@ -7,7 +7,7 @@ import math
 from typing import List, Optional
 
 import torch
-import torch.nn as nn 
+import torch.nn as nn
 from fairseq.token_generation_constraints import (
     ConstraintState,
     OrderedConstraintState,
@@ -115,6 +115,8 @@ class BeamSearch(Search):
         original_batch_idxs: Optional[Tensor] = None,
     ):
         bsz, beam_size, vocab_size = lprobs.size()
+
+        from fairseq import pdb; pdb.set_trace()
 
         if step == 0:
             # at the first step all hypotheses are equally likely, so use
