@@ -327,11 +327,7 @@ class SequenceGenerator(nn.Module):
 
         step_size = 2
 
-        for step in range(max_len + 1):  # one extra step for EOS marker
-
-            if step>=2:
-                step = step_size * step
-                print(step)
+        for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
             # from fairseq import pdb; pdb.set_trace()
 
@@ -437,11 +433,14 @@ class SequenceGenerator(nn.Module):
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
 
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
 
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
-            eos_mask = cand_scores.ne(-math.inf)
+            if step<self.max_len-1:
+                eos_mask = torch.tensor(0).to(cand_scores)
+            else:
+                eos_mask = cand_scores.ne(-math.inf)
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
             # only consider eos when it's among the top beam_size indices
