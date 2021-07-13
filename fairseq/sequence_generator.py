@@ -438,7 +438,7 @@ class SequenceGenerator(nn.Module):
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
             if step<self.max_len-1:
-                eos_mask = torch.tensor(0).to(cand_scores)
+                eos_mask = cand_scores.ne(cand_scores)
             else:
                 eos_mask = cand_scores.ne(-math.inf)
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
