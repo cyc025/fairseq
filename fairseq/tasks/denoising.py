@@ -206,7 +206,7 @@ class DenoisingTask(LegacyFairseqTask):
             if self.args.mask_length != "subword"
             else None
         )
-
+ 
         self.datasets[split] = DenoisingDataset(
             dataset,
             dataset.sizes,

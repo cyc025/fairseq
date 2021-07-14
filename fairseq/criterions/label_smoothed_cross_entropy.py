@@ -48,7 +48,7 @@ def label_smoothed_nll_loss(lprobs, target, epsilon, ignore_index=None, reduce=T
     eps_i = epsilon / (lprobs.size(-1) - 1)
     loss = (1.0 - epsilon - eps_i) * nll_loss + eps_i * smooth_loss
     return loss, nll_loss
-
+ 
 
 @register_criterion(
     "label_smoothed_cross_entropy", dataclass=LabelSmoothedCrossEntropyCriterionConfig
