@@ -85,15 +85,6 @@ class SequenceGenerator(nn.Module):
         self.min_len = min_len
         self.max_len = max_len or self.model.max_decoder_positions()
 
-        # for testing only
-        force_length = int(open('.max.len','r').read().strip().replace('\n',''))
-        self.max_len_a = force_length
-        self.max_len_b = force_length
-        self.min_len = 0
-        self.max_len = force_length
-
-        # from fairseq import pdb; pdb.set_trace()
-
         self.normalize_scores = normalize_scores
         self.len_penalty = len_penalty
         self.unk_penalty = unk_penalty
@@ -320,20 +311,7 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-        # from fairseq import pdb; pdb.set_trace()
-        # max_len = 4
-        # import time
-        # start_time = time.time()
-
-        step_size = 2
-
-        for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
-
-            # from fairseq import pdb; pdb.set_trace()
-
-            if step==self.max_len-1:
-                break
-
+        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -350,8 +328,6 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
-            # from fairseq import pdb; pdb.set_trace()
-
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -367,14 +343,10 @@ class SequenceGenerator(nn.Module):
                 probs = probs[:, -1, :] * self.lm_weight
                 lprobs += probs
 
-            # what
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            # remove 'pad' and 'unk'
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
-
-            # from fairseq import pdb; pdb.set_trace()
 
             # handle max length constraint
             if step >= max_len:
@@ -403,7 +375,6 @@ class SequenceGenerator(nn.Module):
                 attn[:, :, step + 1].copy_(avg_attn_scores)
 
             scores = scores.type_as(lprobs)
-            # what
             eos_bbsz_idx = torch.empty(0).to(
                 tokens
             )  # indices of hypothesis ending with eos (finished sentences)
@@ -411,11 +382,9 @@ class SequenceGenerator(nn.Module):
                 scores
             )  # scores of hypothesis ending with eos (finished sentences)
 
-            # what
             if self.should_set_src_lengths:
                 self.search.set_src_lengths(src_lengths)
 
-            # what
             if self.repeat_ngram_blocker is not None:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
@@ -433,14 +402,9 @@ class SequenceGenerator(nn.Module):
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
 
-            # from fairseq import pdb; pdb.set_trace()
-
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
-            if step < self.max_len - step - 1 and step_size < self.max_len:
-                eos_mask = cand_scores.ne(cand_scores)
-            else:
-                eos_mask = cand_scores.ne(-math.inf)
+            eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
             # only consider eos when it's among the top beam_size indices
@@ -584,9 +548,6 @@ class SequenceGenerator(nn.Module):
             # reorder incremental state in decoder
             reorder_state = active_bbsz_idx
 
-        # end_time = time.time()
-        # print(f"Time: {end_time-start_time}")
-
         # sort by score descending
         for sent in range(len(finalized)):
             scores = torch.tensor(
@@ -597,6 +558,8 @@ class SequenceGenerator(nn.Module):
             finalized[sent] = torch.jit.annotate(
                 List[Dict[str, Tensor]], finalized[sent]
             )
+
+        # from fairseq import pdb; pdb.set_trace() p finalized[0][0]['tokens']
         return finalized
 
     def _prefix_tokens(
