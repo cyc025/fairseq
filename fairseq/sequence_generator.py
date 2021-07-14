@@ -325,7 +325,7 @@ class SequenceGenerator(nn.Module):
         # import time
         # start_time = time.time()
 
-        step_size = 8
+        step_size = 16
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
