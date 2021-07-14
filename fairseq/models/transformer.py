@@ -525,7 +525,7 @@ class TransformerEncoder(FairseqEncoder):
         if return_all_hiddens:
             encoder_states.append(x)
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         # encoder layers
         for layer in self.layers:
