@@ -439,6 +439,7 @@ class SequenceGenerator(nn.Module):
             # Shape of eos_mask: (batch size, beam size)
             if step < self.max_len - step - 1 and step_size >= self.max_len:
                 eos_mask = cand_scores.ne(cand_scores)
+                from fairseq import pdb; pdb.set_trace()
             else:
                 eos_mask = cand_scores.ne(-math.inf)
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
