@@ -396,7 +396,7 @@ class TransformerDecoderLayer(nn.Module):
         x = self.fc2(x)
         x = self.dropout_module(x)
         x = self.residual_connection(x, residual)
-        if not self.normalize_before: 
+        if not self.normalize_before:
             x = self.final_layer_norm(x)
         if self.onnx_trace and incremental_state is not None:
             saved_state = self.self_attn._get_input_buffer(incremental_state)

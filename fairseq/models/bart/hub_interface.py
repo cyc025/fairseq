@@ -99,14 +99,11 @@ class BARTHubInterface(GeneratorHubInterface):
         if "prefix_tokens" in inference_step_args:
             raise NotImplementedError("prefix generation not implemented for BART")
         res = []
-
-
-
         for batch in self._build_batches(tokenized_sentences, skip_invalid_size_inputs):
             src_tokens = batch['net_input']['src_tokens']
             inference_step_args["prefix_tokens"] =src_tokens.new_full(
                 (src_tokens.size(0), 1), fill_value=self.task.source_dictionary.bos()
-            ).to(device=self.device)            
+            ).to(device=self.device)
             results = super().generate(
                 src_tokens,
                 *args,
