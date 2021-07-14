@@ -437,7 +437,7 @@ class SequenceGenerator(nn.Module):
 
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
-            if step<self.max_len-2*step:
+            if step<self.max_len-step-1:
                 eos_mask = cand_scores.ne(cand_scores)
             else:
                 eos_mask = cand_scores.ne(-math.inf)
