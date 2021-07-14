@@ -34,7 +34,9 @@ class GPT2BPE(object):
         self.bpe = get_encoder(encoder_json, vocab_bpe)
 
     def encode(self, x: str) -> str:
-        return " ".join(map(str, self.bpe.encode(x)))
+        a = list(map(str, self.bpe.encode(x)))[:800]
+        return " ".join(a)
+        # return " ".join(map(str, self.bpe.encode(x)))
 
     def decode(self, x: str) -> str:
         # print(x.replace('<pad>',''))
