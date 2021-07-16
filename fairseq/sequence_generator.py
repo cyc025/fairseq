@@ -572,8 +572,6 @@ class SequenceGenerator(nn.Module):
                 cand_scores, dim=1, index=active_hypos
             )
 
-            print(scores.size())
-
             # Update constraints based on which candidates were selected for the next beam
             self.search.update_constraints(active_hypos)
 
