@@ -388,7 +388,7 @@ class SequenceGenerator(nn.Module):
                 and step < max_len
             ):
                 lprobs, tokens, scores = self._prefix_tokens(
-                    int(step/2), lprobs, scores, tokens, prefix_tokens, beam_size
+                    step, lprobs, scores, tokens, prefix_tokens, beam_size
                 )
             elif step < self.min_len:
                 # minimum length constraint (does not apply if using prefix_tokens)
@@ -604,6 +604,7 @@ class SequenceGenerator(nn.Module):
     ):
         """Handle prefix tokens"""
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
+        print(prefix_toks)
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
         prefix_mask = prefix_toks.ne(self.pad)
         lprobs[prefix_mask] = torch.tensor(-math.inf).to(lprobs)
