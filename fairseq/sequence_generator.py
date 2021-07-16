@@ -604,7 +604,6 @@ class SequenceGenerator(nn.Module):
     ):
         """Handle prefix tokens"""
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
-        print(prefix_toks)
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
         prefix_mask = prefix_toks.ne(self.pad)
         lprobs[prefix_mask] = torch.tensor(-math.inf).to(lprobs)
@@ -627,6 +626,7 @@ class SequenceGenerator(nn.Module):
             tokens = self.replicate_first_beam(tokens, eos_mask_batch_dim, beam_size)
             scores = self.replicate_first_beam(scores, eos_mask_batch_dim, beam_size)
             lprobs = self.replicate_first_beam(lprobs, eos_mask_batch_dim, beam_size)
+        print(lprobs,tokens,scores)
         return lprobs, tokens, scores
 
     def replicate_first_beam(self, tensor, mask, beam_size: int):
