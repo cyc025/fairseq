@@ -435,10 +435,6 @@ class SequenceGenerator(nn.Module):
 
             # from fairseq import pdb; pdb.set_trace()
 
-            cand_bbsz_idx = cand_bbsz_idx[cand_bbsz_idx!=2]
-            print(cand_bbsz_idx)
-
-
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
             if step < self.max_len - step - 1 and step_size < self.max_len:
@@ -453,6 +449,9 @@ class SequenceGenerator(nn.Module):
             eos_bbsz_idx = torch.masked_select(
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
+
+            eos_bbsz_idx = eos_bbsz_idx[eos_bbsz_idx!=2]
+            print(eos_bbsz_idx)            
 
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
