@@ -432,6 +432,7 @@ class SequenceGenerator(nn.Module):
             # hypotheses, with a range of values: [0, bsz*beam_size),
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
+            print(cand_bbsz_idx)
 
             # from fairseq import pdb; pdb.set_trace()
 
@@ -626,7 +627,6 @@ class SequenceGenerator(nn.Module):
             tokens = self.replicate_first_beam(tokens, eos_mask_batch_dim, beam_size)
             scores = self.replicate_first_beam(scores, eos_mask_batch_dim, beam_size)
             lprobs = self.replicate_first_beam(lprobs, eos_mask_batch_dim, beam_size)
-        print(lprobs,tokens,scores)
         return lprobs, tokens, scores
 
     def replicate_first_beam(self, tensor, mask, beam_size: int):
