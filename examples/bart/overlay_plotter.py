@@ -46,14 +46,17 @@ width = 0.8
 
 step_1 = get_mean_data(sys.argv[1])
 step_2 = get_mean_data(sys.argv[2])
+step_4 = get_mean_data(sys.argv[3])
 
 
 indices = np.arange(len(step_2))
 
 plt.bar(indices, step_1, width=width,
-        color='b', label='1-step')
+         label='1-step')
 plt.bar([i+0.25*width for i in indices], step_2,
-        width=0.5*width, color='r', alpha=0.5, label='2-step')
+        width=0.5*width, label='2-step')
+plt.bar([i+0.25*width for i in indices], step_4,
+        width=0.5*width, label='4-step')
 
 plt.xticks(indices+width/2.,
            ['{}'.format(i) for i in range(len(step_2))] )
