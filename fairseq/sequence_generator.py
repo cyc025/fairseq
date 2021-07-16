@@ -450,9 +450,6 @@ class SequenceGenerator(nn.Module):
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
 
-            eos_bbsz_idx = eos_bbsz_idx[eos_bbsz_idx!=2]
-            print(eos_bbsz_idx)            
-
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
                 eos_scores = torch.masked_select(
@@ -574,6 +571,8 @@ class SequenceGenerator(nn.Module):
             scores.view(bsz, beam_size, -1)[:, :, step] = torch.gather(
                 cand_scores, dim=1, index=active_hypos
             )
+
+            from fairseq import pdb; pdb.set_trace()
 
             # Update constraints based on which candidates were selected for the next beam
             self.search.update_constraints(active_hypos)
