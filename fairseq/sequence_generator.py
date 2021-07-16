@@ -428,6 +428,10 @@ class SequenceGenerator(nn.Module):
                 original_batch_idxs,
             )
 
+            from fairseq import pdb; pdb.set_trace()
+
+            cand_indices
+
             # cand_bbsz_idx contains beam indices for the top candidate
             # hypotheses, with a range of values: [0, bsz*beam_size),
             # and dimensions: [bsz, cand_size]
@@ -571,8 +575,6 @@ class SequenceGenerator(nn.Module):
             scores.view(bsz, beam_size, -1)[:, :, step] = torch.gather(
                 cand_scores, dim=1, index=active_hypos
             )
-
-            from fairseq import pdb; pdb.set_trace()
 
             # Update constraints based on which candidates were selected for the next beam
             self.search.update_constraints(active_hypos)
