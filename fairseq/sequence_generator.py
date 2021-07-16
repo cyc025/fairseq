@@ -394,8 +394,6 @@ class SequenceGenerator(nn.Module):
                 # minimum length constraint (does not apply if using prefix_tokens)
                 lprobs[:, self.eos] = -math.inf
 
-            print(lprobs[0][:10])
-
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
                 if attn is None:
@@ -573,6 +571,8 @@ class SequenceGenerator(nn.Module):
             scores.view(bsz, beam_size, -1)[:, :, step] = torch.gather(
                 cand_scores, dim=1, index=active_hypos
             )
+
+            print(scores.size())
 
             # Update constraints based on which candidates were selected for the next beam
             self.search.update_constraints(active_hypos)
