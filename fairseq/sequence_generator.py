@@ -107,13 +107,13 @@ class SequenceGenerator(nn.Module):
 
         assert temperature > 0, "--temperature must be greater than 0"
 
-        self.search = (
-            search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
-        )
-
         # self.search = (
-        #     search.Sampling(tgt_dict, sampling_topk=-4, sampling_topp=-0.1) if search_strategy is None else search_strategy
+        #     search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
         # )
+
+        self.search = (
+            search.Sampling(tgt_dict, sampling_topk=-1, sampling_topp=-0.1) if search_strategy is None else search_strategy
+        )
 
         # We only need to set src_lengths in LengthConstrainedBeamSearch.
         # As a module attribute, setting it would break in multithread
