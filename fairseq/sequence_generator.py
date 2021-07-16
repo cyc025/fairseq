@@ -112,7 +112,7 @@ class SequenceGenerator(nn.Module):
         # )
 
         self.search = (
-            search.Sampling(tgt_dict, sampling_topk=-1, sampling_topp=-0.1) if search_strategy is None else search_strategy
+            search.Sampling(tgt_dict, sampling_topk=-4, sampling_topp=-0.1) if search_strategy is None else search_strategy
         )
 
         # We only need to set src_lengths in LengthConstrainedBeamSearch.
@@ -330,7 +330,7 @@ class SequenceGenerator(nn.Module):
         # import time
         # start_time = time.time()
 
-        step_size = 2
+        step_size = 1
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
