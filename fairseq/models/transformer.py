@@ -979,7 +979,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.project_out_dim is not None:
             x = self.project_out_dim(x)
 
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
+        print(self_attn_padding_mask)
 
         return x, {"attn": [attn], "inner_states": inner_states}
 
