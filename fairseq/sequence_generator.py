@@ -359,8 +359,6 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
-            print(lprobs[0])
-
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
@@ -395,6 +393,8 @@ class SequenceGenerator(nn.Module):
             elif step < self.min_len:
                 # minimum length constraint (does not apply if using prefix_tokens)
                 lprobs[:, self.eos] = -math.inf
+
+            print(lprobs[0])
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
