@@ -359,7 +359,7 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
-            print(lprobs)
+            print(lprobs[0])
 
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
