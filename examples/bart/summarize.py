@@ -117,12 +117,15 @@ def main():
     with open(f'results/profile_{curr_length}.log', 'a') as profile_log:
         with profile(use_cuda=False) as prof:
             with record_function("model_inference"):
-                try:
-                    generate(
-                        bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
-                    )
-                except:
-                    print('has error')
+                # try:
+                #     generate(
+                #         bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
+                #     )
+                # except:
+                #     print('has error')
+                generate(
+                    bart, args.src, bsz=args.bsz, n_obs=args.n, outfile=args.out, **eval_kwargs
+                )
         # print(prof)
         profile_log.write(extract_time(str(prof))+'\n')
 
