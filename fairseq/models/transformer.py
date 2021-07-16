@@ -980,7 +980,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             x = self.project_out_dim(x)
 
         # from fairseq import pdb; pdb.set_trace()
-        print(self_attn_mask)
+        print(x)
 
         return x, {"attn": [attn], "inner_states": inner_states}
 
