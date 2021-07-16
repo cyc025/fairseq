@@ -325,7 +325,7 @@ class SequenceGenerator(nn.Module):
         # import time
         # start_time = time.time()
 
-        step_size = 1
+        step_size = 2
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
@@ -427,9 +427,6 @@ class SequenceGenerator(nn.Module):
                 tokens[:, : step + 1],
                 original_batch_idxs,
             )
-
-            from fairseq import pdb; pdb.set_trace()
-
 
             # cand_bbsz_idx contains beam indices for the top candidate
             # hypotheses, with a range of values: [0, bsz*beam_size),
