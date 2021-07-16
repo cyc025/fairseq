@@ -887,9 +887,9 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 - a dictionary with any model-specific outputs
         """
 
+        bs, slen = prev_output_tokens.size()
         print(slen)
 
-        bs, slen = prev_output_tokens.size()
         if alignment_layer is None:
             alignment_layer = self.num_layers - 1
 
