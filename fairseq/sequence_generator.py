@@ -455,7 +455,7 @@ class SequenceGenerator(nn.Module):
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
 
-            from fairseq import pdb; pdb.set_trace()
+            # from fairseq import pdb; pdb.set_trace()
 
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
