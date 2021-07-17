@@ -98,14 +98,9 @@ class SequenceGenerator(nn.Module):
 
         assert temperature > 0, "--temperature must be greater than 0"
 
-        # self.search = (
-        #     search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
-        # )
-
         self.search = (
-            search.Sampling(tgt_dict, sampling_topp=0.01) if search_strategy is None else search_strategy
+            search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
         )
-
         # We only need to set src_lengths in LengthConstrainedBeamSearch.
         # As a module attribute, setting it would break in multithread
         # settings when the model is shared.
@@ -316,14 +311,7 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-        step_size = 1
-
-        for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
-
-
-            if step==self.max_len-1:
-                break
-
+        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -339,9 +327,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-
             # from fairseq import pdb; pdb.set_trace()
-
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -357,14 +343,10 @@ class SequenceGenerator(nn.Module):
                 probs = probs[:, -1, :] * self.lm_weight
                 lprobs += probs
 
-            # what
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            # remove 'pad' and 'unk'
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
-
-            # from fairseq import pdb; pdb.set_trace()
 
             # handle max length constraint
             if step >= max_len:
@@ -393,7 +375,6 @@ class SequenceGenerator(nn.Module):
                 attn[:, :, step + 1].copy_(avg_attn_scores)
 
             scores = scores.type_as(lprobs)
-            # what
             eos_bbsz_idx = torch.empty(0).to(
                 tokens
             )  # indices of hypothesis ending with eos (finished sentences)
@@ -401,11 +382,9 @@ class SequenceGenerator(nn.Module):
                 scores
             )  # scores of hypothesis ending with eos (finished sentences)
 
-            # what
             if self.should_set_src_lengths:
                 self.search.set_src_lengths(src_lengths)
 
-            # what
             if self.repeat_ngram_blocker is not None:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
@@ -423,14 +402,9 @@ class SequenceGenerator(nn.Module):
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
 
-            # cand_bbsz_idx[0] = cand_bbsz_idx[cand_bbsz_idx!=self.pad]
-
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
-            # if step < self.max_len - step - 1 and step_size < self.max_len:
-            #     eos_mask = cand_scores.ne(cand_scores)
-            # else:
-            eos_mask = cand_scores.ne(-math.inf)
+            eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
             # only consider eos when it's among the top beam_size indices
@@ -439,8 +413,6 @@ class SequenceGenerator(nn.Module):
             eos_bbsz_idx = torch.masked_select(
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
-
-            # from fairseq import pdb; pdb.set_trace()
 
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
@@ -575,9 +547,6 @@ class SequenceGenerator(nn.Module):
 
             # reorder incremental state in decoder
             reorder_state = active_bbsz_idx
-
-        # end_time = time.time()
-        # print(f"Time: {end_time-start_time}")
 
         # sort by score descending
         for sent in range(len(finalized)):
@@ -813,6 +782,7 @@ class EnsembleModel(nn.Module):
                 encoder_out = encoder_outs[i]
             # decode each model
             if self.has_incremental_states():
+
                 decoder_out = model.decoder.forward(
                     tokens,
                     encoder_out=encoder_out,
