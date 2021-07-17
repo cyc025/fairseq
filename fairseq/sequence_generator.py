@@ -375,8 +375,6 @@ class SequenceGenerator(nn.Module):
             # what
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            from fairseq import pdb; pdb.set_trace()
-
             # remove 'pad' and 'unk'
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
@@ -456,6 +454,8 @@ class SequenceGenerator(nn.Module):
             eos_bbsz_idx = torch.masked_select(
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
+
+            from fairseq import pdb; pdb.set_trace()
 
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
