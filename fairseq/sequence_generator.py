@@ -438,7 +438,7 @@ class SequenceGenerator(nn.Module):
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
 
-            cand_bbsz_idx[0] = cand_bbsz_idx[cand_bbsz_idx!=self.pad]
+            # cand_bbsz_idx[0] = cand_bbsz_idx[cand_bbsz_idx!=self.pad]
 
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
