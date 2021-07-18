@@ -908,10 +908,11 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             )
 
         if incremental_state is not None:
-            from fairseq import pdb; pdb.set_trace()
-            prev_output_tokens = prev_output_tokens[:, -1:]
+            step_size = 2
+            # from fairseq import pdb; pdb.set_trace()
+            prev_output_tokens = prev_output_tokens[:, -step_size:]
             if positions is not None:
-                positions = positions[:, -1:]
+                positions = positions[:, -step_size:]
 
         # embed tokens and positions
         x = self.embed_scale * self.embed_tokens(prev_output_tokens)
