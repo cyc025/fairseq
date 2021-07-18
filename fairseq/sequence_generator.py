@@ -420,7 +420,7 @@ class SequenceGenerator(nn.Module):
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
 
-            print(eos_bbsz_idx)
+            print(cand_bbsz_idx)
 
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
