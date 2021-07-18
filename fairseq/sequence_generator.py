@@ -833,9 +833,11 @@ class EnsembleModel(nn.Module):
                 decoder_out_tuple, log_probs=True, sample=None
             )
 
-            probs = probs[:, -step_size, :] # change_here ?
+            # probs = probs[:, -step_size, :] # change_here ?
 
-            # probs = probs[:, -1, :]
+            print(probs.size())
+
+            probs = probs[:, -1, :]
 
             if self.models_size == 1:
                 return probs, attn
