@@ -397,8 +397,8 @@ class SequenceGenerator(nn.Module):
             # Shape: (batch, cand_size)
             cand_scores, cand_indices, cand_beams = self.search.step(
                 step,
-                lprobs.view(bsz, -1, self.vocab_size),
-                scores.view(bsz, beam_size, -1)[:, :, :step],
+                lprobs.view(bsz, -step_size, self.vocab_size),
+                scores.view(bsz, beam_size, -step_size)[:, :, :step],
                 tokens[:, : step + 1],
                 original_batch_idxs,
             )
