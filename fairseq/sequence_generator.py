@@ -351,6 +351,9 @@ class SequenceGenerator(nn.Module):
 
             # change_here ?
 
+            from fairseq import pdb; pdb.set_trace()
+            
+
             lprobs[:, self.pad+1] = -math.inf  # never select pad
             lprobs[:, self.unk+1] -= self.unk_penalty  # apply unk penalty
 
@@ -830,8 +833,6 @@ class EnsembleModel(nn.Module):
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
             )
-
-            from fairseq import pdb; pdb.set_trace()
 
             # try:
             #     probs = probs[:, -step_size, :] # change_here ?
