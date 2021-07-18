@@ -89,6 +89,7 @@ class FairseqDecoder(nn.Module):
 
         logits = net_output[0]
         if log_probs:
+            from fairseq import pdb; pdb.set_trace()
             return utils.log_softmax(logits, dim=-1, onnx_trace=self.onnx_trace)
         else:
             return utils.softmax(logits, dim=-1, onnx_trace=self.onnx_trace)

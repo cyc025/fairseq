@@ -833,8 +833,7 @@ class EnsembleModel(nn.Module):
 
             # try:
             #     probs = probs[:, -step_size, :] # change_here ?
-            # except:
-            from fairseq import pdb; pdb.set_trace()
+            # except:            
             probs = probs[:, -1, :]
 
             if self.models_size == 1:
