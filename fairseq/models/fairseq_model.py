@@ -80,8 +80,7 @@ class BaseFairseqModel(nn.Module):
     ):
 
         """Scriptable helper function for get_normalized_probs in ~BaseFairseqModel"""
-        if hasattr(self, "decoder"):
-            from fairseq import pdb; pdb.set_trace()
+        if hasattr(self, "decoder"):            
             return self.decoder.get_normalized_probs(net_output, log_probs, sample)
         elif torch.is_tensor(net_output):
             # syntactic sugar for simple models which don't have a decoder
