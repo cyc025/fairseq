@@ -339,6 +339,8 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
+            from fairseq import pdb; pdb.set_trace()
+
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
@@ -394,11 +396,12 @@ class SequenceGenerator(nn.Module):
             if self.repeat_ngram_blocker is not None:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
+
             # Shape: (batch, cand_size)
             cand_scores, cand_indices, cand_beams = self.search.step(
                 step,
-                lprobs.view(bsz, -step_size, self.vocab_size),
-                scores.view(bsz, beam_size, -step_size)[:, :, :step],
+                lprobs.view(bsz, -1, self.vocab_size),
+                scores.view(bsz, beam_size, -1)[:, :, :step],
                 tokens[:, : step + 1],
                 original_batch_idxs,
             )
