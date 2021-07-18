@@ -349,6 +349,8 @@ class SequenceGenerator(nn.Module):
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
+            # change_here ?
+
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
@@ -811,8 +813,7 @@ class EnsembleModel(nn.Module):
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
-                    attn = attn[:, -1, :]
-
+                    attn = attn[:, -1, :] # change_here
 
             from fairseq import pdb; pdb.set_trace()
             # decoder_out_tuple = (
