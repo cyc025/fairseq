@@ -313,7 +313,6 @@ class SequenceGenerator(nn.Module):
 
 
         step_size = 2
-        max_len += step_size
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
@@ -554,6 +553,8 @@ class SequenceGenerator(nn.Module):
 
             # reorder incremental state in decoder
             reorder_state = active_bbsz_idx
+
+            print(tokens)
 
         # sort by score descending
         for sent in range(len(finalized)):
