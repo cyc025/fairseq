@@ -823,8 +823,6 @@ class EnsembleModel(nn.Module):
                 None if decoder_len <= 1 else decoder_out[1],
             )
 
-            print("decoder_out_tuple",decoder_out_tuple[0].size())
-
             # decoder_out_tuple = (
             #     decoder_out[0][:, -1:, :].div_(temperature), # change_here
             #     None if decoder_len <= 1 else decoder_out[1],
@@ -833,11 +831,10 @@ class EnsembleModel(nn.Module):
                 decoder_out_tuple, log_probs=True, sample=None
             )
 
-            print("probs",probs.size())
-
-            # probs = probs[:, -step_size, :] # change_here ?
-
-            probs = probs[:, -1, :]
+            try:
+                probs = probs[:, -step_size, :] # change_here ?
+            else:
+                probs = probs[:, -1, :]
 
             if self.models_size == 1:
                 return probs, attn
