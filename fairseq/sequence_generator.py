@@ -330,7 +330,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-            # from fairseq import pdb; pdb.set_trace()
+
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 step_size,
                 tokens[:, : step + 1],
@@ -338,6 +338,8 @@ class SequenceGenerator(nn.Module):
                 incremental_states,
                 self.temperature,
             )
+
+            from fairseq import pdb; pdb.set_trace()
 
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
