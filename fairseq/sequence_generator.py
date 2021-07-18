@@ -775,7 +775,7 @@ class EnsembleModel(nn.Module):
     @torch.jit.export
     def forward_decoder(
         self,
-        step_size
+        step_size,
         tokens,
         encoder_outs: List[Dict[str, List[Tensor]]],
         incremental_states: List[Dict[str, Dict[str, Optional[Tensor]]]],
