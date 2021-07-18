@@ -311,7 +311,10 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
+
+        step_size = 2
+
+        for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -329,6 +332,7 @@ class SequenceGenerator(nn.Module):
                 )
             # from fairseq import pdb; pdb.set_trace()
             lprobs, avg_attn_scores = self.model.forward_decoder(
+                step_size,
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
@@ -769,6 +773,7 @@ class EnsembleModel(nn.Module):
     @torch.jit.export
     def forward_decoder(
         self,
+        step_size
         tokens,
         encoder_outs: List[Dict[str, List[Tensor]]],
         incremental_states: List[Dict[str, Dict[str, Optional[Tensor]]]],
@@ -808,14 +813,25 @@ class EnsembleModel(nn.Module):
                 if attn is not None:
                     attn = attn[:, -1, :]
 
+
+            from fairseq import pdb; pdb.set_trace()
+            # decoder_out_tuple = (
+            #     decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
+            #     None if decoder_len <= 1 else decoder_out[1],
+            # )
+
             decoder_out_tuple = (
-                decoder_out[0][:, -1:, :].div_(temperature),
+                decoder_out[0][:, -1:, :].div_(temperature), # change_here
                 None if decoder_len <= 1 else decoder_out[1],
             )
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
             )
+
+            # probs = probs[:, -step_size, :] # change_here ?
+
             probs = probs[:, -1, :]
+
             if self.models_size == 1:
                 return probs, attn
 
