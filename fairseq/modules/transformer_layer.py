@@ -412,8 +412,6 @@ class TransformerDecoderLayer(nn.Module):
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
 
-        print(x.size())
-
         return x, attn, None
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):
