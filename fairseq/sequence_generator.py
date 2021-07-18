@@ -420,6 +420,8 @@ class SequenceGenerator(nn.Module):
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
 
+            print(eos_bbsz_idx)
+
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
                 eos_scores = torch.masked_select(
@@ -447,7 +449,7 @@ class SequenceGenerator(nn.Module):
 
             if self.search.stop_on_max_len and step >= max_len:
                 break
-            # assert step < max_len, f"{step} < {max_len}"
+            assert step < max_len, f"{step} < {max_len}"
 
             # Remove finalized sentences (ones for which {beam_size}
             # finished hypotheses have been generated) from the batch.
