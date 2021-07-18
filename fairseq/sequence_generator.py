@@ -339,8 +339,6 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
-            from fairseq import pdb; pdb.set_trace()
-
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
@@ -847,6 +845,8 @@ class EnsembleModel(nn.Module):
                     avg_attn = attn
                 else:
                     avg_attn.add_(attn)
+
+        from fairseq import pdb; pdb.set_trace()
 
         avg_probs = torch.logsumexp(torch.stack(log_probs, dim=0), dim=0) - math.log(
             self.models_size
