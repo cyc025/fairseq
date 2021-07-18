@@ -191,6 +191,8 @@ class PrefixConstrainedBeamSearch(Search):
             assert scores is not None
             lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
 
+        print(lprobs.size())
+
         top_prediction = torch.topk(
             lprobs.view(bsz, -1),
             k=min(
