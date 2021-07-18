@@ -445,11 +445,9 @@ class SequenceGenerator(nn.Module):
             if num_remaining_sent == 0:
                 break
 
-            self.search.stop_on_max_len = True
-
             if self.search.stop_on_max_len and step >= max_len:
                 break
-            assert step < max_len, f"{step} < {max_len}"
+            # assert step < max_len, f"{step} < {max_len}"
 
             # Remove finalized sentences (ones for which {beam_size}
             # finished hypotheses have been generated) from the batch.
