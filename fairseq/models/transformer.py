@@ -900,8 +900,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if encoder_out is not None and len(encoder_out["encoder_padding_mask"]) > 0:
             padding_mask = encoder_out["encoder_padding_mask"][0]
 
-        from fairseq import pdb; pdb.set_trace()
-
         # embed positions
         positions = None
         if self.embed_positions is not None:
@@ -976,6 +974,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         if self.project_out_dim is not None:
             x = self.project_out_dim(x)
+
+        from fairseq import pdb; pdb.set_trace()
 
         return x, {"attn": [attn], "inner_states": inner_states}
 
