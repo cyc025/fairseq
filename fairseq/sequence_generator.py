@@ -350,6 +350,7 @@ class SequenceGenerator(nn.Module):
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             # change_here ?
+            from fariseq import pdb; pdb.set_trace()
 
             lprobs[:, self.pad+1] = -math.inf  # never select pad
             lprobs[:, self.unk+1] -= self.unk_penalty  # apply unk penalty
