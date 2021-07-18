@@ -823,7 +823,7 @@ class EnsembleModel(nn.Module):
                 None if decoder_len <= 1 else decoder_out[1],
             )
 
-            from fairseq import pdb; pdb.set_trace()
+            print(decoder_out_tuple[0].size())
 
             # decoder_out_tuple = (
             #     decoder_out[0][:, -1:, :].div_(temperature), # change_here
@@ -832,6 +832,8 @@ class EnsembleModel(nn.Module):
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
             )
+
+            print(probs.size())
 
             # probs = probs[:, -step_size, :] # change_here ?
 
