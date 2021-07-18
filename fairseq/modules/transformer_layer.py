@@ -303,8 +303,6 @@ class TransformerDecoderLayer(nn.Module):
             encoded output of shape `(seq_len, batch, embed_dim)`
         """
 
-        print(x.size())
-
         if need_head_weights:
             need_attn = True
 

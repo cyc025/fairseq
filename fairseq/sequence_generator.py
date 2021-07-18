@@ -815,7 +815,7 @@ class EnsembleModel(nn.Module):
                 if attn is not None:
                     attn = attn[:, -1, :] # change_here
 
-            from fairseq import pdb; pdb.set_trace()
+            
             # decoder_out_tuple = (
             #     decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
             #     None if decoder_len <= 1 else decoder_out[1],
