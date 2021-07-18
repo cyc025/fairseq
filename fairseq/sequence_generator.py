@@ -351,8 +351,8 @@ class SequenceGenerator(nn.Module):
 
             # change_here ?
 
-            lprobs[:, self.pad] = -math.inf  # never select pad
-            lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
+            lprobs[:, self.pad+1] = -math.inf  # never select pad
+            lprobs[:, self.unk+1] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
@@ -815,7 +815,7 @@ class EnsembleModel(nn.Module):
                 if attn is not None:
                     attn = attn[:, -1, :] # change_here
 
-            
+
             # decoder_out_tuple = (
             #     decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
             #     None if decoder_len <= 1 else decoder_out[1],
