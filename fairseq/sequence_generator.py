@@ -339,8 +339,6 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
-            from fairseq import pdb; pdb.set_trace()
-
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
@@ -825,6 +823,8 @@ class EnsembleModel(nn.Module):
                 None if decoder_len <= 1 else decoder_out[1],
             )
 
+            from fairseq import pdb; pdb.set_trace()
+
             # decoder_out_tuple = (
             #     decoder_out[0][:, -1:, :].div_(temperature), # change_here
             #     None if decoder_len <= 1 else decoder_out[1],
@@ -834,8 +834,6 @@ class EnsembleModel(nn.Module):
             )
 
             # probs = probs[:, -step_size, :] # change_here ?
-
-            print(probs.size())
 
             probs = probs[:, -1, :]
 
