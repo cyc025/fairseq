@@ -352,10 +352,9 @@ class SequenceGenerator(nn.Module):
             # change_here ?
 
             from fairseq import pdb; pdb.set_trace()
-            
 
-            lprobs[:, self.pad+1] = -math.inf  # never select pad
-            lprobs[:, self.unk+1] -= self.unk_penalty  # apply unk penalty
+            lprobs[:, :, self.pad] = -math.inf  # never select pad
+            lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
