@@ -445,7 +445,7 @@ class SequenceGenerator(nn.Module):
             if num_remaining_sent == 0:
                 break
 
-            self.search = True
+            self.search.stop_on_max_len = True
 
             if self.search.stop_on_max_len and step >= max_len:
                 break
