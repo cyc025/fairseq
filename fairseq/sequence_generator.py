@@ -836,8 +836,6 @@ class EnsembleModel(nn.Module):
             except:
                 probs = probs[:, -1, :]
 
-            from fairseq import pdb; pdb.set_trace()
-
             if self.models_size == 1:
                 return probs, attn
 
