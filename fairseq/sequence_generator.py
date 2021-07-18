@@ -350,7 +350,6 @@ class SequenceGenerator(nn.Module):
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             # change_here ?
-            from fairseq import pdb; pdb.set_trace()
 
             lprobs[:, self.pad+1] = -math.inf  # never select pad
             lprobs[:, self.unk+1] -= self.unk_penalty  # apply unk penalty
@@ -835,6 +834,7 @@ class EnsembleModel(nn.Module):
             # try:
             #     probs = probs[:, -step_size, :] # change_here ?
             # except:
+            from fairseq import pdb; pdb.set_trace()
             probs = probs[:, -1, :]
 
             if self.models_size == 1:
