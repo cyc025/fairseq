@@ -836,7 +836,7 @@ class EnsembleModel(nn.Module):
             # try:
             #     probs = probs[:, -step_size, :] # change_here ?
             # except:
-            probs = probs[:, -1, :]
+            # probs = probs[:, -1, :]
 
             if self.models_size == 1:
                 return probs, attn
