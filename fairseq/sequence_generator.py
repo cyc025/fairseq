@@ -827,7 +827,7 @@ class EnsembleModel(nn.Module):
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
-                    attn = attn[:, -change_here, :] # change_here
+                    attn = attn[:, -step_size, :] # change_here
 
             if step_size>1:
                 decoder_out_tuple = (
