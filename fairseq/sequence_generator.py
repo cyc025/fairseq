@@ -316,7 +316,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 1
+        step_size = 2
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
@@ -366,17 +366,17 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.eos + 1 :] = -math.inf
 
             # handle prefix tokens (possibly with different lengths)
-            if (
-                prefix_tokens is not None
-                and step < prefix_tokens.size(1)
-                and step < max_len
-            ):
-                lprobs, tokens, scores = self._prefix_tokens(
-                    step, lprobs, scores, tokens, prefix_tokens, beam_size
-                )
-            elif step < self.min_len:
-                # minimum length constraint (does not apply if using prefix_tokens)
-                lprobs[:, self.eos] = -math.inf
+            # if (
+            #     prefix_tokens is not None
+            #     and step < prefix_tokens.size(1)
+            #     and step < max_len
+            # ):
+            #     lprobs, tokens, scores = self._prefix_tokens(
+            #         step, lprobs, scores, tokens, prefix_tokens, beam_size
+            #     )
+            # elif step < self.min_len:
+            #     # minimum length constraint (does not apply if using prefix_tokens)
+            #     lprobs[:, self.eos] = -math.inf
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
