@@ -98,7 +98,6 @@ class SequenceGenerator(nn.Module):
 
         assert temperature > 0, "--temperature must be greater than 0"
 
-
         # self.search = (
         #     search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
         # )
@@ -578,7 +577,7 @@ class SequenceGenerator(nn.Module):
         self, step: int, lprobs, scores, tokens, prefix_tokens, beam_size: int
     ):
         """Handle prefix tokens"""
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
 
         # take only prefix tokens up to current step, then repeat it across beam
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
