@@ -98,9 +98,14 @@ class SequenceGenerator(nn.Module):
 
         assert temperature > 0, "--temperature must be greater than 0"
 
+
+        # self.search = (
+        #     search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
+        # )
         self.search = (
-            search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
+            search.Sampling(tgt_dict, sampling_topp=0.9)
         )
+
         # We only need to set src_lengths in LengthConstrainedBeamSearch.
         # As a module attribute, setting it would break in multithread
         # settings when the model is shared.
@@ -573,7 +578,7 @@ class SequenceGenerator(nn.Module):
         self, step: int, lprobs, scores, tokens, prefix_tokens, beam_size: int
     ):
         """Handle prefix tokens"""
-        from fairseq import pdb; pdb.set_trace()
+        # from fairseq import pdb; pdb.set_trace()
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
         prefix_mask = prefix_toks.ne(self.pad)
@@ -819,15 +824,16 @@ class EnsembleModel(nn.Module):
                 if attn is not None:
                     attn = attn[:, -1, :] # change_here
 
-
-            # decoder_out_tuple = (
-            #     decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
-            #     None if decoder_len <= 1 else decoder_out[1],
-            # )
-            decoder_out_tuple = (
-                decoder_out[0][:, -1:, :].div_(temperature), # change_here
-                None if decoder_len <= 1 else decoder_out[1],
-            )
+            if step_size>1:
+                decoder_out_tuple = (
+                    decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
+                    None if decoder_len <= 1 else decoder_out[1],
+                )
+            else:
+                decoder_out_tuple = (
+                    decoder_out[0][:, -1:, :].div_(temperature), # change_here
+                    None if decoder_len <= 1 else decoder_out[1],
+                )
 
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
