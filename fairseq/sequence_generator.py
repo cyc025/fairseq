@@ -353,7 +353,6 @@ class SequenceGenerator(nn.Module):
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            from fairseq import pdb; pdb.set_trace()
             if step_size<=1:
                 lprobs[:, self.pad] = -math.inf  # never select pad
                 lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
@@ -811,9 +810,9 @@ class EnsembleModel(nn.Module):
                 )
             else:
                 if hasattr(model, "decoder"):
-                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out)
+                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out, step_size=step_size)
                 else:
-                    decoder_out = model.forward(tokens)
+                    decoder_out = model.forward(tokens, step_size=step_size,)
 
             attn: Optional[Tensor] = None
             decoder_len = len(decoder_out)
