@@ -353,7 +353,7 @@ class SequenceGenerator(nn.Module):
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            # change_here ?
+            from fairseq import pdb; pdb.set_trace()
             if step_size<=1:
                 lprobs[:, self.pad] = -math.inf  # never select pad
                 lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
@@ -795,8 +795,6 @@ class EnsembleModel(nn.Module):
         temperature: float = 1.0,
         step_size: int = 1,
     ):
-
-        from fairseq import pdb; pdb.set_trace()
         log_probs = []
         avg_attn: Optional[Tensor] = None
         encoder_out: Optional[Dict[str, List[Tensor]]] = None
