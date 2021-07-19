@@ -123,6 +123,7 @@ class BeamSearch(Search):
         else:
             # make probs contain cumulative scores for each hypothesis
             assert scores is not None
+            from fairseq import pdb; pdb.set_trace()
             lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
 
         top_prediction = torch.topk(

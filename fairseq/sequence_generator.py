@@ -577,8 +577,7 @@ class SequenceGenerator(nn.Module):
     def _prefix_tokens(
         self, step: int, lprobs, scores, tokens, prefix_tokens, beam_size: int
     ):
-        """Handle prefix tokens"""
-        from fairseq import pdb; pdb.set_trace()
+        """Handle prefix tokens"""        
         # take only prefix tokens up to current step, then repeat it across beam
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
         # take lporbs based on the prefix tokens
