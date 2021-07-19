@@ -578,11 +578,17 @@ class SequenceGenerator(nn.Module):
         self, step: int, lprobs, scores, tokens, prefix_tokens, beam_size: int
     ):
         """Handle prefix tokens"""
-        # from fairseq import pdb; pdb.set_trace()
+        from fairseq import pdb; pdb.set_trace()
+
+        # take only prefix tokens up to current step, then repeat it across beam
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
+        # take lporbs based on the prefix tokens
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
+        # create masking: True if not pad, False if pad
         prefix_mask = prefix_toks.ne(self.pad)
+        # set those non-pad positions to -inf, to never select
         lprobs[prefix_mask] = torch.tensor(-math.inf).to(lprobs)
+        # ?
         lprobs[prefix_mask] = lprobs[prefix_mask].scatter(
             -1, prefix_toks[prefix_mask].unsqueeze(-1), prefix_lprobs[prefix_mask]
         )
