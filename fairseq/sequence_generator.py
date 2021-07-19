@@ -350,13 +350,10 @@ class SequenceGenerator(nn.Module):
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             # change_here ?
-
             lprobs[:, self.pad] = -math.inf  # never select pad
             lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
-
             # lprobs[:, :, self.pad] = -math.inf  # never select pad
             # lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
-
 
             # handle max length constraint
             if step >= max_len:
@@ -576,6 +573,7 @@ class SequenceGenerator(nn.Module):
         self, step: int, lprobs, scores, tokens, prefix_tokens, beam_size: int
     ):
         """Handle prefix tokens"""
+        from fairseq import pdb; pdb.set_trace()
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
         prefix_mask = prefix_toks.ne(self.pad)
