@@ -801,6 +801,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         alignment_heads: Optional[int] = None,
         src_lengths: Optional[Any] = None,
         return_all_hiddens: bool = False,
+        step_size: int = 1,
     ):
         """
         Args:
@@ -828,6 +829,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             full_context_alignment=full_context_alignment,
             alignment_layer=alignment_layer,
             alignment_heads=alignment_heads,
+            step_size=step_size,
         )
 
         if not features_only:
@@ -842,6 +844,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         full_context_alignment: bool = False,
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
+        step_size = 1,
     ):
         return self.extract_features_scriptable(
             prev_output_tokens,
@@ -850,6 +853,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             full_context_alignment,
             alignment_layer,
             alignment_heads,
+            step_size = step_size,
         )
 
     """
@@ -866,6 +870,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         full_context_alignment: bool = False,
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
+        step_size = 1,
     ):
         """
         Similar to *forward* but only return features.
@@ -908,7 +913,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             )
 
         if incremental_state is not None: # change_here
-            step_size = 1
+            step_size = 2
             prev_output_tokens = prev_output_tokens[:, -step_size:]
             if positions is not None:
                 positions = positions[:, -step_size:]

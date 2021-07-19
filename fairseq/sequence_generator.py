@@ -316,7 +316,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 1
+        step_size = 2
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
@@ -354,10 +354,12 @@ class SequenceGenerator(nn.Module):
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             # change_here ?
-            lprobs[:, self.pad] = -math.inf  # never select pad
-            lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
-            # lprobs[:, :, self.pad] = -math.inf  # never select pad
-            # lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
+            if step_size<=1:
+                lprobs[:, self.pad] = -math.inf  # never select pad
+                lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
+            else:
+                lprobs[:, :, self.pad] = -math.inf  # never select pad
+                lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
@@ -577,8 +579,6 @@ class SequenceGenerator(nn.Module):
         self, step: int, lprobs, scores, tokens, prefix_tokens, beam_size: int
     ):
         """Handle prefix tokens"""
-        from fairseq import pdb; pdb.set_trace()
-
         # take only prefix tokens up to current step, then repeat it across beam
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
         # take lporbs based on the prefix tokens
@@ -789,12 +789,14 @@ class EnsembleModel(nn.Module):
     @torch.jit.export
     def forward_decoder(
         self,
-        step_size,
         tokens,
         encoder_outs: List[Dict[str, List[Tensor]]],
         incremental_states: List[Dict[str, Dict[str, Optional[Tensor]]]],
         temperature: float = 1.0,
+        step_size: int = 1,
     ):
+
+        from fairseq import pdb; pdb.set_trace()
         log_probs = []
         avg_attn: Optional[Tensor] = None
         encoder_out: Optional[Dict[str, List[Tensor]]] = None
