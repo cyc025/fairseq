@@ -302,7 +302,6 @@ class TransformerDecoderLayer(nn.Module):
         Returns:
             encoded output of shape `(seq_len, batch, embed_dim)`
         """
-
         if need_head_weights:
             need_attn = True
 
@@ -411,7 +410,6 @@ class TransformerDecoderLayer(nn.Module):
             else:
                 self_attn_state = [saved_state["prev_key"], saved_state["prev_value"]]
             return x, attn, self_attn_state
-
         return x, attn, None
 
     def make_generation_fast_(self, need_attn: bool = False, **kwargs):

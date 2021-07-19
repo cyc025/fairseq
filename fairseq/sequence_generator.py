@@ -312,7 +312,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 2
+        step_size = 1
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
@@ -351,10 +351,12 @@ class SequenceGenerator(nn.Module):
 
             # change_here ?
 
-            from fairseq import pdb; pdb.set_trace()
+            lprobs[:, self.pad] = -math.inf  # never select pad
+            lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
-            lprobs[:, :, self.pad] = -math.inf  # never select pad
-            lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
+            # lprobs[:, :, self.pad] = -math.inf  # never select pad
+            # lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
+
 
             # handle max length constraint
             if step >= max_len:
@@ -820,23 +822,20 @@ class EnsembleModel(nn.Module):
                     attn = attn[:, -1, :] # change_here
 
 
+            # decoder_out_tuple = (
+            #     decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
+            #     None if decoder_len <= 1 else decoder_out[1],
+            # )
             decoder_out_tuple = (
-                decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
+                decoder_out[0][:, -1:, :].div_(temperature), # change_here
                 None if decoder_len <= 1 else decoder_out[1],
             )
 
-            # decoder_out_tuple = (
-            #     decoder_out[0][:, -1:, :].div_(temperature), # change_here
-            #     None if decoder_len <= 1 else decoder_out[1],
-            # )
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
             )
 
-            # try:
-            #     probs = probs[:, -step_size, :] # change_here ?
-            # except:
-            # probs = probs[:, -1, :]
+            probs = probs[:, -1, :]
 
             if self.models_size == 1:
                 return probs, attn
