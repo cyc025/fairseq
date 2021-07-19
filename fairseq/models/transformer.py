@@ -822,6 +822,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 - a dictionary with any model-specific outputs
         """
 
+        print(step_size)
+
         x, extra = self.extract_features(
             prev_output_tokens,
             encoder_out=encoder_out,
