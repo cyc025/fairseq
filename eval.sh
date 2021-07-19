@@ -6,4 +6,4 @@ cat $DATAPATH/test.hypo | java -cp "*" edu.stanford.nlp.process.PTBTokenizer -io
 cat $DATAPATH/test.target | java -cp "*" edu.stanford.nlp.process.PTBTokenizer -ioFileList -preserveLines > $DATAPATH/test.hypo.target
 # files2rouge $DATAPATH/test.hypo.tokenized $DATAPATH/test.hypo.target
 # Expected output: (ROUGE-2 Average_F: 0.21238)
-rouge -f $DATAPATH/test.hypo.tokenized $DATAPATH/test.hypo.target
+rouge -f $DATAPATH/test.hypo.tokenized $DATAPATH/test.hypo.target --avg
