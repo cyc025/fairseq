@@ -822,8 +822,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 - a dictionary with any model-specific outputs
         """
 
-        print(step_size)
-
         x, extra = self.extract_features(
             prev_output_tokens,
             encoder_out=encoder_out,
@@ -975,6 +973,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
 
         if self.layer_norm is not None:
             x = self.layer_norm(x)
+
+        print(x.size())
 
         # T x B x C -> B x T x C
         x = x.transpose(0, 1)
