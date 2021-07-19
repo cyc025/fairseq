@@ -101,9 +101,9 @@ class SequenceGenerator(nn.Module):
         self.search = (
             search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
         )
-        self.search = (
-            search.Sampling(tgt_dict, sampling_topp=0.95)
-        )
+        # self.search = (
+        #     search.Sampling(tgt_dict, sampling_topp=0.95)
+        # )
 
         # We only need to set src_lengths in LengthConstrainedBeamSearch.
         # As a module attribute, setting it would break in multithread
@@ -587,7 +587,7 @@ class SequenceGenerator(nn.Module):
         prefix_mask = prefix_toks.ne(self.pad)
         # set those non-pad positions to -inf, to never select
         lprobs[prefix_mask] = torch.tensor(-math.inf).to(lprobs)
-        # ?
+        # select unpadded lprobs based on prefix tokens as indices
         lprobs[prefix_mask] = lprobs[prefix_mask].scatter(
             -1, prefix_toks[prefix_mask].unsqueeze(-1), prefix_lprobs[prefix_mask]
         )
