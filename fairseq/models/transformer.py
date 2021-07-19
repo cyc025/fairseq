@@ -974,8 +974,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if self.layer_norm is not None:
             x = self.layer_norm(x)
 
-        print(x.size())
-
         # T x B x C -> B x T x C
         x = x.transpose(0, 1)
 
