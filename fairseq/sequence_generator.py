@@ -844,8 +844,9 @@ class EnsembleModel(nn.Module):
                 decoder_out_tuple, log_probs=True, sample=None
             )
 
-            # if step_size<=1:
-            probs = probs[:, -step_size, :]
+            # get the last dimension only if step size is 1
+            if step_size<=1:
+                probs = probs[:, -1, :]
 
             if self.models_size == 1: # returns here
                 return probs, attn
