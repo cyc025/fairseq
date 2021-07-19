@@ -336,11 +336,11 @@ class SequenceGenerator(nn.Module):
                 )
 
             lprobs, avg_attn_scores = self.model.forward_decoder(
-                step_size,
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
                 self.temperature,
+                step_size,
             )
 
             if self.lm_model is not None:
@@ -805,11 +805,11 @@ class EnsembleModel(nn.Module):
                 encoder_out = encoder_outs[i]
             # decode each model
             if self.has_incremental_states():
-
                 decoder_out = model.decoder.forward(
                     tokens,
                     encoder_out=encoder_out,
                     incremental_state=incremental_states[i],
+                    step_size=step_size,
                 )
             else:
                 if hasattr(model, "decoder"):
@@ -848,7 +848,7 @@ class EnsembleModel(nn.Module):
 
             probs = probs[:, -1, :]
 
-            if self.models_size == 1:
+            if self.models_size == 1: # returns here
                 return probs, attn
 
             log_probs.append(probs)
