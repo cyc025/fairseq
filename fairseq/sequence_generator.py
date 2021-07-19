@@ -316,7 +316,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 1
+        step_size = 2
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
@@ -844,8 +844,8 @@ class EnsembleModel(nn.Module):
                 decoder_out_tuple, log_probs=True, sample=None
             )
 
-            if step_size<=1:
-                probs = probs[:, -1, :]
+            # if step_size<=1:
+            probs = probs[:, -step_size, :]
 
             if self.models_size == 1: # returns here
                 return probs, attn
