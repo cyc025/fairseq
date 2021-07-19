@@ -354,12 +354,12 @@ class SequenceGenerator(nn.Module):
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             from fairseq import pdb; pdb.set_trace()
-            if step_size<=1 and step>step_size:
+            if step_size<=1:
                 lprobs[:, self.pad] = -math.inf  # never select pad
                 lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
             else:
-                lprobs[:, :, self.pad] = -math.inf  # never select pad
-                lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
+                lprobs[:, :, self.pad+1] = -math.inf  # never select pad
+                lprobs[:, :, self.unk+1] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
