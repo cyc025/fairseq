@@ -335,8 +335,6 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
-            print(tokens[:, : step + 1])
-
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -846,7 +844,8 @@ class EnsembleModel(nn.Module):
             )
 
             # change_here
-            # probs = probs[:, -1, :]
+            if step_size<=1:
+                probs = probs[:, -1, :]
 
             if self.models_size == 1: # returns here
                 return probs, attn
