@@ -409,6 +409,11 @@ class SequenceGenerator(nn.Module):
                 original_batch_idxs,
             )
 
+            # cand_scores: [1, 8]
+            # cand_indices: [1, 8]
+            # cand_beams: [1, 8]
+            # bbsz_offsets: [1, 1]
+
             from fairseq import pdb; pdb.set_trace()
 
             # cand_bbsz_idx contains beam indices for the top candidate
@@ -421,12 +426,16 @@ class SequenceGenerator(nn.Module):
             eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
+            # eos_mask: [1, 8]
+
             # only consider eos when it's among the top beam_size indices
             # Now we know what beam item(s) to finish
             # Shape: 1d list of absolute-numbered
             eos_bbsz_idx = torch.masked_select(
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
+
+            # eos_bbsz_idx: [0]
 
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
@@ -503,10 +512,13 @@ class SequenceGenerator(nn.Module):
 
             # Rewrite the operator since the element wise or is not supported in torchscript.
 
+            # step = 2
+            # eos_mask: [1, 16]
+
             eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
             active_mask = torch.add(
                 eos_mask.type_as(cand_offsets) * cand_size,
-                cand_offsets[: eos_mask.size(1)],
+                cand_offsets[: eos_mask.size(1)].unsqueeze(0).repeat(1,step_size), #cand_offsets[: eos_mask.size(1)],
             )
 
             # get the top beam_size active hypotheses, which are just
