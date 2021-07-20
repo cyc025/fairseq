@@ -517,9 +517,16 @@ class SequenceGenerator(nn.Module):
 
             repeat_size = step_size if step > 1 else 1
             eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
+
+            cand_offsets_var = (
+                cand_offsets[: eos_mask.size(1)].unsqueeze(0).repeat(1,repeat_size)
+                if step_size > 1
+                else cand_offsets[: eos_mask.size(1)]
+            }
+
             active_mask = torch.add(
                 eos_mask.type_as(cand_offsets) * cand_size,
-                cand_offsets[: eos_mask.size(1)].unsqueeze(0).repeat(1,repeat_size), #cand_offsets[: eos_mask.size(1)],
+                cand_offsets_var,
             )
 
             # get the top beam_size active hypotheses, which are just
