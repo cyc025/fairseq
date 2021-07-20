@@ -139,7 +139,7 @@ class BeamSearch(Search):
             if step_size > 1:
                 from fairseq import pdb; pdb.set_trace()
                 # should reduce scores to dim: [1, step * step_size, 1]
-                if step < 1:
+                if step < step_size:
                     lprobs = lprobs + scores[0, :, :].reshape(1,-1,1)
                 else:
                     lprobs = lprobs + scores[0, :step_size, :].reshape(1,-1,1)
