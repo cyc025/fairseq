@@ -561,13 +561,11 @@ class SequenceGenerator(nn.Module):
 
             # Set the tokens for each beam (can select the same row more than once)
             if step_size > 1:
-                temp_active_bbsz_idx = (active_bbsz_idx/step_size).long()
-            else:
-                temp_active_bbsz_idx = active_bbsz_idx
+                active_bbsz_idx = (active_bbsz_idx/step_size).long()
 
             active_bbsz_idx
             tokens[:, : step + 1] = torch.index_select(
-                tokens[:, : step + 1], dim=0, index=temp_active_bbsz_idx
+                tokens[:, : step + 1], dim=0, index=active_bbsz_idx
             )
             # Select the next token for each of them
             tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
