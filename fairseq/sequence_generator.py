@@ -543,6 +543,8 @@ class SequenceGenerator(nn.Module):
             # Make sure there is at least one active item for each sentence in the batch.
             assert (~cands_to_ignore).any(dim=1).all()
 
+            from fairseq import pdb; pdb.set_trace()
+
             # update cands_to_ignore to ignore any finalized hypos
 
             # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
@@ -563,8 +565,6 @@ class SequenceGenerator(nn.Module):
             tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
                 cand_indices, dim=1, index=active_hypos
             )
-
-            from fairseq import pdb; pdb.set_trace()
 
             # tokens: [4, 142]
             # scores: [4, 141]
