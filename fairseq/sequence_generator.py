@@ -414,8 +414,6 @@ class SequenceGenerator(nn.Module):
             # cand_beams: [1, 8]
             # bbsz_offsets: [1, 1]
 
-            from fairseq import pdb; pdb.set_trace()
-
             # cand_bbsz_idx contains beam indices for the top candidate
             # hypotheses, with a range of values: [0, bsz*beam_size),
             # and dimensions: [bsz, cand_size]
@@ -514,6 +512,8 @@ class SequenceGenerator(nn.Module):
 
             # step = 2
             # eos_mask: [1, 16]
+
+            from fairseq import pdb; pdb.set_trace()
 
             eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
             active_mask = torch.add(
