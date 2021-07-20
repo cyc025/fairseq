@@ -421,6 +421,8 @@ class SequenceGenerator(nn.Module):
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
 
+            from fairseq import pdb; pdb.set_trace()
+
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
             eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
@@ -541,7 +543,7 @@ class SequenceGenerator(nn.Module):
             # update cands_to_ignore to ignore any finalized hypos.
             cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
             # Make sure there is at least one active item for each sentence in the batch.
-            assert (~cands_to_ignore).any(dim=1).all()            
+            assert (~cands_to_ignore).any(dim=1).all()
 
             ####################################################################
             ####### update cands_to_ignore to ignore any finalized hypos #######
