@@ -118,6 +118,14 @@ class BeamSearch(Search):
 
         from fairseq import pdb; pdb.set_trace()
 
+        # 1-step
+        #     lprobs: [1, 4, 50264]
+        #     scores: [1, 4, 1]
+        # 2-step
+        #     lprobs: [1, 4, 50264]
+        #     scores: [1, 4, 1]
+
+
         if step == 0:
             # at the first step all hypotheses are equally likely, so use
             # only the first beam
