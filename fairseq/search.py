@@ -137,6 +137,7 @@ class BeamSearch(Search):
             assert scores is not None
 
             if step_size > 1:
+                from fairseq import pdb; pdb.set_trace()
                 lprobs = lprobs + scores[0, :, :].reshape(1,-1,1)
             else:
                 lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)

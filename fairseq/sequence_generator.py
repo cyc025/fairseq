@@ -541,9 +541,7 @@ class SequenceGenerator(nn.Module):
             # update cands_to_ignore to ignore any finalized hypos.
             cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
             # Make sure there is at least one active item for each sentence in the batch.
-            assert (~cands_to_ignore).any(dim=1).all()
-
-            from fairseq import pdb; pdb.set_trace()
+            assert (~cands_to_ignore).any(dim=1).all()            
 
             ####################################################################
             ####### update cands_to_ignore to ignore any finalized hypos #######
