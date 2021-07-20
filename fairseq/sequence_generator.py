@@ -563,7 +563,6 @@ class SequenceGenerator(nn.Module):
             if step_size > 1:
                 active_bbsz_idx = (active_bbsz_idx/step_size).long()
 
-            active_bbsz_idx
             tokens[:, : step + 1] = torch.index_select(
                 tokens[:, : step + 1], dim=0, index=active_bbsz_idx
             )
