@@ -564,7 +564,7 @@ class SequenceGenerator(nn.Module):
                 cand_indices, dim=1, index=active_hypos
             )
 
-            # from fairseq import pdb; pdb.set_trace()
+            from fairseq import pdb; pdb.set_trace()
 
             # tokens: [4, 142]
             # scores: [4, 141]
