@@ -116,14 +116,15 @@ class BeamSearch(Search):
     ):
         bsz, beam_size, vocab_size = lprobs.size()
 
-        from fairseq import pdb; pdb.set_trace()
-
+        # t = 2
         # 1-step
         #     lprobs: [1, 4, 50264]
         #     scores: [1, 4, 1]
+        #     scores[:, :, step - 1]: ?
         # 2-step
-        #     lprobs: [1, 4, 50264]
-        #     scores: [1, 4, 1]
+        #     lprobs: [1, 8, 50264]
+        #     scores: [1, 4, 2]
+        #     scores[:, :, step - 1]: [1, 4]
 
 
         if step == 0:
@@ -134,7 +135,8 @@ class BeamSearch(Search):
             # make probs contain cumulative scores for each hypothesis
             assert scores is not None
             from fairseq import pdb; pdb.set_trace()
-            lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
+            lprobs = lprobs + scores[0, :, :].reshape(1,-1,1)
+            # lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
 
         top_prediction = torch.topk(
             lprobs.view(bsz, -1),
