@@ -142,7 +142,8 @@ class BeamSearch(Search):
                 if step < step_size:
                     lprobs = lprobs + scores[0, :, :].reshape(1,-1,1)
                 else:
-                    lprobs = lprobs + scores.reshape(1,-1,1)[:, :step_size * step, :]
+                    # TODO: sum across beam to get correct lprobs
+                    lprobs = lprobs + scores.reshape(1,-1,1)[:, :beam_size, :]
             else:
                 lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
 
