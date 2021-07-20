@@ -545,7 +545,9 @@ class SequenceGenerator(nn.Module):
 
             from fairseq import pdb; pdb.set_trace()
 
-            # update cands_to_ignore to ignore any finalized hypos
+            ####################################################################
+            ####### update cands_to_ignore to ignore any finalized hypos #######
+            ####################################################################
 
             # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
             # can be selected more than once).
@@ -558,6 +560,10 @@ class SequenceGenerator(nn.Module):
             # copy tokens and scores for active hypotheses
 
             # Set the tokens for each beam (can select the same row more than once)
+            if step_size > 1:
+                active_bbsz_idx = (active_bbsz_idx/step_size).long()
+
+            active_bbsz_idx
             tokens[:, : step + 1] = torch.index_select(
                 tokens[:, : step + 1], dim=0, index=active_bbsz_idx
             )
@@ -566,6 +572,7 @@ class SequenceGenerator(nn.Module):
                 cand_indices, dim=1, index=active_hypos
             )
 
+            ######### Dimensions Statistics #########
             # tokens: [4, 142]
             # scores: [4, 141]
             # cand_scores: [1, 8]
