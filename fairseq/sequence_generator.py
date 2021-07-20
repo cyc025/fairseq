@@ -423,6 +423,7 @@ class SequenceGenerator(nn.Module):
 
             from fairseq import pdb; pdb.set_trace()
 
+            print("step",step)
             print("cands_to_ignore",cands_to_ignore)
             print("cand_scores",cand_scores)
 
