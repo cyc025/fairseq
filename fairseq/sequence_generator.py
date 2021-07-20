@@ -408,6 +408,7 @@ class SequenceGenerator(nn.Module):
                 scores.view(bsz, beam_size, -1)[:, :, :step],
                 tokens[:, : step + 1],
                 original_batch_idxs,
+                step_size,
             )
 
             # cand_scores: [1, 8]

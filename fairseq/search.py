@@ -113,6 +113,7 @@ class BeamSearch(Search):
         scores: Optional[Tensor],
         prev_output_tokens: Optional[Tensor] = None,
         original_batch_idxs: Optional[Tensor] = None,
+        step_size: int = 1,
     ):
         bsz, beam_size, vocab_size = lprobs.size()
 
@@ -134,9 +135,11 @@ class BeamSearch(Search):
         else:
             # make probs contain cumulative scores for each hypothesis
             assert scores is not None
-                        
-            lprobs = lprobs + scores[0, :, :].reshape(1,-1,1)
-            # lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
+
+            if step_size > 1:
+                lprobs = lprobs + scores[0, :, :].reshape(1,-1,1)
+            else:
+                lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
 
         top_prediction = torch.topk(
             lprobs.view(bsz, -1),
