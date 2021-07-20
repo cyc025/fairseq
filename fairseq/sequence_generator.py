@@ -423,6 +423,9 @@ class SequenceGenerator(nn.Module):
 
             from fairseq import pdb; pdb.set_trace()
 
+            print("cands_to_ignore",cands_to_ignore)
+            print("eos_mask",eos_mask)
+
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
             eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
