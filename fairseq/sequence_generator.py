@@ -320,8 +320,6 @@ class SequenceGenerator(nn.Module):
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
-            from fairseq import pdb; pdb.set_trace()
-
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -557,6 +555,9 @@ class SequenceGenerator(nn.Module):
             tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
                 cand_indices, dim=1, index=active_hypos
             )
+
+            from fairseq import pdb; pdb.set_trace()
+
             if step > 0:
                 scores[:, :step] = torch.index_select(
                     scores[:, :step], dim=0, index=active_bbsz_idx
