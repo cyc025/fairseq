@@ -319,6 +319,9 @@ class SequenceGenerator(nn.Module):
         step_size = 2
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
+
+            from fairseq import pdb; pdb.set_trace()
+
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -513,7 +516,6 @@ class SequenceGenerator(nn.Module):
             # step = 2
             # eos_mask: [1, 16]
 
-            from fairseq import pdb; pdb.set_trace()
             repeat_size = step_size if step > 1 else 1
             eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
             active_mask = torch.add(
