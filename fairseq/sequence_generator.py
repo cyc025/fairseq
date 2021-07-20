@@ -558,6 +558,12 @@ class SequenceGenerator(nn.Module):
 
             from fairseq import pdb; pdb.set_trace()
 
+            # tokens: [4, 142]
+            # scores: [4, 141]
+            # cand_scores: [1, 8]
+            # active_bbsz_idx: [4]
+            # active_hypos: [1, 4]
+
             if step > 0:
                 scores[:, :step] = torch.index_select(
                     scores[:, :step], dim=0, index=active_bbsz_idx
