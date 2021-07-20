@@ -409,6 +409,8 @@ class SequenceGenerator(nn.Module):
                 original_batch_idxs,
             )
 
+            from fairseq import pdb; pdb.set_trace()
+
             # cand_bbsz_idx contains beam indices for the top candidate
             # hypotheses, with a range of values: [0, bsz*beam_size),
             # and dimensions: [bsz, cand_size]

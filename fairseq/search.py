@@ -134,7 +134,7 @@ class BeamSearch(Search):
         else:
             # make probs contain cumulative scores for each hypothesis
             assert scores is not None
-            from fairseq import pdb; pdb.set_trace()
+                        
             lprobs = lprobs + scores[0, :, :].reshape(1,-1,1)
             # lprobs = lprobs + scores[:, :, step - 1].unsqueeze(-1)
 
