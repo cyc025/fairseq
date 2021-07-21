@@ -685,7 +685,7 @@ class SequenceGenerator(nn.Module):
         assert bbsz_idx.numel() == eos_scores.numel()
 
         # for step_size > 1
-        for i in range(bbsz_idx):
+        for i in range(bbsz_idx.size()[0]):
             if bbsz_idx[i] >= beam_size:
                 bbsz_idx[i] = beam_size - 1
 
