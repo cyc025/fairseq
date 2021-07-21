@@ -470,7 +470,8 @@ class SequenceGenerator(nn.Module):
             if num_remaining_sent == 0:
                 break
 
-            from fairseq import pdb; pdb.set_trace()
+            if step == 140:
+                from fairseq import pdb; pdb.set_trace()
 
             if self.search.stop_on_max_len and step >= max_len:
                 break
