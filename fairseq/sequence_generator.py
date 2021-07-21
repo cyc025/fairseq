@@ -199,19 +199,19 @@ class SequenceGenerator(nn.Module):
             )
 
         # TODO: iterative refinement generator does not support ensemble for now.
-        if not self.retain_dropout:
-            for model in models:
-                model.eval()
+        # if not self.retain_dropout:
+        #     for model in models:
+        #         model.eval()
 
         model, reranker = models[0], None
-        if self.reranking:
-            assert len(models) > 1, "Assuming the last checkpoint is the reranker"
-            assert (
-                self.beam_size > 1
-            ), "Reranking requires multiple translation for each example"
-
-            reranker = models[-1]
-            models = models[:-1]
+        # if self.reranking:
+        #     assert len(models) > 1, "Assuming the last checkpoint is the reranker"
+        #     assert (
+        #         self.beam_size > 1
+        #     ), "Reranking requires multiple translation for each example"
+        #
+        #     reranker = models[-1]
+        #     models = models[:-1]
 
         if len(models) > 1 and hasattr(model, "enable_ensemble"):
             assert model.allow_ensemble, "{} does not support ensembling".format(
