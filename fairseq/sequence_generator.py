@@ -421,7 +421,7 @@ class SequenceGenerator(nn.Module):
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
 
-            # from fairseq import pdb; pdb.set_trace()
+            from fairseq import pdb; pdb.set_trace()
 
 
             print("step",step)
