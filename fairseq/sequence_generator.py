@@ -724,9 +724,10 @@ class SequenceGenerator(nn.Module):
         # set() is not supported in script export
         sents_seen: Dict[str, Optional[Tensor]] = {}
 
+        from fairseq import pdb; pdb.set_trace()
+
         # For every finished beam item
         for i in range(bbsz_idx.size()[0]):
-            from fairseq import pdb; pdb.set_trace()
             idx = bbsz_idx[i]
             score = eos_scores[i]
             # sentence index in the current (possibly reduced) batch
