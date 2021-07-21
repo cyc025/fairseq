@@ -403,6 +403,8 @@ class SequenceGenerator(nn.Module):
             if self.repeat_ngram_blocker is not None and step_size <2:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
+            print(step)
+
             # Shape: (batch, cand_size)
             cand_scores, cand_indices, cand_beams = self.search.step(
                 step,
