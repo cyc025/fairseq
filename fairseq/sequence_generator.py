@@ -222,10 +222,12 @@ class SequenceGenerator(nn.Module):
         # TODO: better encoder inputs?
         src_tokens = sample["net_input"]["src_tokens"]
         src_lengths = sample["net_input"]["src_lengths"]
+        net_input = sample["net_input"]
         bsz, src_len = src_tokens.size()
 
         # initialize
-        encoder_out = model.forward_encoder([src_tokens, src_lengths])
+        # encoder_out = model.forward_encoder([src_tokens, src_lengths])
+        encoder_out = self.model.forward_encoder(net_input)
         prev_decoder_out = model.initialize_output_tokens(encoder_out, src_tokens)
 
         if self.beam_size > 1:
