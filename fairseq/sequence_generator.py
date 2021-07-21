@@ -470,6 +470,8 @@ class SequenceGenerator(nn.Module):
             if num_remaining_sent == 0:
                 break
 
+            from fairseq import pdb; pdb.set_trace()
+
             if self.search.stop_on_max_len and step >= max_len:
                 break
             assert step < max_len, f"{step} < {max_len}"
@@ -680,16 +682,12 @@ class SequenceGenerator(nn.Module):
             bbsz_idx (Tensor):
         """
 
-        from fairseq import pdb; pdb.set_trace()
-
         assert bbsz_idx.numel() == eos_scores.numel()
 
         # for step_size > 1
         for i in range(bbsz_idx.size()[0]):
             if bbsz_idx[i] >= beam_size:
                 bbsz_idx[i] = beam_size - 1
-
-        from fairseq import pdb; pdb.set_trace()
 
         # clone relevant token and attention tensors.
         # tokens is (batch * beam, max_len). So the index_select
