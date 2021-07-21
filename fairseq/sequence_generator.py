@@ -838,9 +838,6 @@ class EnsembleModel(nn.Module):
         step_size: int = 1,
         step: int = 1, # temp
     ):
-        if step == 32:
-            from fairseq import pdb; pdb.set_trace()
-
 
         log_probs = []
         avg_attn: Optional[Tensor] = None
