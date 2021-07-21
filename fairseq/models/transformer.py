@@ -892,7 +892,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 - a dictionary with any model-specific outputs
         """
 
-        print( len(prev_output_tokens) )
+        print( prev_output_tokens.size() )
         from fairseq import pdb; pdb.set_trace()
 
         bs, slen = prev_output_tokens.size()
