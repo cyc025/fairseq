@@ -189,7 +189,7 @@ class SequenceGenerator(nn.Module):
                 (default: self.eos)
         """
         #return self._generate(sample, **kwargs)
-        return self._nar_generate(sample, **kwargs)
+        return self._nar_generate(models, sample, **kwargs)
 
     def _nar_generate(self, models, sample, prefix_tokens=None, constraints=None):
 
