@@ -400,7 +400,7 @@ class SequenceGenerator(nn.Module):
             if self.should_set_src_lengths:
                 self.search.set_src_lengths(src_lengths)
 
-            if self.repeat_ngram_blocker is not None:
+            if self.repeat_ngram_blocker is not None and step_size <2:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
             # Shape: (batch, cand_size)
