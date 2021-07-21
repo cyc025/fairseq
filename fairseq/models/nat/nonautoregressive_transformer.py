@@ -116,11 +116,14 @@ class NATransformerModel(FairseqNATModel):
         }
 
     def forward_decoder(self, decoder_out, encoder_out, decoding_format=None, **kwargs):
+
+        from fairseq import pdb; pdb.set_trace()
+
         step = decoder_out.step
         output_tokens = decoder_out.output_tokens
         output_scores = decoder_out.output_scores
         history = decoder_out.history
- 
+
         # execute the decoder
         output_masks = output_tokens.ne(self.pad)
         _scores, _tokens = self.decoder(
