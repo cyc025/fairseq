@@ -316,7 +316,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 1
+        step_size = 2
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
@@ -423,14 +423,9 @@ class SequenceGenerator(nn.Module):
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
 
-            # print("cand_scores",cand_scores)
-            # print("cand_indices.eq(self.eos)",cand_indices.eq(self.eos))
-            # print("cand_scores.ne(-math.inf)",cand_scores.ne(-math.inf))
-
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
             eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
-
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
             # eos_mask: [1, 8]
@@ -473,11 +468,12 @@ class SequenceGenerator(nn.Module):
             if num_remaining_sent == 0:
                 break
 
+            if step == 140:
+                from fairseq import pdb; pdb.set_trace()
+
             if self.search.stop_on_max_len and step >= max_len:
                 break
             assert step < max_len, f"{step} < {max_len}"
-
-
 
             # Remove finalized sentences (ones for which {beam_size}
             # finished hypotheses have been generated) from the batch.
@@ -520,7 +516,6 @@ class SequenceGenerator(nn.Module):
                 batch_idxs = None
 
 
-
             # Set active_mask so that values > cand_size indicate eos hypos
             # and values < cand_size indicate candidate active hypos.
             # After, the min values per row are the top candidate active hypos
@@ -529,8 +524,6 @@ class SequenceGenerator(nn.Module):
 
             # step = 2
             # eos_mask: [1, 16]
-
-
 
             repeat_size = step_size if step > 1 else 1
             eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
@@ -612,7 +605,6 @@ class SequenceGenerator(nn.Module):
 
             # reorder incremental state in decoder
             reorder_state = active_bbsz_idx
-
 
 
         # sort by score descending
