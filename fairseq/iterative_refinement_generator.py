@@ -98,10 +98,10 @@ class IterativeRefinementGenerator(object):
                 ref = utils.strip_pad(sample["target"][i, :], self.pad)
                 yield id, src, ref, hypos[i]
 
-    @torch.no_grad()
+    @torch.no_grad() 
     def generate(self, models, sample, prefix_tokens=None, constraints=None):
         if constraints is not None:
-            raise NotImplementedError( 
+            raise NotImplementedError(
                 "Constrained decoding with the IterativeRefinementGenerator is not supported"
             )
 
