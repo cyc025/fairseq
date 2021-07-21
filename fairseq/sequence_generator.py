@@ -403,7 +403,6 @@ class SequenceGenerator(nn.Module):
             if self.repeat_ngram_blocker is not None and step_size <2:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
-            print(step)
 
             # Shape: (batch, cand_size)
             cand_scores, cand_indices, cand_beams = self.search.step(
@@ -727,6 +726,7 @@ class SequenceGenerator(nn.Module):
 
         # For every finished beam item
         for i in range(bbsz_idx.size()[0]):
+            from fairseq import pdb; pdb.set_trace()
             idx = bbsz_idx[i]
             score = eos_scores[i]
             # sentence index in the current (possibly reduced) batch
