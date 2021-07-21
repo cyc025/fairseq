@@ -424,8 +424,8 @@ class SequenceGenerator(nn.Module):
             # from fairseq import pdb; pdb.set_trace()
 
 
-            # print("step",step)
-            # print("cands_to_ignore",cands_to_ignore)
+            print("step",step)
+            print("cands_to_ignore",cands_to_ignore)
             # print("cand_scores",cand_scores)
             # print("cand_indices.eq(self.eos)",cand_indices.eq(self.eos))
             # print("cand_scores.ne(-math.inf)",cand_scores.ne(-math.inf))
@@ -554,8 +554,6 @@ class SequenceGenerator(nn.Module):
             cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
             # Make sure there is at least one active item for each sentence in the batch.
             assert (~cands_to_ignore).any(dim=1).all()
-
-            print(step,cands_to_ignore)
 
             ####################################################################
             ####### update cands_to_ignore to ignore any finalized hypos #######
