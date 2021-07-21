@@ -421,7 +421,7 @@ class SequenceGenerator(nn.Module):
             # hypotheses, with a range of values: [0, bsz*beam_size),
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
-            
+
             # print("cand_scores",cand_scores)
             # print("cand_indices.eq(self.eos)",cand_indices.eq(self.eos))
             # print("cand_scores.ne(-math.inf)",cand_scores.ne(-math.inf))
@@ -836,6 +836,9 @@ class EnsembleModel(nn.Module):
         temperature: float = 1.0,
         step_size: int = 1,
     ):
+        from fairseq import pdb; pdb.set_trace()
+
+
         log_probs = []
         avg_attn: Optional[Tensor] = None
         encoder_out: Optional[Dict[str, List[Tensor]]] = None
