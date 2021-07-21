@@ -685,8 +685,9 @@ class SequenceGenerator(nn.Module):
         assert bbsz_idx.numel() == eos_scores.numel()
 
         # for step_size > 1
-        if bbsz_idx >= tokens.size()[0]:
-            bbsz_idx -= 1
+        for i in range(bbsz_idx):
+            if bbsz_idx[i] >= beam_size:
+                bbsz_idx[i] = beam_size - 1
 
         # clone relevant token and attention tensors.
         # tokens is (batch * beam, max_len). So the index_select
