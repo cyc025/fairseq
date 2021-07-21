@@ -182,7 +182,7 @@ echo "Start self-training loop."
 for I in 1
 do
     echo "Training model."
-    # train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
+    train_translate $CURR_TRAINSET_PATH $SRC $TGT $TASK;
     echo "Generating outputs."
     generate;
 done
