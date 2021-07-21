@@ -366,18 +366,19 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, : self.eos] = -math.inf
                 lprobs[:, self.eos + 1 :] = -math.inf
 
-            # handle prefix tokens (possibly with different lengths)
-            # if (
-            #     prefix_tokens is not None
-            #     and step < prefix_tokens.size(1)
-            #     and step < max_len
-            # ):
-            #     lprobs, tokens, scores = self._prefix_tokens(
-            #         step, lprobs, scores, tokens, prefix_tokens, beam_size
-            #     )
-            # elif step < self.min_len:
-            #     # minimum length constraint (does not apply if using prefix_tokens)
-            #     lprobs[:, self.eos] = -math.inf
+            if step_size < 2:
+                # handle prefix tokens (possibly with different lengths)
+                if (
+                    prefix_tokens is not None
+                    and step < prefix_tokens.size(1)
+                    and step < max_len
+                ):
+                    lprobs, tokens, scores = self._prefix_tokens(
+                        step, lprobs, scores, tokens, prefix_tokens, beam_size
+                    )
+                elif step < self.min_len:
+                    # minimum length constraint (does not apply if using prefix_tokens)
+                    lprobs[:, self.eos] = -math.inf
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
@@ -420,13 +421,7 @@ class SequenceGenerator(nn.Module):
             # hypotheses, with a range of values: [0, bsz*beam_size),
             # and dimensions: [bsz, cand_size]
             cand_bbsz_idx = cand_beams.add(bbsz_offsets)
-
-
-            if step == 32:
-                from fairseq import pdb; pdb.set_trace()
-
-            print("step",step)
-            print("cands_to_ignore",cands_to_ignore)
+            
             # print("cand_scores",cand_scores)
             # print("cand_indices.eq(self.eos)",cand_indices.eq(self.eos))
             # print("cand_scores.ne(-math.inf)",cand_scores.ne(-math.inf))
@@ -434,8 +429,6 @@ class SequenceGenerator(nn.Module):
             # finalize hypotheses that end in eos
             # Shape of eos_mask: (batch size, beam size)
             eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
-
-            # print("eos_mask",eos_mask)
 
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
@@ -555,6 +548,8 @@ class SequenceGenerator(nn.Module):
             cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
             # Make sure there is at least one active item for each sentence in the batch.
             assert (~cands_to_ignore).any(dim=1).all()
+
+            print(cands_to_ignore)
 
             ####################################################################
             ####### update cands_to_ignore to ignore any finalized hypos #######
