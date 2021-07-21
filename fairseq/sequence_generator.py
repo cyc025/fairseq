@@ -685,7 +685,7 @@ class SequenceGenerator(nn.Module):
         assert bbsz_idx.numel() == eos_scores.numel()
 
         # for step_size > 1
-        if bbsz_idx > tokens.size()[0]:
+        if bbsz_idx >= tokens.size()[0]:
             bbsz_idx -= 1
 
         # clone relevant token and attention tensors.
