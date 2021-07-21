@@ -451,6 +451,8 @@ class SequenceGenerator(nn.Module):
                     cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
                 )
 
+                from fairseq import pdb; pdb.set_trace()
+
                 finalized_sents = self.finalize_hypos(
                     step,
                     eos_bbsz_idx,
@@ -723,8 +725,6 @@ class SequenceGenerator(nn.Module):
         # unreduced batch
         # set() is not supported in script export
         sents_seen: Dict[str, Optional[Tensor]] = {}
-
-        from fairseq import pdb; pdb.set_trace()
 
         # For every finished beam item
         for i in range(bbsz_idx.size()[0]):
