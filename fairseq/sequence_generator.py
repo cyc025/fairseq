@@ -336,6 +336,8 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
+            from fairseq import pdb; pdb.set_trace()
+
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -345,6 +347,8 @@ class SequenceGenerator(nn.Module):
                 step,
             )
 
+            from fairseq import pdb; pdb.set_trace()
+
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
@@ -352,6 +356,8 @@ class SequenceGenerator(nn.Module):
                 )
                 probs = probs[:, -1, :] * self.lm_weight
                 lprobs += probs
+
+            from fairseq import pdb; pdb.set_trace()
 
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
@@ -367,6 +373,8 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, : self.eos] = -math.inf
                 lprobs[:, self.eos + 1 :] = -math.inf
 
+            from fairseq import pdb; pdb.set_trace()
+
             if step_size < 2:
                 # handle prefix tokens (possibly with different lengths)
                 if (
@@ -380,6 +388,8 @@ class SequenceGenerator(nn.Module):
                 elif step < self.min_len:
                     # minimum length constraint (does not apply if using prefix_tokens)
                     lprobs[:, self.eos] = -math.inf
+
+            from fairseq import pdb; pdb.set_trace()
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
@@ -397,12 +407,15 @@ class SequenceGenerator(nn.Module):
                 scores
             )  # scores of hypothesis ending with eos (finished sentences)
 
+            from fairseq import pdb; pdb.set_trace()
+
             if self.should_set_src_lengths:
                 self.search.set_src_lengths(src_lengths)
 
             if self.repeat_ngram_blocker is not None and step_size <2:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
+            from fairseq import pdb; pdb.set_trace()
 
             # Shape: (batch, cand_size)
             cand_scores, cand_indices, cand_beams = self.search.step(
@@ -413,6 +426,8 @@ class SequenceGenerator(nn.Module):
                 original_batch_idxs,
                 step_size,
             )
+
+            from fairseq import pdb; pdb.set_trace()
 
             # cand_scores: [1, 8]
             # cand_indices: [1, 8]
@@ -445,6 +460,8 @@ class SequenceGenerator(nn.Module):
 
             # eos_bbsz_idx: [0]
 
+            from fairseq import pdb; pdb.set_trace()
+
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
                 eos_scores = torch.masked_select(
@@ -474,6 +491,8 @@ class SequenceGenerator(nn.Module):
             if self.search.stop_on_max_len and step >= max_len:
                 break
             assert step < max_len, f"{step} < {max_len}"
+
+            from fairseq import pdb; pdb.set_trace()
 
             # Remove finalized sentences (ones for which {beam_size}
             # finished hypotheses have been generated) from the batch.
@@ -515,6 +534,8 @@ class SequenceGenerator(nn.Module):
             else:
                 batch_idxs = None
 
+            from fairseq import pdb; pdb.set_trace()
+
             # Set active_mask so that values > cand_size indicate eos hypos
             # and values < cand_size indicate candidate active hypos.
             # After, the min values per row are the top candidate active hypos
@@ -523,6 +544,8 @@ class SequenceGenerator(nn.Module):
 
             # step = 2
             # eos_mask: [1, 16]
+
+            from fairseq import pdb; pdb.set_trace()
 
             repeat_size = step_size if step > 1 else 1
             eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
@@ -551,8 +574,6 @@ class SequenceGenerator(nn.Module):
             cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
             # Make sure there is at least one active item for each sentence in the batch.
             assert (~cands_to_ignore).any(dim=1).all()
-
-            print(cands_to_ignore)
 
             ####################################################################
             ####### update cands_to_ignore to ignore any finalized hypos #######
@@ -606,6 +627,8 @@ class SequenceGenerator(nn.Module):
 
             # reorder incremental state in decoder
             reorder_state = active_bbsz_idx
+
+            from fairseq import pdb; pdb.set_trace()
 
         # sort by score descending
         for sent in range(len(finalized)):
