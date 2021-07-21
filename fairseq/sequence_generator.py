@@ -689,6 +689,8 @@ class SequenceGenerator(nn.Module):
             if bbsz_idx[i] >= beam_size:
                 bbsz_idx[i] = beam_size - 1
 
+        from fairseq import pdb; pdb.set_trace()
+
         # clone relevant token and attention tensors.
         # tokens is (batch * beam, max_len). So the index_select
         # gets the newly EOS rows, then selects cols 1..{step + 2}
