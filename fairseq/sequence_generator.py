@@ -316,7 +316,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 2
+        step_size = 1
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
@@ -359,8 +359,8 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.pad] = -math.inf  # never select pad
                 lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
             else:
-                lprobs[:, :, self.pad+1] = -math.inf  # never select pad
-                lprobs[:, :, self.unk+1] -= self.unk_penalty  # apply unk penalty
+                lprobs[:, :, self.pad] = -math.inf  # never select pad
+                lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
@@ -467,9 +467,6 @@ class SequenceGenerator(nn.Module):
             assert num_remaining_sent >= 0
             if num_remaining_sent == 0:
                 break
-
-            if step == 140:
-                from fairseq import pdb; pdb.set_trace()
 
             if self.search.stop_on_max_len and step >= max_len:
                 break
