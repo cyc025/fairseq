@@ -451,8 +451,6 @@ class SequenceGenerator(nn.Module):
                     cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
                 )
 
-                from fairseq import pdb; pdb.set_trace()
-
                 finalized_sents = self.finalize_hypos(
                     step,
                     eos_bbsz_idx,
@@ -681,6 +679,9 @@ class SequenceGenerator(nn.Module):
         Args:
             bbsz_idx (Tensor):
         """
+
+        from fairseq import pdb; pdb.set_trace()
+
         assert bbsz_idx.numel() == eos_scores.numel()
 
         # clone relevant token and attention tensors.
