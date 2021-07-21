@@ -42,20 +42,20 @@ cat $TRAIN_SRC_PATH $TRAIN_TGT_PATH $DEV_SRC_PATH $DEV_TGT_PATH $TEST_SRC_PATH $
 
 
 # clean
-rm -f $CORPUS_PATH/$CORPUS_DEST/*
-rm -f $CORPUS_PATH/preprocess.log
-rm -f $CORPUS_PATH/*spm*
-rm -f $CORPUS_PATH/*.vocab
-rm -f $CORPUS_PATH/*.model
-rm -f $CORPUS_PATH/*.bin
-rm -f $CORPUS_PATH/*.idx
-rm -f $CORPUS_PATH/*.txt
-rm -f $CORPUS_PATH/st_corpus/*spm*
-rm -f $CORPUS_PATH/st_corpus/*.txt
-rm -f $CORPUS_PATH/st_corpus/*.bin
-rm -f $CORPUS_PATH/st_corpus/*.idx
-rm -f results/*
-rm -f $CORPUS_PATH/pretrain/*
+# rm -f $CORPUS_PATH/$CORPUS_DEST/*
+# rm -f $CORPUS_PATH/preprocess.log
+# rm -f $CORPUS_PATH/*spm*
+# rm -f $CORPUS_PATH/*.vocab
+# rm -f $CORPUS_PATH/*.model
+# rm -f $CORPUS_PATH/*.bin
+# rm -f $CORPUS_PATH/*.idx
+# rm -f $CORPUS_PATH/*.txt
+# rm -f $CORPUS_PATH/st_corpus/*spm*
+# rm -f $CORPUS_PATH/st_corpus/*.txt
+# rm -f $CORPUS_PATH/st_corpus/*.bin
+# rm -f $CORPUS_PATH/st_corpus/*.idx
+# rm -f results/*
+# rm -f $CORPUS_PATH/pretrain/*
 
 
 SPM_MODEL_PATH=$CORPUS_PATH/$SRC-$TGT;
@@ -172,7 +172,7 @@ generate() {
 ########################
 
 echo "Preprocessing documents."
-preprocess;
+# preprocess;
 
 ####################
 ## translation  ##
