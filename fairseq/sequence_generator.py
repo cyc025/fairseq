@@ -458,10 +458,6 @@ class SequenceGenerator(nn.Module):
                 cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
             )
 
-            # eos_bbsz_idx: [0]
-
-
-
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
 
@@ -486,6 +482,8 @@ class SequenceGenerator(nn.Module):
                     max_len,
                 )
                 num_remaining_sent -= len(finalized_sents)
+
+                from fairseq import pdb; pdb.set_trace()
 
             assert num_remaining_sent >= 0
             if num_remaining_sent == 0:
