@@ -453,6 +453,7 @@ class SequenceGenerator(nn.Module):
 
                 finalized_sents = self.finalize_hypos(
                     step,
+                    step_size,
                     eos_bbsz_idx,
                     eos_scores,
                     tokens,
@@ -660,6 +661,7 @@ class SequenceGenerator(nn.Module):
     def finalize_hypos(
         self,
         step: int,
+        step_size: int,
         bbsz_idx,
         eos_scores,
         tokens,
@@ -682,10 +684,10 @@ class SequenceGenerator(nn.Module):
 
         assert bbsz_idx.numel() == eos_scores.numel()
 
-        # for step_size > 1
-        for i in range(bbsz_idx.size()[0]):
-            if bbsz_idx[i] >= beam_size:
-                bbsz_idx[i] = beam_size - 1
+        if step_size > 1:
+            for i in range(bbsz_idx.size()[0]):
+                if bbsz_idx[i] >= beam_size:
+                    bbsz_idx[i] = beam_size - 1
 
         # clone relevant token and attention tensors.
         # tokens is (batch * beam, max_len). So the index_select
