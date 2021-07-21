@@ -316,7 +316,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 1
+        step_size = 2
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
@@ -336,8 +336,6 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
-
-
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
@@ -347,8 +345,6 @@ class SequenceGenerator(nn.Module):
                 step,
             )
 
-
-
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
@@ -357,23 +353,19 @@ class SequenceGenerator(nn.Module):
                 probs = probs[:, -1, :] * self.lm_weight
                 lprobs += probs
 
-
-
             lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
             if step_size<=1:
                 lprobs[:, self.pad] = -math.inf  # never select pad
                 lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
             else:
-                lprobs[:, :, self.pad] = -math.inf  # never select pad
-                lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
+                lprobs[:, :, self.pad+1] = -math.inf  # never select pad
+                lprobs[:, :, self.unk+1] -= self.unk_penalty  # apply unk penalty
 
             # handle max length constraint
             if step >= max_len:
                 lprobs[:, : self.eos] = -math.inf
                 lprobs[:, self.eos + 1 :] = -math.inf
-
-
 
             if step_size < 2:
                 # handle prefix tokens (possibly with different lengths)
@@ -388,8 +380,6 @@ class SequenceGenerator(nn.Module):
                 elif step < self.min_len:
                     # minimum length constraint (does not apply if using prefix_tokens)
                     lprobs[:, self.eos] = -math.inf
-
-
 
             # Record attention scores, only support avg_attn_scores is a Tensor
             if avg_attn_scores is not None:
@@ -407,15 +397,11 @@ class SequenceGenerator(nn.Module):
                 scores
             )  # scores of hypothesis ending with eos (finished sentences)
 
-
-
             if self.should_set_src_lengths:
                 self.search.set_src_lengths(src_lengths)
 
             if self.repeat_ngram_blocker is not None and step_size <2:
                 lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
-
-
 
             # Shape: (batch, cand_size)
             cand_scores, cand_indices, cand_beams = self.search.step(
@@ -426,8 +412,6 @@ class SequenceGenerator(nn.Module):
                 original_batch_idxs,
                 step_size,
             )
-
-
 
             # cand_scores: [1, 8]
             # cand_indices: [1, 8]
