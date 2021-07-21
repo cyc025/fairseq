@@ -342,6 +342,7 @@ class SequenceGenerator(nn.Module):
                 incremental_states,
                 self.temperature,
                 step_size,
+                step,
             )
 
             if self.lm_model is not None:
@@ -835,8 +836,10 @@ class EnsembleModel(nn.Module):
         incremental_states: List[Dict[str, Dict[str, Optional[Tensor]]]],
         temperature: float = 1.0,
         step_size: int = 1,
+        step: int = 1, # temp
     ):
-        from fairseq import pdb; pdb.set_trace()
+        if step == 32:
+            from fairseq import pdb; pdb.set_trace()
 
 
         log_probs = []
