@@ -423,13 +423,17 @@ class SequenceGenerator(nn.Module):
 
             from fairseq import pdb; pdb.set_trace()
 
-            # finalize hypotheses that end in eos
-            # Shape of eos_mask: (batch size, beam size)
-            eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
 
             print("step",step)
             print("cands_to_ignore",cands_to_ignore)
             print("cand_scores",cand_scores)
+            print("cand_indices.eq(self.eos)",cand_indices.eq(self.eos))
+            print("cand_scores.ne(-math.inf)",cand_scores.ne(-math.inf))
+
+            # finalize hypotheses that end in eos
+            # Shape of eos_mask: (batch size, beam size)
+            eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
+
             print("eos_mask",eos_mask)
 
             eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
