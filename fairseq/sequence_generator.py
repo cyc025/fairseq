@@ -188,8 +188,8 @@ class SequenceGenerator(nn.Module):
             bos_token (int, optional): beginning of sentence token
                 (default: self.eos)
         """
-        #return self._generate(sample, **kwargs)
-        return self._nar_generate(models, sample, **kwargs)
+        return self._generate(sample, **kwargs)
+        # return self._nar_generate(models, sample, **kwargs)
 
     def _nar_generate(self, models, sample, prefix_tokens=None, constraints=None):
 
