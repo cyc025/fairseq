@@ -66,7 +66,6 @@ save_path=saved_models
 
 CUDA_VISIBLE_DEVICES=7 python3 train.py ${data_dir} \
     --save-dir ${save_path} \
-    --task translation \
     --arch transformer_wmt_en_de --share-decoder-input-output-embed \
     --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 \
     --lr 5e-4 --lr-scheduler inverse_sqrt --warmup-updates 4000 \
