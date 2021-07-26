@@ -74,7 +74,7 @@ CUDA_VISIBLE_DEVICES=7 python3 train.py ${data_dir} \
     --criterion label_smoothed_cross_entropy --label-smoothing 0.1 \
     --max-tokens 4096 \
     --encoder-layers 6 --encoder-embed-dim 512 --decoder-layers 6 --decoder-embed-dim 512  \
-    --eval-bleu --keep-last-epochs 2 \
+    --eval-bleu --no-epoch-checkpoints \
     --eval-bleu-args '{"beam": 5, "max_len_a": 1.2, "max_len_b": 10}' \
     --eval-bleu-detok moses \
     --eval-bleu-remove-bpe \
