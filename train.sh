@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-data_dir=data_bin
+data_dir=data-bin/iwslt14.tokenized.de-en 
 save_path=saved_models
 
 
