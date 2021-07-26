@@ -655,7 +655,7 @@ class SequenceGenerator(nn.Module):
             finalized_sents: List[int] = []
             if eos_bbsz_idx.numel() > 0:
 
-                from fairseq import pdb; pdb.set_trace()
+                # from fairseq import pdb; pdb.set_trace()
 
                 eos_scores = torch.masked_select(
                     cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
@@ -677,7 +677,7 @@ class SequenceGenerator(nn.Module):
                 )
                 num_remaining_sent -= len(finalized_sents)
 
-                from fairseq import pdb; pdb.set_trace()
+                # from fairseq import pdb; pdb.set_trace()
 
             assert num_remaining_sent >= 0
             if num_remaining_sent == 0:
