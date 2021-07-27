@@ -43,4 +43,4 @@ python3 train.py ${data_dir} \
     --skip-invalid-size-inputs-valid-test \
     --best-checkpoint-metric bleu --maximize-best-checkpoint-metric \
     --save-interval-updates 30000 \
-    --max-update 10000  \
+    --max-update 10000000  \
