@@ -26,7 +26,7 @@ save_path=saved_models
 #     --save-interval-updates 30000 \
 #     --max-update 10000  \
 
-CUDA_VISIBLE_DEVICES=7 python3 train.py ${data_dir} \
+python3 train.py ${data_dir} \
     --save-dir ${save_path} \
     --arch transformer_wmt_en_de --share-decoder-input-output-embed \
     --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 \
