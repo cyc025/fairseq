@@ -26,7 +26,7 @@ save_path=saved_models
 #     --save-interval-updates 30000 \
 #     --max-update 10000  \
 
-
+# 6-6-512: 35
 # 12-1-512: 27.24
 # 11-2-512: 29.38
 # 12-1-64:
