@@ -35,17 +35,20 @@ def run(decoder_embed_dim,decoder_layers,decoder_attention_heads):
               --batch-size 1024 \
               {parameters} \
               --max-update 8000 --no-epoch-checkpoints --keep-best-checkpoints 1"
-    os.system(train_command)
 
-    eval_command = f"fairseq-eval-lm data-bin/wikitext-2 \
-                    --path checkpoints/transformer_wikitext-2/checkpoint_best.pt \
-                    --batch-size 2 \
-                    --tokens-per-sample 512 \
-                    --context-window 400 | grep \"Perplexity: \" > .pp.log"
-    os.system(eval_command)
-    s = open('.pp.log','r').read()
-    perplexity_score = get_perplexity(s)
-    return perplexity_score
+    print(train_command)
+    #
+    # os.system(train_command)
+    #
+    # eval_command = f"fairseq-eval-lm data-bin/wikitext-2 \
+    #                 --path checkpoints/transformer_wikitext-2/checkpoint_best.pt \
+    #                 --batch-size 2 \
+    #                 --tokens-per-sample 512 \
+    #                 --context-window 400 | grep \"Perplexity: \" > .pp.log"
+    # os.system(eval_command)
+    # s = open('.pp.log','r').read()
+    # perplexity_score = get_perplexity(s)
+    # return perplexity_score
 
 
 def postprocess(field):
