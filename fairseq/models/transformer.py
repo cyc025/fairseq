@@ -56,7 +56,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
     .. argparse::
         :ref: fairseq.models.transformer_parser
         :prog:
-    """
+    """ 
 
     @classmethod
     def hub_models(cls):
@@ -801,7 +801,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         alignment_heads: Optional[int] = None,
         src_lengths: Optional[Any] = None,
         return_all_hiddens: bool = False,
-        step_size: int = 1,
+        step_size: Optional[int] = 1,
     ):
         """
         Args:
@@ -844,7 +844,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         full_context_alignment: bool = False,
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
-        step_size: int = 1,
+        step_size: Optional[int] = 1,
     ):
         return self.extract_features_scriptable(
             prev_output_tokens,
@@ -870,7 +870,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         full_context_alignment: bool = False,
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
-        step_size: int = 1,
+        step_size: Optional[int] = 1,
     ):
         """
         Similar to *forward* but only return features.
@@ -891,7 +891,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 - the decoder's features of shape `(batch, tgt_len, embed_dim)`
                 - a dictionary with any model-specific outputs
         """
-        
+
         bs, slen = prev_output_tokens.size()
         if alignment_layer is None:
             alignment_layer = self.num_layers - 1
