@@ -452,9 +452,9 @@ class SequenceGenerator(nn.Module):
                 "cands_to_ignore": cands_to_ignore,
             }
 
-        def unpack_cand_state():
-            return cand_indices, cand_bbsz_idx, cand_offsets, \
-                    cand_size, cand_scores, cands_to_ignore
+        def unpack_cand_state(cand_state):
+            return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
+                    cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
         step_size = 1
         new_max_len = int( (max_len + 1) / step_size )
