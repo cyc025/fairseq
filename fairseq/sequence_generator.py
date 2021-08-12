@@ -184,7 +184,6 @@ class SequenceGenerator(nn.Module):
             bos_token (int, optional): beginning of sentence token
                 (default: self.eos)
         """
-        from fairseq import pdb; pdb.set_trace()
         return self._generate(sample, **kwargs)
 
     def _generate(

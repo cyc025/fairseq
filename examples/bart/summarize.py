@@ -24,6 +24,7 @@ def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_k
             if n_obs is not None and count > n_obs:
                 break
             if count % bsz == 0:
+                from fairseq import pdb; pdb.set_trace()
                 hypotheses_batch = bart.sample(slines, **eval_kwargs)
                 for hypothesis in hypotheses_batch:
                     fout.write(hypothesis + "\n")
