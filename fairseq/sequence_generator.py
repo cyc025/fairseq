@@ -893,7 +893,7 @@ class EnsembleModel(nn.Module):
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
-                    attn = attn[:, -1, :] # change_here
+                    attn = attn[:, -step_size, :] # change_here
 
             if step_size>1:
                 decoder_out_tuple = (
@@ -902,7 +902,7 @@ class EnsembleModel(nn.Module):
                 )
             else:
                 decoder_out_tuple = (
-                    decoder_out[0][:, -1:, :].div_(temperature), # change_here
+                    decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
                     None if decoder_len <= 1 else decoder_out[1],
                 )
 
