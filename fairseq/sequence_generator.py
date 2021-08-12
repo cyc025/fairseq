@@ -489,15 +489,12 @@ class SequenceGenerator(nn.Module):
             )
 
 
-            from fairseq import pdb; pdb.set_trace()
-
             # perform mini-step
             mini_step_break = False
             start_step_index = step_size * step
             for mini_step in range( start_step_index, start_step_index + step_size, 1):
 
-                print(mini_step-start_step_index)
-                from fairseq import pdb; pdb.set_trace()
+                # resolve new lprobs
                 if len(lprobs.size()) > 2:
                     lprobs = lprobs[:,mini_step-start_step_index,:]
 
