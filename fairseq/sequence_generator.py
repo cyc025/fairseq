@@ -456,7 +456,7 @@ class SequenceGenerator(nn.Module):
             return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
-        input_step_size = 2
+        input_step_size = 3
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size ) + 1
@@ -487,7 +487,6 @@ class SequenceGenerator(nn.Module):
                 step_size,
                 step,
             )
-
 
             # perform mini-step
             mini_step_break = False
