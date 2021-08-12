@@ -487,10 +487,11 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
-            mini_step_break = False
-
             # perform mini-step
-            for i in range(step_size):
+            mini_step_break = False
+            remain_len = new_max_len - step_size
+            adj_step_size = step_size if step_size < remain_len else remain_len
+            for i in range(adj_step_size):
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : step + 1])
