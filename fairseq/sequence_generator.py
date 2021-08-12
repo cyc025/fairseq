@@ -101,10 +101,6 @@ class SequenceGenerator(nn.Module):
         self.search = (
             search.BeamSearch(tgt_dict) if search_strategy is None else search_strategy
         )
-        # self.search = (
-        #     search.Sampling(tgt_dict, sampling_topp=0.95)
-        # )
-
         # We only need to set src_lengths in LengthConstrainedBeamSearch.
         # As a module attribute, setting it would break in multithread
         # settings when the model is shared.
@@ -189,221 +185,6 @@ class SequenceGenerator(nn.Module):
                 (default: self.eos)
         """
         return self._generate(sample, **kwargs)
-        # return self._nar_generate(models, sample, **kwargs)
-
-    def _nar_generate(self, models, sample, prefix_tokens=None, constraints=None):
-
-        if constraints is not None:
-            raise NotImplementedError(
-                "Constrained decoding with the IterativeRefinementGenerator is not supported"
-            )
-
-        # TODO: iterative refinement generator does not support ensemble for now.
-        # if not self.retain_dropout:
-        #     for model in models:
-        #         model.eval()
-
-        model, reranker = models[0], None
-        # if self.reranking:
-        #     assert len(models) > 1, "Assuming the last checkpoint is the reranker"
-        #     assert (
-        #         self.beam_size > 1
-        #     ), "Reranking requires multiple translation for each example"
-        #
-        #     reranker = models[-1]
-        #     models = models[:-1]
-
-        if len(models) > 1 and hasattr(model, "enable_ensemble"):
-            assert model.allow_ensemble, "{} does not support ensembling".format(
-                model.__class__.__name__
-            )
-            model.enable_ensemble(models)
-
-        # TODO: better encoder inputs?
-        src_tokens = sample["net_input"]["src_tokens"]
-        src_lengths = sample["net_input"]["src_lengths"]
-        net_input = sample["net_input"]
-        bsz, src_len = src_tokens.size()
-
-        # initialize
-        # encoder_out = model.forward_encoder([src_tokens, src_lengths])
-        encoder_out = self.model.forward_encoder(net_input)
-        prev_decoder_out = model.initialize_output_tokens(encoder_out, src_tokens)
-
-        if self.beam_size > 1:
-            assert (
-                model.allow_length_beam
-            ), "{} does not support decoding with length beam.".format(
-                model.__class__.__name__
-            )
-
-            # regenerate data based on length-beam
-            length_beam_order = (
-                utils.new_arange(src_tokens, self.beam_size, bsz).t().reshape(-1)
-            )
-            encoder_out = model.encoder.reorder_encoder_out(
-                encoder_out, length_beam_order
-            )
-            prev_decoder_out = model.regenerate_length_beam(
-                prev_decoder_out, self.beam_size
-            )
-            bsz = bsz * self.beam_size
-
-        sent_idxs = torch.arange(bsz)
-        prev_output_tokens = prev_decoder_out.output_tokens.clone()
-
-        if self.retain_history:
-            prev_decoder_out = prev_decoder_out._replace(history=[prev_output_tokens])
-
-        finalized = [[] for _ in range(bsz)]
-
-        def is_a_loop(x, y, s, a):
-            b, l_x, l_y = x.size(0), x.size(1), y.size(1)
-            if l_x > l_y:
-                y = torch.cat([y, x.new_zeros(b, l_x - l_y).fill_(self.pad)], 1)
-                s = torch.cat([s, s.new_zeros(b, l_x - l_y)], 1)
-                if a is not None:
-                    a = torch.cat([a, a.new_zeros(b, l_x - l_y, a.size(2))], 1)
-            elif l_x < l_y:
-                x = torch.cat([x, y.new_zeros(b, l_y - l_x).fill_(self.pad)], 1)
-            return (x == y).all(1), y, s, a
-
-        def finalized_hypos(step, prev_out_token, prev_out_score, prev_out_attn):
-            cutoff = prev_out_token.ne(self.pad)
-            tokens = prev_out_token[cutoff]
-            if prev_out_score is None:
-                scores, score = None, None
-            else:
-                scores = prev_out_score[cutoff]
-                score = scores.mean()
-
-            if prev_out_attn is None:
-                hypo_attn, alignment = None, None
-            else:
-                hypo_attn = prev_out_attn[cutoff]
-                alignment = hypo_attn.max(dim=1)[1]
-            return {
-                "steps": step,
-                "tokens": tokens,
-                "positional_scores": scores,
-                "score": score,
-                "hypo_attn": hypo_attn,
-                "alignment": alignment,
-            }
-
-        for step in range(self.max_iter + 1):
-
-            decoder_options = {
-                "eos_penalty": self.eos_penalty,
-                "max_ratio": self.max_ratio,
-                "decoding_format": self.decoding_format,
-            }
-            prev_decoder_out = prev_decoder_out._replace(
-                step=step,
-                max_step=self.max_iter + 1,
-            )
-
-            decoder_out = model.forward_decoder(
-                prev_decoder_out, encoder_out, **decoder_options
-            )
-
-            if self.adaptive:
-                # terminate if there is a loop
-                terminated, out_tokens, out_scores, out_attn = is_a_loop(
-                    prev_output_tokens,
-                    decoder_out.output_tokens,
-                    decoder_out.output_scores,
-                    decoder_out.attn,
-                )
-                decoder_out = decoder_out._replace(
-                    output_tokens=out_tokens,
-                    output_scores=out_scores,
-                    attn=out_attn,
-                )
-
-            else:
-                terminated = decoder_out.output_tokens.new_zeros(
-                    decoder_out.output_tokens.size(0)
-                ).bool()
-
-            if step == self.max_iter:  # reach last iteration, terminate
-                terminated.fill_(1)
-
-            # collect finalized sentences
-            finalized_idxs = sent_idxs[terminated]
-            finalized_tokens = decoder_out.output_tokens[terminated]
-            finalized_scores = decoder_out.output_scores[terminated]
-            finalized_attn = (
-                None
-                if (decoder_out.attn is None or decoder_out.attn.size(0) == 0)
-                else decoder_out.attn[terminated]
-            )
-
-            if self.retain_history:
-                finalized_history_tokens = [h[terminated] for h in decoder_out.history]
-
-            for i in range(finalized_idxs.size(0)):
-                finalized[finalized_idxs[i]] = [
-                    finalized_hypos(
-                        step,
-                        finalized_tokens[i],
-                        finalized_scores[i],
-                        None if finalized_attn is None else finalized_attn[i],
-                    )
-                ]
-
-                if self.retain_history:
-                    finalized[finalized_idxs[i]][0]["history"] = []
-                    for j in range(len(finalized_history_tokens)):
-                        finalized[finalized_idxs[i]][0]["history"].append(
-                            finalized_hypos(
-                                step, finalized_history_tokens[j][i], None, None
-                            )
-                        )
-
-            # check if all terminated
-            if terminated.sum() == terminated.size(0):
-                break
-
-            # for next step
-            not_terminated = ~terminated
-            prev_decoder_out = decoder_out._replace(
-                output_tokens=decoder_out.output_tokens[not_terminated],
-                output_scores=decoder_out.output_scores[not_terminated],
-                attn=decoder_out.attn[not_terminated]
-                if (decoder_out.attn is not None and decoder_out.attn.size(0) > 0)
-                else None,
-                history=[h[not_terminated] for h in decoder_out.history]
-                if decoder_out.history is not None
-                else None,
-            )
-            encoder_out = model.encoder.reorder_encoder_out(
-                encoder_out, not_terminated.nonzero(as_tuple=False).squeeze()
-            )
-            sent_idxs = sent_idxs[not_terminated]
-            prev_output_tokens = prev_decoder_out.output_tokens.clone()
-
-        if self.beam_size > 1:
-            if reranker is not None:
-                finalized = self.rerank(
-                    reranker, finalized, [src_tokens, src_lengths], self.beam_size
-                )
-
-            # aggregate information from length beam
-            finalized = [
-                finalized[
-                    np.argmax(
-                        [
-                            finalized[self.beam_size * i + j][0]["score"]
-                            for j in range(self.beam_size)
-                        ]
-                    )
-                    + self.beam_size * i
-                ]
-                for i in range(len(finalized) // self.beam_size)
-            ]
-
-        return finalized
 
     def _generate(
         self,
@@ -531,10 +312,8 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 1
 
-        for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
-
+        for step in range(0,max_len + 1,1):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -550,17 +329,15 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
-
+            # from fairseq import pdb; pdb.set_trace()
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
                 self.temperature,
-                step_size,
-                step,
             )
 
-            mini_step_size = step_size
+            mini_step_size = 2
 
             for i in range(mini_step_size):
 
@@ -574,31 +351,26 @@ class SequenceGenerator(nn.Module):
 
                 lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-                if step_size<=1:
-                    lprobs[:, self.pad] = -math.inf  # never select pad
-                    lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
-                else:
-                    lprobs[:, :, self.pad] = -math.inf  # never select pad
-                    lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
+                lprobs[:, self.pad] = -math.inf  # never select pad
+                lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
                 # handle max length constraint
                 if step >= max_len:
                     lprobs[:, : self.eos] = -math.inf
                     lprobs[:, self.eos + 1 :] = -math.inf
 
-                if step_size < 2:
-                    # handle prefix tokens (possibly with different lengths)
-                    if (
-                        prefix_tokens is not None
-                        and step < prefix_tokens.size(1)
-                        and step < max_len
-                    ):
-                        lprobs, tokens, scores = self._prefix_tokens(
-                            step, lprobs, scores, tokens, prefix_tokens, beam_size
-                        )
-                    elif step < self.min_len:
-                        # minimum length constraint (does not apply if using prefix_tokens)
-                        lprobs[:, self.eos] = -math.inf
+                # handle prefix tokens (possibly with different lengths)
+                if (
+                    prefix_tokens is not None
+                    and step < prefix_tokens.size(1)
+                    and step < max_len
+                ):
+                    lprobs, tokens, scores = self._prefix_tokens(
+                        step, lprobs, scores, tokens, prefix_tokens, beam_size
+                    )
+                elif step < self.min_len:
+                    # minimum length constraint (does not apply if using prefix_tokens)
+                    lprobs[:, self.eos] = -math.inf
 
                 # Record attention scores, only support avg_attn_scores is a Tensor
                 if avg_attn_scores is not None:
@@ -619,7 +391,7 @@ class SequenceGenerator(nn.Module):
                 if self.should_set_src_lengths:
                     self.search.set_src_lengths(src_lengths)
 
-                if self.repeat_ngram_blocker is not None and step_size <2:
+                if self.repeat_ngram_blocker is not None:
                     lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
                 # Shape: (batch, cand_size)
@@ -629,13 +401,7 @@ class SequenceGenerator(nn.Module):
                     scores.view(bsz, beam_size, -1)[:, :, :step],
                     tokens[:, : step + 1],
                     original_batch_idxs,
-                    step_size,
                 )
-
-                # cand_scores: [1, 8]
-                # cand_indices: [1, 8]
-                # cand_beams: [1, 8]
-                # bbsz_offsets: [1, 1]
 
                 # cand_bbsz_idx contains beam indices for the top candidate
                 # hypotheses, with a range of values: [0, bsz*beam_size),
@@ -647,8 +413,6 @@ class SequenceGenerator(nn.Module):
                 eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
                 eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
-                # eos_mask: [1, 8]
-
                 # only consider eos when it's among the top beam_size indices
                 # Now we know what beam item(s) to finish
                 # Shape: 1d list of absolute-numbered
@@ -658,14 +422,12 @@ class SequenceGenerator(nn.Module):
 
                 finalized_sents: List[int] = []
                 if eos_bbsz_idx.numel() > 0:
-
                     eos_scores = torch.masked_select(
                         cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
                     )
 
                     finalized_sents = self.finalize_hypos(
                         step,
-                        step_size,
                         eos_bbsz_idx,
                         eos_scores,
                         tokens,
@@ -682,7 +444,6 @@ class SequenceGenerator(nn.Module):
                 assert num_remaining_sent >= 0
                 if num_remaining_sent == 0:
                     break
-
                 if self.search.stop_on_max_len and step >= max_len:
                     break
                 assert step < max_len, f"{step} < {max_len}"
@@ -727,28 +488,16 @@ class SequenceGenerator(nn.Module):
                 else:
                     batch_idxs = None
 
-
                 # Set active_mask so that values > cand_size indicate eos hypos
                 # and values < cand_size indicate candidate active hypos.
                 # After, the min values per row are the top candidate active hypos
 
                 # Rewrite the operator since the element wise or is not supported in torchscript.
 
-                # step = 2
-                # eos_mask: [1, 16]
-
-                repeat_size = step_size if step > 1 else 1
                 eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
-
-                cand_offsets_var = (
-                    cand_offsets[: eos_mask.size(1)].unsqueeze(0).repeat(1,repeat_size)
-                    if step_size > 1
-                    else cand_offsets[: eos_mask.size(1)]
-                )
-
                 active_mask = torch.add(
                     eos_mask.type_as(cand_offsets) * cand_size,
-                    cand_offsets_var,
+                    cand_offsets[: eos_mask.size(1)],
                 )
 
                 # get the top beam_size active hypotheses, which are just
@@ -765,9 +514,7 @@ class SequenceGenerator(nn.Module):
                 # Make sure there is at least one active item for each sentence in the batch.
                 assert (~cands_to_ignore).any(dim=1).all()
 
-                ####################################################################
-                ####### update cands_to_ignore to ignore any finalized hypos #######
-                ####################################################################
+                # update cands_to_ignore to ignore any finalized hypos
 
                 # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
                 # can be selected more than once).
@@ -780,9 +527,6 @@ class SequenceGenerator(nn.Module):
                 # copy tokens and scores for active hypotheses
 
                 # Set the tokens for each beam (can select the same row more than once)
-                if step_size > 1:
-                    active_bbsz_idx = (active_bbsz_idx/step_size).long()
-
                 tokens[:, : step + 1] = torch.index_select(
                     tokens[:, : step + 1], dim=0, index=active_bbsz_idx
                 )
@@ -790,14 +534,6 @@ class SequenceGenerator(nn.Module):
                 tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
                     cand_indices, dim=1, index=active_hypos
                 )
-
-                ######### Dimensions Statistics #########
-                # tokens: [4, 142]
-                # scores: [4, 141]
-                # cand_scores: [1, 8]
-                # active_bbsz_idx: [4]
-                # active_hypos: [1, 4]
-
                 if step > 0:
                     scores[:, :step] = torch.index_select(
                         scores[:, :step], dim=0, index=active_bbsz_idx
@@ -818,7 +554,6 @@ class SequenceGenerator(nn.Module):
                 # reorder incremental state in decoder
                 reorder_state = active_bbsz_idx
 
-
         # sort by score descending
         for sent in range(len(finalized)):
             scores = torch.tensor(
@@ -835,15 +570,10 @@ class SequenceGenerator(nn.Module):
         self, step: int, lprobs, scores, tokens, prefix_tokens, beam_size: int
     ):
         """Handle prefix tokens"""
-        # take only prefix tokens up to current step, then repeat it across beam
         prefix_toks = prefix_tokens[:, step].unsqueeze(-1).repeat(1, beam_size).view(-1)
-        # take lporbs based on the prefix tokens
         prefix_lprobs = lprobs.gather(-1, prefix_toks.unsqueeze(-1))
-        # create masking: True if not pad, False if pad
         prefix_mask = prefix_toks.ne(self.pad)
-        # set those non-pad positions to -inf, to never select
         lprobs[prefix_mask] = torch.tensor(-math.inf).to(lprobs)
-        # select unpadded lprobs based on prefix tokens as indices
         lprobs[prefix_mask] = lprobs[prefix_mask].scatter(
             -1, prefix_toks[prefix_mask].unsqueeze(-1), prefix_lprobs[prefix_mask]
         )
@@ -873,7 +603,6 @@ class SequenceGenerator(nn.Module):
     def finalize_hypos(
         self,
         step: int,
-        step_size: int,
         bbsz_idx,
         eos_scores,
         tokens,
@@ -893,13 +622,7 @@ class SequenceGenerator(nn.Module):
         Args:
             bbsz_idx (Tensor):
         """
-
         assert bbsz_idx.numel() == eos_scores.numel()
-
-        if step_size > 1:
-            for i in range(bbsz_idx.size()[0]):
-                if bbsz_idx[i] >= beam_size:
-                    bbsz_idx[i] = beam_size - 1
 
         # clone relevant token and attention tensors.
         # tokens is (batch * beam, max_len). So the index_select
@@ -1056,10 +779,7 @@ class EnsembleModel(nn.Module):
         encoder_outs: List[Dict[str, List[Tensor]]],
         incremental_states: List[Dict[str, Dict[str, Optional[Tensor]]]],
         temperature: float = 1.0,
-        step_size: int = 1,
-        step: int = 1, # temp
     ):
-
         log_probs = []
         avg_attn: Optional[Tensor] = None
         encoder_out: Optional[Dict[str, List[Tensor]]] = None
@@ -1068,17 +788,17 @@ class EnsembleModel(nn.Module):
                 encoder_out = encoder_outs[i]
             # decode each model
             if self.has_incremental_states():
+
                 decoder_out = model.decoder.forward(
                     tokens,
                     encoder_out=encoder_out,
                     incremental_state=incremental_states[i],
-                    step_size=step_size,
                 )
             else:
                 if hasattr(model, "decoder"):
-                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out, step_size=step_size)
+                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out)
                 else:
-                    decoder_out = model.forward(tokens, step_size=step_size,)
+                    decoder_out = model.forward(tokens)
 
             attn: Optional[Tensor] = None
             decoder_len = len(decoder_out)
@@ -1092,28 +812,17 @@ class EnsembleModel(nn.Module):
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
-                    attn = attn[:, -1, :] # change_here
+                    attn = attn[:, -1, :]
 
-            if step_size>1:
-                decoder_out_tuple = (
-                    decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
-                    None if decoder_len <= 1 else decoder_out[1],
-                )
-            else:
-                decoder_out_tuple = (
-                    decoder_out[0][:, -1:, :].div_(temperature), # change_here
-                    None if decoder_len <= 1 else decoder_out[1],
-                )
-
+            decoder_out_tuple = (
+                decoder_out[0][:, -1:, :].div_(temperature),
+                None if decoder_len <= 1 else decoder_out[1],
+            )
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
             )
-
-            # get the last dimension only if step size is 1
-            if step_size<=1:
-                probs = probs[:, -1, :]
-
-            if self.models_size == 1: # returns here
+            probs = probs[:, -1, :]
+            if self.models_size == 1:
                 return probs, attn
 
             log_probs.append(probs)
@@ -1122,7 +831,6 @@ class EnsembleModel(nn.Module):
                     avg_attn = attn
                 else:
                     avg_attn.add_(attn)
-
 
         avg_probs = torch.logsumexp(torch.stack(log_probs, dim=0), dim=0) - math.log(
             self.models_size
