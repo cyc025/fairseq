@@ -871,6 +871,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
         step_size: Optional[int] = 1,
+        step: Optional[int] = 1,
     ):
         """
         Similar to *forward* but only return features.
@@ -907,6 +908,11 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             padding_mask = encoder_out["encoder_padding_mask"][0]
 
         from fairseq import pdb; pdb.set_trace()
+
+        if step == 0:
+            prev_output_tokens = prev_output_tokens.repeat(1,step_size)
+        else:
+            prev_output_tokens = torch.cat( (prev_output_tokens, prev_output_tokens[:,-1].unsqueeze(1).repeat(1,step_size) ), dim = 1)
 
         # embed positions
         positions = None
