@@ -595,7 +595,7 @@ class SequenceGenerator(nn.Module):
                 if num_remaining_sent == 0:
                     mini_step_break = True
                     break
-                if self.search.stop_on_max_len and step >= max_len:
+                if self.search.stop_on_max_len and step >= new_max_len:
                     mini_step_break = True
                     break
                 assert step < max_len, f"{step} < {max_len}"
