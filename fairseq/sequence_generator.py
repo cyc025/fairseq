@@ -560,261 +560,263 @@ class SequenceGenerator(nn.Module):
                 step,
             )
 
-            from fairseq import pdb; pdb.set_trace()
+            mini_step_size = step_size
 
-            if self.lm_model is not None:
-                lm_out = self.lm_model(tokens[:, : step + 1])
-                probs = self.lm_model.get_normalized_probs(
-                    lm_out, log_probs=True, sample=None
-                )
-                probs = probs[:, -1, :] * self.lm_weight
-                lprobs += probs
+            for i in range(inner_step_size):
 
-            lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
-
-            if step_size<=1:
-                lprobs[:, self.pad] = -math.inf  # never select pad
-                lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
-            else:
-                lprobs[:, :, self.pad] = -math.inf  # never select pad
-                lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
-
-            # handle max length constraint
-            if step >= max_len:
-                lprobs[:, : self.eos] = -math.inf
-                lprobs[:, self.eos + 1 :] = -math.inf
-
-            if step_size < 2:
-                # handle prefix tokens (possibly with different lengths)
-                if (
-                    prefix_tokens is not None
-                    and step < prefix_tokens.size(1)
-                    and step < max_len
-                ):
-                    lprobs, tokens, scores = self._prefix_tokens(
-                        step, lprobs, scores, tokens, prefix_tokens, beam_size
+                if self.lm_model is not None:
+                    lm_out = self.lm_model(tokens[:, : step + 1])
+                    probs = self.lm_model.get_normalized_probs(
+                        lm_out, log_probs=True, sample=None
                     )
-                elif step < self.min_len:
-                    # minimum length constraint (does not apply if using prefix_tokens)
-                    lprobs[:, self.eos] = -math.inf
+                    probs = probs[:, -1, :] * self.lm_weight
+                    lprobs += probs
 
-            # Record attention scores, only support avg_attn_scores is a Tensor
-            if avg_attn_scores is not None:
-                if attn is None:
-                    attn = torch.empty(
-                        bsz * beam_size, avg_attn_scores.size(1), max_len + 2
-                    ).to(scores)
-                attn[:, :, step + 1].copy_(avg_attn_scores)
+                lprobs[lprobs != lprobs] = torch.tensor(-math.inf).to(lprobs)
 
-            scores = scores.type_as(lprobs)
-            eos_bbsz_idx = torch.empty(0).to(
-                tokens
-            )  # indices of hypothesis ending with eos (finished sentences)
-            eos_scores = torch.empty(0).to(
-                scores
-            )  # scores of hypothesis ending with eos (finished sentences)
+                if step_size<=1:
+                    lprobs[:, self.pad] = -math.inf  # never select pad
+                    lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
+                else:
+                    lprobs[:, :, self.pad] = -math.inf  # never select pad
+                    lprobs[:, :, self.unk] -= self.unk_penalty  # apply unk penalty
 
-            if self.should_set_src_lengths:
-                self.search.set_src_lengths(src_lengths)
+                # handle max length constraint
+                if step >= max_len:
+                    lprobs[:, : self.eos] = -math.inf
+                    lprobs[:, self.eos + 1 :] = -math.inf
 
-            if self.repeat_ngram_blocker is not None and step_size <2:
-                lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
+                if step_size < 2:
+                    # handle prefix tokens (possibly with different lengths)
+                    if (
+                        prefix_tokens is not None
+                        and step < prefix_tokens.size(1)
+                        and step < max_len
+                    ):
+                        lprobs, tokens, scores = self._prefix_tokens(
+                            step, lprobs, scores, tokens, prefix_tokens, beam_size
+                        )
+                    elif step < self.min_len:
+                        # minimum length constraint (does not apply if using prefix_tokens)
+                        lprobs[:, self.eos] = -math.inf
 
-            # Shape: (batch, cand_size)
-            cand_scores, cand_indices, cand_beams = self.search.step(
-                step,
-                lprobs.view(bsz, -1, self.vocab_size),
-                scores.view(bsz, beam_size, -1)[:, :, :step],
-                tokens[:, : step + 1],
-                original_batch_idxs,
-                step_size,
-            )
+                # Record attention scores, only support avg_attn_scores is a Tensor
+                if avg_attn_scores is not None:
+                    if attn is None:
+                        attn = torch.empty(
+                            bsz * beam_size, avg_attn_scores.size(1), max_len + 2
+                        ).to(scores)
+                    attn[:, :, step + 1].copy_(avg_attn_scores)
 
-            # cand_scores: [1, 8]
-            # cand_indices: [1, 8]
-            # cand_beams: [1, 8]
-            # bbsz_offsets: [1, 1]
+                scores = scores.type_as(lprobs)
+                eos_bbsz_idx = torch.empty(0).to(
+                    tokens
+                )  # indices of hypothesis ending with eos (finished sentences)
+                eos_scores = torch.empty(0).to(
+                    scores
+                )  # scores of hypothesis ending with eos (finished sentences)
 
-            # cand_bbsz_idx contains beam indices for the top candidate
-            # hypotheses, with a range of values: [0, bsz*beam_size),
-            # and dimensions: [bsz, cand_size]
-            cand_bbsz_idx = cand_beams.add(bbsz_offsets)
+                if self.should_set_src_lengths:
+                    self.search.set_src_lengths(src_lengths)
 
-            # finalize hypotheses that end in eos
-            # Shape of eos_mask: (batch size, beam size)
-            eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
-            eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
+                if self.repeat_ngram_blocker is not None and step_size <2:
+                    lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
 
-            # eos_mask: [1, 8]
-
-            # only consider eos when it's among the top beam_size indices
-            # Now we know what beam item(s) to finish
-            # Shape: 1d list of absolute-numbered
-            eos_bbsz_idx = torch.masked_select(
-                cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
-            )
-
-            finalized_sents: List[int] = []
-            if eos_bbsz_idx.numel() > 0:
-
-                eos_scores = torch.masked_select(
-                    cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
-                )
-
-                finalized_sents = self.finalize_hypos(
+                # Shape: (batch, cand_size)
+                cand_scores, cand_indices, cand_beams = self.search.step(
                     step,
+                    lprobs.view(bsz, -1, self.vocab_size),
+                    scores.view(bsz, beam_size, -1)[:, :, :step],
+                    tokens[:, : step + 1],
+                    original_batch_idxs,
                     step_size,
-                    eos_bbsz_idx,
-                    eos_scores,
-                    tokens,
-                    scores,
-                    finalized,
-                    finished,
-                    beam_size,
-                    attn,
-                    src_lengths,
-                    max_len,
                 )
-                num_remaining_sent -= len(finalized_sents)
 
-            assert num_remaining_sent >= 0
-            if num_remaining_sent == 0:
-                break
+                # cand_scores: [1, 8]
+                # cand_indices: [1, 8]
+                # cand_beams: [1, 8]
+                # bbsz_offsets: [1, 1]
 
-            if self.search.stop_on_max_len and step >= max_len:
-                break
-            assert step < max_len, f"{step} < {max_len}"
-
-            # Remove finalized sentences (ones for which {beam_size}
-            # finished hypotheses have been generated) from the batch.
-            if len(finalized_sents) > 0:
-                new_bsz = bsz - len(finalized_sents)
-
-                # construct batch_idxs which holds indices of batches to keep for the next pass
-                batch_mask = torch.ones(
-                    bsz, dtype=torch.bool, device=cand_indices.device
-                )
-                batch_mask[finalized_sents] = False
-                # TODO replace `nonzero(as_tuple=False)` after TorchScript supports it
-                batch_idxs = torch.arange(
-                    bsz, device=cand_indices.device
-                ).masked_select(batch_mask)
-
-                # Choose the subset of the hypothesized constraints that will continue
-                self.search.prune_sentences(batch_idxs)
-
-                eos_mask = eos_mask[batch_idxs]
-                cand_beams = cand_beams[batch_idxs]
-                bbsz_offsets.resize_(new_bsz, 1)
+                # cand_bbsz_idx contains beam indices for the top candidate
+                # hypotheses, with a range of values: [0, bsz*beam_size),
+                # and dimensions: [bsz, cand_size]
                 cand_bbsz_idx = cand_beams.add(bbsz_offsets)
-                cand_scores = cand_scores[batch_idxs]
-                cand_indices = cand_indices[batch_idxs]
 
-                if prefix_tokens is not None:
-                    prefix_tokens = prefix_tokens[batch_idxs]
-                src_lengths = src_lengths[batch_idxs]
-                cands_to_ignore = cands_to_ignore[batch_idxs]
+                # finalize hypotheses that end in eos
+                # Shape of eos_mask: (batch size, beam size)
+                eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
+                eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
 
-                scores = scores.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
-                tokens = tokens.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
-                if attn is not None:
-                    attn = attn.view(bsz, -1)[batch_idxs].view(
-                        new_bsz * beam_size, attn.size(1), -1
+                # eos_mask: [1, 8]
+
+                # only consider eos when it's among the top beam_size indices
+                # Now we know what beam item(s) to finish
+                # Shape: 1d list of absolute-numbered
+                eos_bbsz_idx = torch.masked_select(
+                    cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
+                )
+
+                finalized_sents: List[int] = []
+                if eos_bbsz_idx.numel() > 0:
+
+                    eos_scores = torch.masked_select(
+                        cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
                     )
-                bsz = new_bsz
-            else:
-                batch_idxs = None
+
+                    finalized_sents = self.finalize_hypos(
+                        step,
+                        step_size,
+                        eos_bbsz_idx,
+                        eos_scores,
+                        tokens,
+                        scores,
+                        finalized,
+                        finished,
+                        beam_size,
+                        attn,
+                        src_lengths,
+                        max_len,
+                    )
+                    num_remaining_sent -= len(finalized_sents)
+
+                assert num_remaining_sent >= 0
+                if num_remaining_sent == 0:
+                    break
+
+                if self.search.stop_on_max_len and step >= max_len:
+                    break
+                assert step < max_len, f"{step} < {max_len}"
+
+                # Remove finalized sentences (ones for which {beam_size}
+                # finished hypotheses have been generated) from the batch.
+                if len(finalized_sents) > 0:
+                    new_bsz = bsz - len(finalized_sents)
+
+                    # construct batch_idxs which holds indices of batches to keep for the next pass
+                    batch_mask = torch.ones(
+                        bsz, dtype=torch.bool, device=cand_indices.device
+                    )
+                    batch_mask[finalized_sents] = False
+                    # TODO replace `nonzero(as_tuple=False)` after TorchScript supports it
+                    batch_idxs = torch.arange(
+                        bsz, device=cand_indices.device
+                    ).masked_select(batch_mask)
+
+                    # Choose the subset of the hypothesized constraints that will continue
+                    self.search.prune_sentences(batch_idxs)
+
+                    eos_mask = eos_mask[batch_idxs]
+                    cand_beams = cand_beams[batch_idxs]
+                    bbsz_offsets.resize_(new_bsz, 1)
+                    cand_bbsz_idx = cand_beams.add(bbsz_offsets)
+                    cand_scores = cand_scores[batch_idxs]
+                    cand_indices = cand_indices[batch_idxs]
+
+                    if prefix_tokens is not None:
+                        prefix_tokens = prefix_tokens[batch_idxs]
+                    src_lengths = src_lengths[batch_idxs]
+                    cands_to_ignore = cands_to_ignore[batch_idxs]
+
+                    scores = scores.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
+                    tokens = tokens.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
+                    if attn is not None:
+                        attn = attn.view(bsz, -1)[batch_idxs].view(
+                            new_bsz * beam_size, attn.size(1), -1
+                        )
+                    bsz = new_bsz
+                else:
+                    batch_idxs = None
 
 
-            # Set active_mask so that values > cand_size indicate eos hypos
-            # and values < cand_size indicate candidate active hypos.
-            # After, the min values per row are the top candidate active hypos
+                # Set active_mask so that values > cand_size indicate eos hypos
+                # and values < cand_size indicate candidate active hypos.
+                # After, the min values per row are the top candidate active hypos
 
-            # Rewrite the operator since the element wise or is not supported in torchscript.
+                # Rewrite the operator since the element wise or is not supported in torchscript.
 
-            # step = 2
-            # eos_mask: [1, 16]
+                # step = 2
+                # eos_mask: [1, 16]
 
-            repeat_size = step_size if step > 1 else 1
-            eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
+                repeat_size = step_size if step > 1 else 1
+                eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
 
-            cand_offsets_var = (
-                cand_offsets[: eos_mask.size(1)].unsqueeze(0).repeat(1,repeat_size)
-                if step_size > 1
-                else cand_offsets[: eos_mask.size(1)]
-            )
-
-            active_mask = torch.add(
-                eos_mask.type_as(cand_offsets) * cand_size,
-                cand_offsets_var,
-            )
-
-            # get the top beam_size active hypotheses, which are just
-            # the hypos with the smallest values in active_mask.
-            # {active_hypos} indicates which {beam_size} hypotheses
-            # from the list of {2 * beam_size} candidates were
-            # selected. Shapes: (batch size, beam size)
-            new_cands_to_ignore, active_hypos = torch.topk(
-                active_mask, k=beam_size, dim=1, largest=False
-            )
-
-            # update cands_to_ignore to ignore any finalized hypos.
-            cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
-            # Make sure there is at least one active item for each sentence in the batch.
-            assert (~cands_to_ignore).any(dim=1).all()
-
-            ####################################################################
-            ####### update cands_to_ignore to ignore any finalized hypos #######
-            ####################################################################
-
-            # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
-            # can be selected more than once).
-            active_bbsz_idx = torch.gather(cand_bbsz_idx, dim=1, index=active_hypos)
-            active_scores = torch.gather(cand_scores, dim=1, index=active_hypos)
-
-            active_bbsz_idx = active_bbsz_idx.view(-1)
-            active_scores = active_scores.view(-1)
-
-            # copy tokens and scores for active hypotheses
-
-            # Set the tokens for each beam (can select the same row more than once)
-            if step_size > 1:
-                active_bbsz_idx = (active_bbsz_idx/step_size).long()
-
-            tokens[:, : step + 1] = torch.index_select(
-                tokens[:, : step + 1], dim=0, index=active_bbsz_idx
-            )
-            # Select the next token for each of them
-            tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
-                cand_indices, dim=1, index=active_hypos
-            )
-
-            ######### Dimensions Statistics #########
-            # tokens: [4, 142]
-            # scores: [4, 141]
-            # cand_scores: [1, 8]
-            # active_bbsz_idx: [4]
-            # active_hypos: [1, 4]
-
-            if step > 0:
-                scores[:, :step] = torch.index_select(
-                    scores[:, :step], dim=0, index=active_bbsz_idx
-                )
-            scores.view(bsz, beam_size, -1)[:, :, step] = torch.gather(
-                cand_scores, dim=1, index=active_hypos
-            )
-
-            # Update constraints based on which candidates were selected for the next beam
-            self.search.update_constraints(active_hypos)
-
-            # copy attention for active hypotheses
-            if attn is not None:
-                attn[:, :, : step + 2] = torch.index_select(
-                    attn[:, :, : step + 2], dim=0, index=active_bbsz_idx
+                cand_offsets_var = (
+                    cand_offsets[: eos_mask.size(1)].unsqueeze(0).repeat(1,repeat_size)
+                    if step_size > 1
+                    else cand_offsets[: eos_mask.size(1)]
                 )
 
-            # reorder incremental state in decoder
-            reorder_state = active_bbsz_idx
+                active_mask = torch.add(
+                    eos_mask.type_as(cand_offsets) * cand_size,
+                    cand_offsets_var,
+                )
+
+                # get the top beam_size active hypotheses, which are just
+                # the hypos with the smallest values in active_mask.
+                # {active_hypos} indicates which {beam_size} hypotheses
+                # from the list of {2 * beam_size} candidates were
+                # selected. Shapes: (batch size, beam size)
+                new_cands_to_ignore, active_hypos = torch.topk(
+                    active_mask, k=beam_size, dim=1, largest=False
+                )
+
+                # update cands_to_ignore to ignore any finalized hypos.
+                cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
+                # Make sure there is at least one active item for each sentence in the batch.
+                assert (~cands_to_ignore).any(dim=1).all()
+
+                ####################################################################
+                ####### update cands_to_ignore to ignore any finalized hypos #######
+                ####################################################################
+
+                # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
+                # can be selected more than once).
+                active_bbsz_idx = torch.gather(cand_bbsz_idx, dim=1, index=active_hypos)
+                active_scores = torch.gather(cand_scores, dim=1, index=active_hypos)
+
+                active_bbsz_idx = active_bbsz_idx.view(-1)
+                active_scores = active_scores.view(-1)
+
+                # copy tokens and scores for active hypotheses
+
+                # Set the tokens for each beam (can select the same row more than once)
+                if step_size > 1:
+                    active_bbsz_idx = (active_bbsz_idx/step_size).long()
+
+                tokens[:, : step + 1] = torch.index_select(
+                    tokens[:, : step + 1], dim=0, index=active_bbsz_idx
+                )
+                # Select the next token for each of them
+                tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
+                    cand_indices, dim=1, index=active_hypos
+                )
+
+                ######### Dimensions Statistics #########
+                # tokens: [4, 142]
+                # scores: [4, 141]
+                # cand_scores: [1, 8]
+                # active_bbsz_idx: [4]
+                # active_hypos: [1, 4]
+
+                if step > 0:
+                    scores[:, :step] = torch.index_select(
+                        scores[:, :step], dim=0, index=active_bbsz_idx
+                    )
+                scores.view(bsz, beam_size, -1)[:, :, step] = torch.gather(
+                    cand_scores, dim=1, index=active_hypos
+                )
+
+                # Update constraints based on which candidates were selected for the next beam
+                self.search.update_constraints(active_hypos)
+
+                # copy attention for active hypotheses
+                if attn is not None:
+                    attn[:, :, : step + 2] = torch.index_select(
+                        attn[:, :, : step + 2], dim=0, index=active_bbsz_idx
+                    )
+
+                # reorder incremental state in decoder
+                reorder_state = active_bbsz_idx
 
 
         # sort by score descending
