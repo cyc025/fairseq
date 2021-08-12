@@ -182,6 +182,7 @@ class SequenceGenerator(nn.Module):
         cands_to_ignore,
         scores,
         beam_size,
+        tokens,
     ):
 
         # Remove finalized sentences (ones for which {beam_size}
@@ -300,6 +301,7 @@ class SequenceGenerator(nn.Module):
             cand_size,
             cands_to_ignore,
             scores,
+            tokens,
         )
 
     @torch.no_grad()
@@ -598,6 +600,7 @@ class SequenceGenerator(nn.Module):
                     cand_size,
                     cands_to_ignore,
                     scores,
+                    tokens,
                 ) = self.handle_sentences(
                     finalized_sents,
                     eos_mask,
@@ -609,6 +612,7 @@ class SequenceGenerator(nn.Module):
                     cands_to_ignore,
                     scores,
                     beam_size,
+                    tokens,
                 )
 
 
