@@ -458,8 +458,8 @@ class SequenceGenerator(nn.Module):
 
         input_step_size = 3000
 
-        step_size = input_step_size if input_step_size < max_len else max_len - 1
-        new_max_len = int( max_len / step_size )
+        step_size = input_step_size if input_step_size < max_len else 1
+        new_max_len = int( max_len / step_size ) + 1
 
         for step in range(0,new_max_len):  # one extra step for EOS marker
 
@@ -489,7 +489,6 @@ class SequenceGenerator(nn.Module):
             # perform mini-step
             mini_step_break = False
             start_step_index = step_size * step
-            print(start_step_index, start_step_index + step_size)
             for mini_step in range( start_step_index, start_step_index + step_size, 1):
 
                 if self.lm_model is not None:
