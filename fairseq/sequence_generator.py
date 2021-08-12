@@ -170,6 +170,124 @@ class SequenceGenerator(nn.Module):
                 )
                 yield id, src, ref, hypos[i]
 
+    def handle_sentences(
+        self,
+        finalized_sents,
+        cand_indices,
+        beam_size,
+        scores,
+    ):
+
+        # Remove finalized sentences (ones for which {beam_size}
+        # finished hypotheses have been generated) from the batch.
+        if len(finalized_sents) > 0:
+            new_bsz = bsz - len(finalized_sents)
+
+            # construct batch_idxs which holds indices of batches to keep for the next pass
+            batch_mask = torch.ones(
+                bsz, dtype=torch.bool, device=cand_indices.device
+            )
+            batch_mask[finalized_sents] = False
+            # TODO replace `nonzero(as_tuple=False)` after TorchScript supports it
+            batch_idxs = torch.arange(
+                bsz, device=cand_indices.device
+            ).masked_select(batch_mask)
+
+            # Choose the subset of the hypothesized constraints that will continue
+            self.search.prune_sentences(batch_idxs)
+
+            eos_mask = eos_mask[batch_idxs]
+            cand_beams = cand_beams[batch_idxs]
+            bbsz_offsets.resize_(new_bsz, 1)
+            cand_bbsz_idx = cand_beams.add(bbsz_offsets)
+            cand_scores = cand_scores[batch_idxs]
+            cand_indices = cand_indices[batch_idxs]
+
+            if prefix_tokens is not None:
+                prefix_tokens = prefix_tokens[batch_idxs]
+            src_lengths = src_lengths[batch_idxs]
+            cands_to_ignore = cands_to_ignore[batch_idxs]
+
+            scores = scores.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
+            tokens = tokens.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
+            if attn is not None:
+                attn = attn.view(bsz, -1)[batch_idxs].view(
+                    new_bsz * beam_size, attn.size(1), -1
+                )
+            bsz = new_bsz
+        else:
+            batch_idxs = None
+
+        # Set active_mask so that values > cand_size indicate eos hypos
+        # and values < cand_size indicate candidate active hypos.
+        # After, the min values per row are the top candidate active hypos
+
+        # Rewrite the operator since the element wise or is not supported in torchscript.
+
+        eos_mask[:, :beam_size] = ~((~cands_to_ignore) & (~eos_mask[:, :beam_size]))
+        active_mask = torch.add(
+            eos_mask.type_as(cand_offsets) * cand_size,
+            cand_offsets[: eos_mask.size(1)],
+        )
+
+        # get the top beam_size active hypotheses, which are just
+        # the hypos with the smallest values in active_mask.
+        # {active_hypos} indicates which {beam_size} hypotheses
+        # from the list of {2 * beam_size} candidates were
+        # selected. Shapes: (batch size, beam size)
+        new_cands_to_ignore, active_hypos = torch.topk(
+            active_mask, k=beam_size, dim=1, largest=False
+        )
+
+        # update cands_to_ignore to ignore any finalized hypos.
+        cands_to_ignore = new_cands_to_ignore.ge(cand_size)[:, :beam_size]
+        # Make sure there is at least one active item for each sentence in the batch.
+        assert (~cands_to_ignore).any(dim=1).all()
+
+        # update cands_to_ignore to ignore any finalized hypos
+
+        # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
+        # can be selected more than once).
+        active_bbsz_idx = torch.gather(cand_bbsz_idx, dim=1, index=active_hypos)
+        active_scores = torch.gather(cand_scores, dim=1, index=active_hypos)
+
+        active_bbsz_idx = active_bbsz_idx.view(-1)
+        active_scores = active_scores.view(-1)
+
+        # copy tokens and scores for active hypotheses
+
+        # Set the tokens for each beam (can select the same row more than once)
+        tokens[:, : step + 1] = torch.index_select(
+            tokens[:, : step + 1], dim=0, index=active_bbsz_idx
+        )
+        # Select the next token for each of them
+        tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
+            cand_indices, dim=1, index=active_hypos
+        )
+        if step > 0:
+            scores[:, :step] = torch.index_select(
+                scores[:, :step], dim=0, index=active_bbsz_idx
+            )
+        scores.view(bsz, beam_size, -1)[:, :, step] = torch.gather(
+            cand_scores, dim=1, index=active_hypos
+        )
+
+        # Update constraints based on which candidates were selected for the next beam
+        self.search.update_constraints(active_hypos)
+
+        # copy attention for active hypotheses
+        if attn is not None:
+            attn[:, :, : step + 2] = torch.index_select(
+                attn[:, :, : step + 2], dim=0, index=active_bbsz_idx
+            )
+
+        # reorder incremental state in decoder
+        reorder_state = active_bbsz_idx
+
+        return (
+            reorder_state,
+        )
+
     @torch.no_grad()
     def generate(self, models, sample: Dict[str, Dict[str, Tensor]], **kwargs) -> List[List[Dict[str, Tensor]]]:
         """Generate translations. Match the api of other fairseq generators.
@@ -341,10 +459,10 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
+            mini_step_break = False
+
             # perform mini-step
             for i in range(step_size):
-
-                print(f'here {i}')
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : step + 1])
@@ -448,10 +566,19 @@ class SequenceGenerator(nn.Module):
 
                 assert num_remaining_sent >= 0
                 if num_remaining_sent == 0:
+                    mini_step_break = True
                     break
                 if self.search.stop_on_max_len and step >= max_len:
+                    mini_step_break = True
                     break
                 assert step < max_len, f"{step} < {max_len}"
+
+                # self.handle_sentences(
+                #     finalized_sents,
+                #     cand_indices,
+                #     beam_size,
+                #     scores,
+                # )
 
                 # Remove finalized sentences (ones for which {beam_size}
                 # finished hypotheses have been generated) from the batch.
@@ -558,6 +685,10 @@ class SequenceGenerator(nn.Module):
 
                 # reorder incremental state in decoder
                 reorder_state = active_bbsz_idx
+
+            if mini_step_break:
+                break
+
 
         # sort by score descending
         for sent in range(len(finalized)):
