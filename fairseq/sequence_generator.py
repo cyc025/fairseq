@@ -173,6 +173,7 @@ class SequenceGenerator(nn.Module):
     def handle_sentences(
         self,
         finalized_sents,
+        eos_mask,
         cand_indices,
         cands_to_ignore,
         beam_size,
@@ -581,6 +582,7 @@ class SequenceGenerator(nn.Module):
 
                 (
                     finalized_sents,
+                    eos_mask,
                     cand_indices,
                     cands_to_ignore,
                     beam_size,
