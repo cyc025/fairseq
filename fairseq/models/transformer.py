@@ -56,7 +56,7 @@ class TransformerModel(FairseqEncoderDecoderModel):
     .. argparse::
         :ref: fairseq.models.transformer_parser
         :prog:
-    """ 
+    """
 
     @classmethod
     def hub_models(cls):

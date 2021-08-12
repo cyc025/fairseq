@@ -311,7 +311,7 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
-        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
+        for step in range(0,max_len + 1,1):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -334,6 +334,8 @@ class SequenceGenerator(nn.Module):
                 incremental_states,
                 self.temperature,
             )
+
+            from fairseq import pdb; pdb.set_trace()
 
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
