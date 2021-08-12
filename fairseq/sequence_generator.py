@@ -600,13 +600,12 @@ class SequenceGenerator(nn.Module):
                 ) = self.handle_sentences(
                     finalized_sents,
                     eos_mask,
-                    cand_scores,
                     cand_indices,
                     cand_bbsz_idx,
                     cand_offsets,
                     cand_size,
+                    cand_scores,
                     cands_to_ignore,
-                    beam_size,
                     scores,
                 )
 
