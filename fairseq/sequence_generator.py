@@ -459,9 +459,9 @@ class SequenceGenerator(nn.Module):
         input_step_size = 2
 
         step_size = input_step_size if input_step_size < max_len else 1
-        new_max_len = int( max_len / step_size ) + 1
+        trim_max_len = int( max_len / step_size ) + 1
 
-        for step in range(0,new_max_len):  # one extra step for EOS marker
+        for step in range(0,trim_max_len):  # one extra step for EOS marker
 
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
@@ -595,10 +595,10 @@ class SequenceGenerator(nn.Module):
                 if num_remaining_sent == 0:
                     mini_step_break = True
                     break
-                if self.search.stop_on_max_len and mini_step >= new_max_len:
+                if self.search.stop_on_max_len and mini_step >= max_len:
                     mini_step_break = True
                     break
-                assert mini_step < new_max_len, f"{mini_step} < {new_max_len}"
+                assert mini_step < max_len, f"{mini_step} < {max_len}"
 
                 cand_state = to_cand_state(
                     cand_indices, cand_bbsz_idx, cand_offsets,
