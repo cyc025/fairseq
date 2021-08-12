@@ -344,6 +344,8 @@ class SequenceGenerator(nn.Module):
             # perform mini-step
             for i in range(step_size):
 
+                print(f'here {i}')
+
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : step + 1])
                     probs = self.lm_model.get_normalized_probs(
