@@ -204,7 +204,7 @@ class SequenceGenerator(nn.Module):
             eos_mask = eos_mask[batch_idxs]
             cand_beams = cand_beams[batch_idxs]
             bbsz_offsets.resize_(new_bsz, 1)
-            cand_bbsz_idx = cand_beams.add(bbsz_offsets)
+            cand_dict['cand_bbsz_idx'] = cand_beams.add(bbsz_offsets)
             cand_dict['cand_scores'] = cand_dict['cand_scores'][batch_idxs]
             cand_indices = cand_indices[batch_idxs]
 
@@ -253,7 +253,7 @@ class SequenceGenerator(nn.Module):
 
         # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
         # can be selected more than once).
-        active_bbsz_idx = torch.gather(cand_bbsz_idx, dim=1, index=active_hypos)
+        active_bbsz_idx = torch.gather(cand_dict['cand_bbsz_idx'], dim=1, index=active_hypos)
         active_scores = torch.gather(cand_dict['cand_scores'], dim=1, index=active_hypos)
 
         active_bbsz_idx = active_bbsz_idx.view(-1)
