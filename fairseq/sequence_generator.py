@@ -176,6 +176,7 @@ class SequenceGenerator(nn.Module):
         eos_mask,
         cand_indices,
         cand_offsets,
+        cand_size,
         cands_to_ignore,
         beam_size,
         scores,
@@ -292,6 +293,7 @@ class SequenceGenerator(nn.Module):
             eos_mask,
             cand_indices,
             cand_offsets,
+            cand_size,
             cands_to_ignore,
             scores,
         )
@@ -587,6 +589,7 @@ class SequenceGenerator(nn.Module):
                     eos_mask,
                     cand_indices,
                     cand_offsets,
+                    cand_size,
                     cands_to_ignore,
                     scores,
                 ) = self.handle_sentences(
@@ -594,6 +597,7 @@ class SequenceGenerator(nn.Module):
                     eos_mask,
                     cand_indices,
                     cand_offsets,
+                    cand_size,
                     cands_to_ignore,
                     beam_size,
                     scores,
