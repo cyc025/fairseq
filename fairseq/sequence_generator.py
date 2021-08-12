@@ -456,7 +456,7 @@ class SequenceGenerator(nn.Module):
             return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
-        step_size = 3
+        step_size = 2
         new_max_len = int( (max_len) / step_size ) + 1
 
         for step in range(0,new_max_len):  # one extra step for EOS marker
@@ -489,7 +489,6 @@ class SequenceGenerator(nn.Module):
             mini_step_break = False
             remain_len = new_max_len - step
             adj_step_size = step_size if step_size < remain_len else 1
-            print(remain_len,adj_step_size,step)
             for i in range(adj_step_size):
 
                 if self.lm_model is not None:
@@ -634,7 +633,7 @@ class SequenceGenerator(nn.Module):
             finalized[sent] = torch.jit.annotate(
                 List[Dict[str, Tensor]], finalized[sent]
             )
-        print(finalized)
+
         return finalized
 
     def _prefix_tokens(
