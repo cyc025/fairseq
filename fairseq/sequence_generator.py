@@ -312,8 +312,9 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
+        new_max_len = int( (max_len + 1) / 2)
 
-        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
+        for step in range(0,new_max_len):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
@@ -565,7 +566,6 @@ class SequenceGenerator(nn.Module):
                 List[Dict[str, Tensor]], finalized[sent]
             )
 
-        print(finalized)
         return finalized
 
     def _prefix_tokens(
