@@ -562,7 +562,7 @@ class SequenceGenerator(nn.Module):
 
             mini_step_size = step_size
 
-            for i in range(inner_step_size):
+            for i in range(mini_step_size):
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : step + 1])
