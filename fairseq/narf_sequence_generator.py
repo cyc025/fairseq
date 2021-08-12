@@ -306,7 +306,7 @@ class SequenceGenerator(nn.Module):
             decoder_out = model.forward_decoder(
                 prev_decoder_out, encoder_out, **decoder_options
             )
-
+ 
             if self.adaptive:
                 # terminate if there is a loop
                 terminated, out_tokens, out_scores, out_attn = is_a_loop(
