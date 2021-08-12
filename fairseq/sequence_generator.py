@@ -313,7 +313,7 @@ class SequenceGenerator(nn.Module):
 
 
 
-        for step in range(0,max_len + 1,1):  # one extra step for EOS marker
+        for step in range(0,max_len + 1,2):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
                 if batch_idxs is not None:
