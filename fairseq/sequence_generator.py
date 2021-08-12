@@ -170,7 +170,7 @@ class SequenceGenerator(nn.Module):
                 )
                 yield id, src, ref, hypos[i]
 
-    def handle_sentences(
+    def handle_cands(
         self,
         step,
         bsz,
@@ -604,7 +604,7 @@ class SequenceGenerator(nn.Module):
                     cand_size, cand_scores, cands_to_ignore
                 )
 
-                (finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_sentences(
+                (finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_cands(
                         step, bsz, attn,
                         finalized_sents,
                         eos_mask,
