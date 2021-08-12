@@ -917,6 +917,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             if positions is not None:
                 positions = positions[:, -step_size:]
 
+        print( len(prev_output_tokens) )
+
         # embed tokens and positions
         x = self.embed_scale * self.embed_tokens(prev_output_tokens)
 
