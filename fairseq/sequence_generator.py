@@ -494,10 +494,10 @@ class SequenceGenerator(nn.Module):
             for mini_step in range( start_step_index, start_step_index + step_size, 1):
 
                 # resolve new lprobs
-                if len(lprobs.size()) > 2:
+                if len(raw_lprobs.size()) > 2:
                     lprobs = raw_lprobs[:,mini_step-start_step_index,:]
                 else:
-                    lprobs = raw_lprobs[:,:]
+                    lprobs = raw_lprobs
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : mini_step + 1])
