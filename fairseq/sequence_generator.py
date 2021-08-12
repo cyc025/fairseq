@@ -488,7 +488,7 @@ class SequenceGenerator(nn.Module):
             # perform mini-step
             mini_step_break = False
             remain_len = new_max_len - step
-            adj_step_size = step_size if step_size < remain_len else remain_len
+            adj_step_size = step_size if step_size < remain_len else 1
             print(remain_len,adj_step_size,step)
             for i in range(adj_step_size):
 
