@@ -14,7 +14,6 @@ CNN_KWARGS = dict(beam=4, lenpen=2.0, max_len_b=140, min_len=55, no_repeat_ngram
 @torch.no_grad()
 def generate(bart, infile, outfile="bart_hypo.txt", bsz=32, n_obs=None, **eval_kwargs):
     count = 1
-    from fairseq import pdb; pdb.set_trace()
 
     # if n_obs is not None: bsz = min(bsz, n_obs)
 
