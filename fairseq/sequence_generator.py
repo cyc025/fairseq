@@ -311,6 +311,8 @@ class SequenceGenerator(nn.Module):
         else:
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
+        from fairseq import pdb; pdb.set_trace()
+
         for step in range(0,max_len + 1,1):  # one extra step for EOS marker
             # reorder decoder internal states based on the prev choice of beams
             if reorder_state is not None:
