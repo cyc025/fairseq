@@ -206,7 +206,7 @@ class SequenceGenerator(nn.Module):
             bbsz_offsets.resize_(new_bsz, 1)
             cand_state['cand_bbsz_idx'] = cand_beams.add(bbsz_offsets)
             cand_state['cand_scores'] = cand_state['cand_scores'][batch_idxs]
-            cand_indices = cand_indices[batch_idxs]
+            cand_state['cand_indices'] = cand_state['cand_indices'][batch_idxs]
 
             if prefix_tokens is not None:
                 prefix_tokens = prefix_tokens[batch_idxs]
@@ -267,7 +267,7 @@ class SequenceGenerator(nn.Module):
         )
         # Select the next token for each of them
         tokens.view(bsz, beam_size, -1)[:, :, step + 1] = torch.gather(
-            cand_indices, dim=1, index=active_hypos
+            cand_state['cand_indices'], dim=1, index=active_hypos
         )
         if step > 0:
             scores[:, :step] = torch.index_select(
