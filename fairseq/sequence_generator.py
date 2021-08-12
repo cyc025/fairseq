@@ -560,6 +560,8 @@ class SequenceGenerator(nn.Module):
                 step,
             )
 
+            from fairseq import pdb; pdb.set_trace()
+
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
                 probs = self.lm_model.get_normalized_probs(
