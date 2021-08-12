@@ -456,11 +456,10 @@ class SequenceGenerator(nn.Module):
             return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
-        input_step_size = 5
+        input_step_size = 2
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size )
-        print(step_size,step_max_len,input_step_size)
         for step in range(0,step_max_len):  # one extra step for EOS marker
 
             # reorder decoder internal states based on the prev choice of beams

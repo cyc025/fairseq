@@ -920,7 +920,6 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         # embed tokens and positions
         x = self.embed_scale * self.embed_tokens(prev_output_tokens)
 
-
         # from fairseq import pdb; pdb.set_trace()
 
         if self.quant_noise is not None:
