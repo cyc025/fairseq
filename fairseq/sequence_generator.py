@@ -582,13 +582,13 @@ class SequenceGenerator(nn.Module):
 
                 (
                     finalized_sents,
-                    eos_mask,
                     cand_indices,
                     cands_to_ignore,
                     beam_size,
                     scores,
                 ) = self.handle_sentences(
                     finalized_sents,
+                    eos_mask,
                     cand_indices,
                     cands_to_ignore,
                     beam_size,
