@@ -917,10 +917,12 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             if positions is not None:
                 positions = positions[:, -step_size:]
 
-        print( prev_output_tokens )
-
         # embed tokens and positions
         x = self.embed_scale * self.embed_tokens(prev_output_tokens)
+
+        # repeat x by step-size times
+        # x.repeat(dim)
+        from fairseq import pdb; pdb.set_trace()
 
         if self.quant_noise is not None:
             x = self.quant_noise(x)
