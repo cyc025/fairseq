@@ -921,7 +921,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         x = self.embed_scale * self.embed_tokens(prev_output_tokens)
 
         # repeat x by step-size times
-        x = x.repeat(dim=1)
+        x = x.repeat(1,2,1)
         # from fairseq import pdb; pdb.set_trace()
 
         if self.quant_noise is not None:
