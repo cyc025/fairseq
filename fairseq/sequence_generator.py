@@ -457,7 +457,7 @@ class SequenceGenerator(nn.Module):
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
         step_size = 2
-        new_max_len = int( (max_len) / step_size ) + 1
+        new_max_len = int( (max_len) / step_size ) 
 
         for step in range(0,new_max_len):  # one extra step for EOS marker
 
@@ -487,12 +487,11 @@ class SequenceGenerator(nn.Module):
 
             # perform mini-step
             mini_step_break = False
-            remain_len = new_max_len - step
-            adj_step_size = step_size if step_size < remain_len else 1
-            for i in range(adj_step_size):
+            start_step_index = step_size * step
+            for mini_step in range( start_step_index, start_step_index + step_size, 1):
 
                 if self.lm_model is not None:
-                    lm_out = self.lm_model(tokens[:, : step + 1])
+                    lm_out = self.lm_model(tokens[:, : mini_step + 1])
                     probs = self.lm_model.get_normalized_probs(
                         lm_out, log_probs=True, sample=None
                     )
@@ -505,20 +504,20 @@ class SequenceGenerator(nn.Module):
                 lprobs[:, self.unk] -= self.unk_penalty  # apply unk penalty
 
                 # handle max length constraint
-                if step >= max_len:
+                if mini_step >= max_len:
                     lprobs[:, : self.eos] = -math.inf
                     lprobs[:, self.eos + 1 :] = -math.inf
 
                 # handle prefix tokens (possibly with different lengths)
                 if (
                     prefix_tokens is not None
-                    and step < prefix_tokens.size(1)
-                    and step < max_len
+                    and mini_step < prefix_tokens.size(1)
+                    and mini_step < max_len
                 ):
                     lprobs, tokens, scores = self._prefix_tokens(
-                        step, lprobs, scores, tokens, prefix_tokens, beam_size
+                        mini_step, lprobs, scores, tokens, prefix_tokens, beam_size
                     )
-                elif step < self.min_len:
+                elif mini_step < self.min_len:
                     # minimum length constraint (does not apply if using prefix_tokens)
                     lprobs[:, self.eos] = -math.inf
 
@@ -528,7 +527,7 @@ class SequenceGenerator(nn.Module):
                         attn = torch.empty(
                             bsz * beam_size, avg_attn_scores.size(1), max_len + 2
                         ).to(scores)
-                    attn[:, :, step + 1].copy_(avg_attn_scores)
+                    attn[:, :, mini_step + 1].copy_(avg_attn_scores)
 
                 scores = scores.type_as(lprobs)
                 eos_bbsz_idx = torch.empty(0).to(
@@ -542,14 +541,14 @@ class SequenceGenerator(nn.Module):
                     self.search.set_src_lengths(src_lengths)
 
                 if self.repeat_ngram_blocker is not None:
-                    lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, step)
+                    lprobs = self.repeat_ngram_blocker(tokens, lprobs, bsz, beam_size, mini_step)
 
                 # Shape: (batch, cand_size)
                 cand_scores, cand_indices, cand_beams = self.search.step(
-                    step,
+                    mini_step,
                     lprobs.view(bsz, -1, self.vocab_size),
-                    scores.view(bsz, beam_size, -1)[:, :, :step],
-                    tokens[:, : step + 1],
+                    scores.view(bsz, beam_size, -1)[:, :, :mini_step],
+                    tokens[:, : mini_step + 1],
                     original_batch_idxs,
                 )
 
@@ -577,7 +576,7 @@ class SequenceGenerator(nn.Module):
                     )
 
                     finalized_sents = self.finalize_hypos(
-                        step,
+                        mini_step,
                         eos_bbsz_idx,
                         eos_scores,
                         tokens,
@@ -595,10 +594,10 @@ class SequenceGenerator(nn.Module):
                 if num_remaining_sent == 0:
                     mini_step_break = True
                     break
-                if self.search.stop_on_max_len and step >= new_max_len:
+                if self.search.stop_on_max_len and mini_step >= max_len:
                     mini_step_break = True
                     break
-                assert step < max_len, f"{step} < {max_len}"
+                assert mini_step < max_len, f"{mini_step} < {max_len}"
 
                 cand_state = to_cand_state(
                     cand_indices, cand_bbsz_idx, cand_offsets,
@@ -606,7 +605,7 @@ class SequenceGenerator(nn.Module):
                 )
 
                 (finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_cands(
-                        step, bsz, attn,
+                        mini_step, bsz, attn,
                         finalized_sents,
                         eos_mask,
                         cand_state,
@@ -618,8 +617,6 @@ class SequenceGenerator(nn.Module):
                     cand_indices, cand_bbsz_idx, cand_offsets,
                     cand_size, cand_scores, cands_to_ignore
                 ) = unpack_cand_state(cand_state)
-
-            print(tokens,finalized_sents)
 
             if mini_step_break:
                 break
