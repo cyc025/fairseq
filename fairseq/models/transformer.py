@@ -912,7 +912,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             positions = self.embed_positions(
                 prev_output_tokens, incremental_state=incremental_state
             )
-
+        print(len(prev_output_tokens))
         if incremental_state is not None: # change_here
             prev_output_tokens = prev_output_tokens[:, -step_size:]
             if positions is not None:
