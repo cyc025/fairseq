@@ -306,7 +306,7 @@ class SequenceGenerator(nn.Module):
             decoder_out = model.forward_decoder(
                 prev_decoder_out, encoder_out, **decoder_options
             )
- 
+
             if self.adaptive:
                 # terminate if there is a loop
                 terminated, out_tokens, out_scores, out_attn = is_a_loop(
@@ -1076,7 +1076,7 @@ class EnsembleModel(nn.Module):
                 )
             else:
                 if hasattr(model, "decoder"):
-                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out, step_size=step_size)
+                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out, step_size=step_size,)
                 else:
                     decoder_out = model.forward(tokens, step_size=step_size,)
 

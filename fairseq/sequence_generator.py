@@ -485,6 +485,7 @@ class SequenceGenerator(nn.Module):
                 incremental_states,
                 self.temperature,
                 step_size,
+                step,
             )
 
             # perform mini-step
@@ -850,7 +851,10 @@ class EnsembleModel(nn.Module):
         encoder_outs: List[Dict[str, List[Tensor]]],
         incremental_states: List[Dict[str, Dict[str, Optional[Tensor]]]],
         temperature: float = 1.0,
+        step_size: Optional[int] = 1,
+        step: Optional[int] = 1, # temp
     ):
+
         log_probs = []
         avg_attn: Optional[Tensor] = None
         encoder_out: Optional[Dict[str, List[Tensor]]] = None
@@ -859,17 +863,17 @@ class EnsembleModel(nn.Module):
                 encoder_out = encoder_outs[i]
             # decode each model
             if self.has_incremental_states():
-
                 decoder_out = model.decoder.forward(
                     tokens,
                     encoder_out=encoder_out,
                     incremental_state=incremental_states[i],
+                    step_size=step_size,
                 )
             else:
                 if hasattr(model, "decoder"):
-                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out)
+                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out, step_size=step_size,)
                 else:
-                    decoder_out = model.forward(tokens)
+                    decoder_out = model.forward(tokens, step_size=step_size,)
 
             attn: Optional[Tensor] = None
             decoder_len = len(decoder_out)
@@ -883,17 +887,28 @@ class EnsembleModel(nn.Module):
                     elif attn_holder is not None:
                         attn = attn_holder[0]
                 if attn is not None:
-                    attn = attn[:, -1, :]
+                    attn = attn[:, -1, :] # change_here
 
-            decoder_out_tuple = (
-                decoder_out[0][:, -1:, :].div_(temperature),
-                None if decoder_len <= 1 else decoder_out[1],
-            )
+            if step_size>1:
+                decoder_out_tuple = (
+                    decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
+                    None if decoder_len <= 1 else decoder_out[1],
+                )
+            else:
+                decoder_out_tuple = (
+                    decoder_out[0][:, -1:, :].div_(temperature), # change_here
+                    None if decoder_len <= 1 else decoder_out[1],
+                )
+
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
             )
-            probs = probs[:, -1, :]
-            if self.models_size == 1:
+
+            # get the last dimension only if step size is 1
+            if step_size<=1:
+                probs = probs[:, -1, :]
+
+            if self.models_size == 1: # returns here
                 return probs, attn
 
             log_probs.append(probs)
@@ -902,6 +917,7 @@ class EnsembleModel(nn.Module):
                     avg_attn = attn
                 else:
                     avg_attn.add_(attn)
+
 
         avg_probs = torch.logsumexp(torch.stack(log_probs, dim=0), dim=0) - math.log(
             self.models_size
