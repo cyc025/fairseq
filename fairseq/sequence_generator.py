@@ -173,6 +173,7 @@ class SequenceGenerator(nn.Module):
     def handle_sentences(
         self,
         step,
+        bsz,
         finalized_sents,
         eos_mask,
         cand_indices,
@@ -604,6 +605,7 @@ class SequenceGenerator(nn.Module):
                     tokens,
                 ) = self.handle_sentences(
                     step,
+                    bsz,
                     finalized_sents,
                     eos_mask,
                     cand_indices,
