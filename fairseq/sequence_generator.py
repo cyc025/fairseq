@@ -491,7 +491,7 @@ class SequenceGenerator(nn.Module):
             mini_step_break = False
             remain_len = new_max_len - step - 1
             adj_step_size = step_size if step_size < remain_len else remain_len
-            print(remain_len,adj_step_size)
+            print(remain_len,adj_step_size,step)
             for i in range(adj_step_size):
 
                 if self.lm_model is not None:
