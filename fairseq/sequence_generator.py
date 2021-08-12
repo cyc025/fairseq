@@ -456,7 +456,7 @@ class SequenceGenerator(nn.Module):
             return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
-        input_step_size = 3
+        input_step_size = 2
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size ) + 1
@@ -479,7 +479,7 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
-            lprobs, avg_attn_scores = self.model.forward_decoder(
+            raw_lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
                 incremental_states,
@@ -495,7 +495,7 @@ class SequenceGenerator(nn.Module):
 
                 # resolve new lprobs
                 if len(lprobs.size()) > 2:
-                    lprobs = lprobs[:,mini_step-start_step_index,:]
+                    lprobs = raw_lprobs[:,mini_step-start_step_index,:]
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : mini_step + 1])
