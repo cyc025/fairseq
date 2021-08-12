@@ -559,6 +559,7 @@ class SequenceGenerator(nn.Module):
                 step_size,
                 step,
             )
+            print(tokens[0])
 
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
