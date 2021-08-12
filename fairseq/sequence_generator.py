@@ -174,6 +174,7 @@ class SequenceGenerator(nn.Module):
         self,
         finalized_sents,
         cand_indices,
+        cands_to_ignore,
         beam_size,
         scores,
     ):
@@ -285,7 +286,11 @@ class SequenceGenerator(nn.Module):
         reorder_state = active_bbsz_idx
 
         return (
-            reorder_state,
+            finalized_sents,
+            cand_indices,
+            cands_to_ignore,
+            beam_size,
+            scores,
         )
 
     @torch.no_grad()
@@ -575,13 +580,15 @@ class SequenceGenerator(nn.Module):
 
 
                 (
-                    tokens,
-                    scores,
-                    finalized_sents,
-                    attn,
-                    cand_indices,) = self.handle_sentences(
                     finalized_sents,
                     cand_indices,
+                    cands_to_ignore,
+                    beam_size,
+                    scores,
+                ) = self.handle_sentences(
+                    finalized_sents,
+                    cand_indices,
+                    cands_to_ignore,
                     beam_size,
                     scores,
                 )
