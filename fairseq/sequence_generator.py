@@ -489,7 +489,7 @@ class SequenceGenerator(nn.Module):
             # perform mini-step
             mini_step_break = False
             start_step_index = step_size * step
-            for mini_step in range( start_step_index, start_step_index + step_size - 1, 1):
+            for mini_step in range( start_step_index, start_step_index + step_size, 1):
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : mini_step + 1])
@@ -595,10 +595,10 @@ class SequenceGenerator(nn.Module):
                 if num_remaining_sent == 0:
                     mini_step_break = True
                     break
-                if self.search.stop_on_max_len and mini_step >= max_len:
+                if self.search.stop_on_max_len and mini_step >= max_len+1:
                     mini_step_break = True
                     break
-                assert mini_step < max_len, f"{mini_step} < {max_len}"
+                assert mini_step < max_len+1, f"{mini_step} < {max_len+1}"
 
                 cand_state = to_cand_state(
                     cand_indices, cand_bbsz_idx, cand_offsets,
@@ -618,8 +618,6 @@ class SequenceGenerator(nn.Module):
                     cand_indices, cand_bbsz_idx, cand_offsets,
                     cand_size, cand_scores, cands_to_ignore
                 ) = unpack_cand_state(cand_state)
-
-                print(tokens)
 
             if mini_step_break:
                 break
