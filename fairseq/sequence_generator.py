@@ -181,6 +181,7 @@ class SequenceGenerator(nn.Module):
         cand_scores,
         cands_to_ignore,
         scores,
+        beam_size,
     ):
 
         # Remove finalized sentences (ones for which {beam_size}
@@ -607,6 +608,7 @@ class SequenceGenerator(nn.Module):
                     cand_scores,
                     cands_to_ignore,
                     scores,
+                    beam_size,
                 )
 
 
