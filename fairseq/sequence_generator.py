@@ -457,7 +457,7 @@ class SequenceGenerator(nn.Module):
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
         step_size = 2
-        new_max_len = int( (max_len) / step_size )
+        new_max_len = int( (max_len) / step_size ) + 1
 
         for step in range(0,new_max_len):  # one extra step for EOS marker
 
@@ -477,7 +477,6 @@ class SequenceGenerator(nn.Module):
                     encoder_outs, reorder_state
                 )
 
-            # from fairseq import pdb; pdb.set_trace()
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
                 encoder_outs,
