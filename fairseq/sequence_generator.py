@@ -489,7 +489,7 @@ class SequenceGenerator(nn.Module):
             # perform mini-step
             mini_step_break = False
             start_step_index = step_size * step
-            for mini_step in range( start_step_index, start_step_index + step_size, 1):
+            for mini_step in range( start_step_index, start_step_index + step_size - 1, 1):
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : mini_step + 1])
