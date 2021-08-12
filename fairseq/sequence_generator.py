@@ -488,6 +488,8 @@ class SequenceGenerator(nn.Module):
                 step,
             )
 
+            from fairseq import pdb; pdb.set_trace()
+
             # perform mini-step
             mini_step_break = False
             start_step_index = step_size * step

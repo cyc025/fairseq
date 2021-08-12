@@ -905,9 +905,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
                 enc.size()[1] == bs
             ), f"Expected enc.shape == (t, {bs}, c) got {enc.shape}"
         if encoder_out is not None and len(encoder_out["encoder_padding_mask"]) > 0:
-            padding_mask = encoder_out["encoder_padding_mask"][0]
-
-        from fairseq import pdb; pdb.set_trace()
+            padding_mask = encoder_out["encoder_padding_mask"][0]        
 
         if step == 0:
             prev_output_tokens = prev_output_tokens.repeat(1,step_size)
