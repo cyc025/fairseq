@@ -498,7 +498,8 @@ class SequenceGenerator(nn.Module):
 
                 print(mini_step-start_step_index)
                 from fairseq import pdb; pdb.set_trace()
-                lprobs = lprobs[:,mini_step-start_step_index,:]
+                if step_size > 1:
+                    lprobs = lprobs[:,mini_step-start_step_index,:]
 
                 if self.lm_model is not None:
                     lm_out = self.lm_model(tokens[:, : mini_step + 1])
