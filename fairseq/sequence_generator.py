@@ -459,6 +459,8 @@ class SequenceGenerator(nn.Module):
         step_size = 4
         new_max_len = int( (max_len + 1) / step_size )
 
+        print(new_max_len)
+
         for step in range(0,new_max_len):  # one extra step for EOS marker
 
             # reorder decoder internal states based on the prev choice of beams
