@@ -312,8 +312,8 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 2
-        new_max_len = int( (max_len + 1) / step_size)
+        step_size = 1
+        new_max_len = int( (max_len + 1) / step_size )
 
         for step in range(0,new_max_len):  # one extra step for EOS marker
 
@@ -332,6 +332,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs = self.model.reorder_encoder_out(
                     encoder_outs, reorder_state
                 )
+
             # from fairseq import pdb; pdb.set_trace()
             lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
@@ -340,6 +341,7 @@ class SequenceGenerator(nn.Module):
                 self.temperature,
             )
 
+            # perform mini-step
             for i in range(step_size):
 
                 if self.lm_model is not None:
