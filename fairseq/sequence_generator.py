@@ -531,7 +531,7 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        step_size = 2
+        step_size = 1
 
         for step in range(0, max_len + 1, step_size):  # one extra step for EOS marker
 
@@ -559,6 +559,7 @@ class SequenceGenerator(nn.Module):
                 step_size,
                 step,
             )
+            
 
             if self.lm_model is not None:
                 lm_out = self.lm_model(tokens[:, : step + 1])
