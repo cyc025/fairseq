@@ -457,7 +457,7 @@ class SequenceGenerator(nn.Module):
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
         step_size = 2
-        new_max_len = int( (max_len) / step_size ) 
+        new_max_len = int( (max_len) / step_size )
 
         for step in range(0,new_max_len):  # one extra step for EOS marker
 
@@ -617,6 +617,8 @@ class SequenceGenerator(nn.Module):
                     cand_indices, cand_bbsz_idx, cand_offsets,
                     cand_size, cand_scores, cands_to_ignore
                 ) = unpack_cand_state(cand_state)
+
+                print(finalized)
 
             if mini_step_break:
                 break
