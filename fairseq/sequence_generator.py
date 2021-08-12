@@ -619,6 +619,8 @@ class SequenceGenerator(nn.Module):
                     cand_size, cand_scores, cands_to_ignore
                 ) = unpack_cand_state(cand_state)
 
+                print(tokens)
+
             if mini_step_break:
                 break
 
