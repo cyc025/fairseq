@@ -177,7 +177,7 @@ class SequenceGenerator(nn.Module):
         attn,
         finalized_sents,
         eos_mask,
-        cand_dict,
+        cand_state,
         scores,
         beam_size,
         tokens,
@@ -190,12 +190,12 @@ class SequenceGenerator(nn.Module):
 
             # construct batch_idxs which holds indices of batches to keep for the next pass
             batch_mask = torch.ones(
-                bsz, dtype=torch.bool, device=cand_dict['cand_indices'].device
+                bsz, dtype=torch.bool, device=cand_state['cand_indices'].device
             )
             batch_mask[finalized_sents] = False
             # TODO replace `nonzero(as_tuple=False)` after TorchScript supports it
             batch_idxs = torch.arange(
-                bsz, device=cand_dict['cand_indices'].device
+                bsz, device=cand_state['cand_indices'].device
             ).masked_select(batch_mask)
 
             # Choose the subset of the hypothesized constraints that will continue
@@ -204,14 +204,14 @@ class SequenceGenerator(nn.Module):
             eos_mask = eos_mask[batch_idxs]
             cand_beams = cand_beams[batch_idxs]
             bbsz_offsets.resize_(new_bsz, 1)
-            cand_dict['cand_bbsz_idx'] = cand_beams.add(bbsz_offsets)
-            cand_dict['cand_scores'] = cand_dict['cand_scores'][batch_idxs]
+            cand_state['cand_bbsz_idx'] = cand_beams.add(bbsz_offsets)
+            cand_state['cand_scores'] = cand_state['cand_scores'][batch_idxs]
             cand_indices = cand_indices[batch_idxs]
 
             if prefix_tokens is not None:
                 prefix_tokens = prefix_tokens[batch_idxs]
             src_lengths = src_lengths[batch_idxs]
-            cand_dict['cands_to_ignore'] = cand_dict['cands_to_ignore'][batch_idxs]
+            cand_state['cands_to_ignore'] = cand_state['cands_to_ignore'][batch_idxs]
 
             scores = scores.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
             tokens = tokens.view(bsz, -1)[batch_idxs].view(new_bsz * beam_size, -1)
@@ -229,10 +229,10 @@ class SequenceGenerator(nn.Module):
 
         # Rewrite the operator since the element wise or is not supported in torchscript.
 
-        eos_mask[:, :beam_size] = ~((~cand_dict['cands_to_ignore']) & (~eos_mask[:, :beam_size]))
+        eos_mask[:, :beam_size] = ~((~cand_state['cands_to_ignore']) & (~eos_mask[:, :beam_size]))
         active_mask = torch.add(
-            eos_mask.type_as(cand_dict['cand_offsets']) * cand_dict['cand_size'],
-            cand_dict['cand_offsets'][: eos_mask.size(1)],
+            eos_mask.type_as(cand_state['cand_offsets']) * cand_state['cand_size'],
+            cand_state['cand_offsets'][: eos_mask.size(1)],
         )
 
         # get the top beam_size active hypotheses, which are just
@@ -245,16 +245,16 @@ class SequenceGenerator(nn.Module):
         )
 
         # update cands_to_ignore to ignore any finalized hypos.
-        cand_dict['cands_to_ignore'] = new_cands_to_ignore.ge(cand_dict['cand_size'])[:, :beam_size]
+        cand_state['cands_to_ignore'] = new_cands_to_ignore.ge(cand_state['cand_size'])[:, :beam_size]
         # Make sure there is at least one active item for each sentence in the batch.
-        assert (~cand_dict['cands_to_ignore']).any(dim=1).all()
+        assert (~cand_state['cands_to_ignore']).any(dim=1).all()
 
         # update cands_to_ignore to ignore any finalized hypos
 
         # {active_bbsz_idx} denotes which beam number is continued for each new hypothesis (a beam
         # can be selected more than once).
-        active_bbsz_idx = torch.gather(cand_dict['cand_bbsz_idx'], dim=1, index=active_hypos)
-        active_scores = torch.gather(cand_dict['cand_scores'], dim=1, index=active_hypos)
+        active_bbsz_idx = torch.gather(cand_state['cand_bbsz_idx'], dim=1, index=active_hypos)
+        active_scores = torch.gather(cand_state['cand_scores'], dim=1, index=active_hypos)
 
         active_bbsz_idx = active_bbsz_idx.view(-1)
         active_scores = active_scores.view(-1)
@@ -274,7 +274,7 @@ class SequenceGenerator(nn.Module):
                 scores[:, :step], dim=0, index=active_bbsz_idx
             )
         scores.view(bsz, beam_size, -1)[:, :, step] = torch.gather(
-            cand_dict['cand_scores'], dim=1, index=active_hypos
+            cand_state['cand_scores'], dim=1, index=active_hypos
         )
 
         # Update constraints based on which candidates were selected for the next beam
@@ -292,7 +292,7 @@ class SequenceGenerator(nn.Module):
         return (
             finalized_sents,
             eos_mask,
-            cand_dict,
+            cand_state,
             scores,
             tokens,
         )
@@ -439,6 +439,23 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
+        def to_cand_state(
+            cand_indices, cand_bbsz_idx, cand_offsets,
+            cand_size, cand_scores, cands_to_ignore
+        ):
+            return {
+                "cand_indices": cand_indices,
+                "cand_bbsz_idx": cand_bbsz_idx,
+                "cand_offsets": cand_offsets,
+                "cand_size": cand_size,
+                "cand_scores": cand_scores,
+                "cands_to_ignore": cands_to_ignore,
+            }
+
+        def unpack_cand_state():
+            return cand_indices, cand_bbsz_idx, cand_offsets, \
+                    cand_size, cand_scores, cands_to_ignore
+
         step_size = 1
         new_max_len = int( (max_len + 1) / step_size )
 
@@ -582,27 +599,22 @@ class SequenceGenerator(nn.Module):
                     break
                 assert step < max_len, f"{step} < {max_len}"
 
-
-                cand_dict = {
-                    "cand_indices": cand_indices,
-                    "cand_bbsz_idx": cand_bbsz_idx,
-                    "cand_offsets": cand_offsets,
-                    "cand_size": cand_size,
-                    "cand_scores": cand_scores,
-                    "cands_to_ignore": cands_to_ignore,
-                }
-
-                (
-                    finalized_sents,eos_mask,cand_dict,scores,tokens,
-                ) = self.handle_sentences(
-                    step, bsz, attn,
-                    finalized_sents,
-                    eos_mask,
-                    cand_dict,
-                    scores,
-                    beam_size,
-                    tokens,
+                cand_state = to_cand_state(
+                    cand_indices, cand_bbsz_idx, cand_offsets,
+                    cand_size, cand_scores, cands_to_ignore
                 )
+
+                (finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_sentences(
+                        step, bsz, attn,
+                        finalized_sents,
+                        eos_mask,
+                        cand_state,
+                        scores,
+                        beam_size,
+                        tokens,
+                )
+                (cand_indices, cand_bbsz_idx, cand_offsets,
+                cand_size, cand_scores, cands_to_ignore) = unpack_cand_state(cand_state)
 
             if mini_step_break:
                 break
