@@ -596,10 +596,10 @@ class SequenceGenerator(nn.Module):
                 if num_remaining_sent == 0:
                     mini_step_break = True
                     break
-                if self.search.stop_on_max_len and mini_step >= max_len:
+                if self.search.stop_on_max_len and mini_step >= new_max_len:
                     mini_step_break = True
                     break
-                assert mini_step < max_len, f"{mini_step} < {max_len}"
+                assert mini_step < new_max_len, f"{mini_step} < {new_max_len}"
 
                 cand_state = to_cand_state(
                     cand_indices, cand_bbsz_idx, cand_offsets,
