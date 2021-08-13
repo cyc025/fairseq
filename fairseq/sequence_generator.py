@@ -535,6 +535,9 @@ class SequenceGenerator(nn.Module):
                 finalized_sents,
                 num_remaining_sent,
                 eos_bbsz_idx,
+                cand_bbsz_idx,
+                cand_offsets,
+                cand_scores,
             )
 
         input_step_size = 1
@@ -636,6 +639,9 @@ class SequenceGenerator(nn.Module):
                     finalized_sents,
                     num_remaining_sent,
                     eos_bbsz_idx,
+                    cand_bbsz_idx,
+                    cand_offsets,
+                    cand_scores,
                 ) = hypos_finalize_wrapper(
                     mini_step,
                     num_remaining_sent,
