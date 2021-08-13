@@ -464,21 +464,22 @@ class SequenceGenerator(nn.Module):
 
         for step in range(0,step_max_len):  # one extra step for EOS marker
 
-            # reorder decoder internal states based on the prev choice of beams
-            if reorder_state is not None:
-                if batch_idxs is not None:
-                    # update beam indices to take into account removed sentences
-                    corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
-                        batch_idxs
+            if step == 0:
+                # reorder decoder internal states based on the prev choice of beams
+                if reorder_state is not None:
+                    if batch_idxs is not None:
+                        # update beam indices to take into account removed sentences
+                        corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
+                            batch_idxs
+                        )
+                        reorder_state.view(-1, beam_size).add_(
+                            corr.unsqueeze(-1) * beam_size
+                        )
+                        original_batch_idxs = original_batch_idxs[batch_idxs]
+                    self.model.reorder_incremental_state(incremental_states, reorder_state)
+                    encoder_outs = self.model.reorder_encoder_out(
+                        encoder_outs, reorder_state
                     )
-                    reorder_state.view(-1, beam_size).add_(
-                        corr.unsqueeze(-1) * beam_size
-                    )
-                    original_batch_idxs = original_batch_idxs[batch_idxs]
-                self.model.reorder_incremental_state(incremental_states, reorder_state)
-                encoder_outs = self.model.reorder_encoder_out(
-                    encoder_outs, reorder_state
-                )
 
             raw_lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
