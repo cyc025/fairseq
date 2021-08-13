@@ -481,7 +481,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs,
             )
 
-        input_step_size = 2
+        input_step_size = 5
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size ) + 1
@@ -617,7 +617,7 @@ class SequenceGenerator(nn.Module):
 
                 assert num_remaining_sent >= 0
                 if num_remaining_sent == 0:
-                    mini_step_break = True 
+                    mini_step_break = True
                     break
                 if self.search.stop_on_max_len and mini_step >= max_len:
                     mini_step_break = True
