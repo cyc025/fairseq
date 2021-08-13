@@ -500,8 +500,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs,
                 incremental_states,
                 self.temperature,
-                step_size,
-                step,
+                step_size, step,
             )
 
             # perform mini-step
@@ -629,6 +628,7 @@ class SequenceGenerator(nn.Module):
                     cand_size, cand_scores, cands_to_ignore
                 )
 
+                # handle candidate states
                 (reorder_state,finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_cands(
                         mini_step, bsz, attn,
                         finalized_sents,
@@ -917,16 +917,10 @@ class EnsembleModel(nn.Module):
                 if attn is not None:
                     attn = attn[:, -step_size, :] # change_here
 
-            if step_size>1:
-                decoder_out_tuple = (
-                    decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
-                    None if decoder_len <= 1 else decoder_out[1],
-                )
-            else:
-                decoder_out_tuple = (
-                    decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
-                    None if decoder_len <= 1 else decoder_out[1],
-                )
+            decoder_out_tuple = (
+                decoder_out[0][:, -step_size:, :].div_(temperature), # change_here
+                None if decoder_len <= 1 else decoder_out[1],
+            )
 
             probs = model.get_normalized_probs(
                 decoder_out_tuple, log_probs=True, sample=None
