@@ -481,7 +481,7 @@ class SequenceGenerator(nn.Module):
                 encoder_outs,
             )
 
-        input_step_size = 5
+        input_step_size = 2
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size ) + 1
