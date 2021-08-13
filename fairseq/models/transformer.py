@@ -907,13 +907,14 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         if encoder_out is not None and len(encoder_out["encoder_padding_mask"]) > 0:
             padding_mask = encoder_out["encoder_padding_mask"][0]
 
-        if step == 0:
-            prev_output_tokens = prev_output_tokens.repeat(1,step_size)
-        else:
-            prev_output_tokens = torch.cat(
-                (prev_output_tokens, prev_output_tokens[:,-1].unsqueeze(1).repeat(1,step_size) ),
-                dim = 1
-            )
+        if step_size > 1:
+            if step == 0:
+                prev_output_tokens = prev_output_tokens.repeat(1,step_size)
+            else:
+                prev_output_tokens = torch.cat(
+                    (prev_output_tokens, prev_output_tokens[:,-1].unsqueeze(1).repeat(1,step_size) ),
+                    dim = 1
+                )
 
         # embed positions
         positions = None
