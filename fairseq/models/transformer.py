@@ -847,7 +847,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
         step_size: Optional[int] = 1,
-        step=step,
+        step: Optional[int] = 1,
     ):
         return self.extract_features_scriptable(
             prev_output_tokens,
