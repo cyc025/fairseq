@@ -440,17 +440,18 @@ class SequenceGenerator(nn.Module):
             original_batch_idxs = torch.arange(0, bsz).type_as(tokens)
 
 
-        def to_cand_state(cand_var_names):
-            return dict((name, eval(name)) for name in cand_var_names)
-
-            # return {
-            #     "cand_indices": cand_indices,
-            #     "cand_bbsz_idx": cand_bbsz_idx,
-            #     "cand_offsets": cand_offsets,
-            #     "cand_size": cand_size,
-            #     "cand_scores": cand_scores,
-            #     "cands_to_ignore": cands_to_ignore,
-            # }
+        def to_cand_state(
+            cand_indices, cand_bbsz_idx, cand_offsets,
+            cand_size, cand_scores, cands_to_ignore
+        ):
+            return {
+                "cand_indices": cand_indices,
+                "cand_bbsz_idx": cand_bbsz_idx,
+                "cand_offsets": cand_offsets,
+                "cand_size": cand_size,
+                "cand_scores": cand_scores,
+                "cands_to_ignore": cands_to_ignore,
+            }
 
         def unpack_cand_state(cand_state):
             return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
@@ -623,11 +624,10 @@ class SequenceGenerator(nn.Module):
                     break
                 assert mini_step < max_len, f"{mini_step} < {max_len}"
 
-                cand_var_names = [
-                    "cand_indices", "cand_bbsz_idx", "cand_offsets",
-                    "cand_size", "cand_scores", "cands_to_ignore"
-                ]
-                cand_state = dict((name, eval(name)) for name in cand_var_names)
+                cand_state = to_cand_state(
+                    cand_indices, cand_bbsz_idx, cand_offsets,
+                    cand_size, cand_scores, cands_to_ignore
+                )
 
                 (reorder_state,finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_cands(
                         mini_step, bsz, attn,
