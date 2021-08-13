@@ -802,6 +802,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         src_lengths: Optional[Any] = None,
         return_all_hiddens: bool = False,
         step_size: Optional[int] = 1,
+        step: Optional[int] = 0,
     ):
         """
         Args:
@@ -830,6 +831,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             alignment_layer=alignment_layer,
             alignment_heads=alignment_heads,
             step_size=step_size,
+            step=step,
         )
 
         if not features_only:
@@ -845,6 +847,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         alignment_layer: Optional[int] = None,
         alignment_heads: Optional[int] = None,
         step_size: Optional[int] = 1,
+        step=step,
     ):
         return self.extract_features_scriptable(
             prev_output_tokens,
@@ -854,6 +857,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             alignment_layer,
             alignment_heads,
             step_size = step_size,
+            step = step,
         )
 
     """
