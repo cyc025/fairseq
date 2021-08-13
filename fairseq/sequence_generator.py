@@ -457,6 +457,30 @@ class SequenceGenerator(nn.Module):
             return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
+        def reorder_states(
+            reorder_state,original_batch_idxs,batch_idxs,incremental_states,beam_size,encoder_outs
+        ):
+            # reorder decoder internal states based on the prev choice of beams
+            if reorder_state is not None:
+                if batch_idxs is not None:
+                    # update beam indices to take into account removed sentences
+                    corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
+                        batch_idxs
+                    )
+                    reorder_state.view(-1, beam_size).add_(
+                        corr.unsqueeze(-1) * beam_size
+                    )
+                    original_batch_idxs = original_batch_idxs[batch_idxs]
+                self.model.reorder_incremental_state(incremental_states, reorder_state)
+                encoder_outs = self.model.reorder_encoder_out(
+                    encoder_outs, reorder_state
+                )
+            return (
+                reorder_state,
+                original_batch_idxs,
+                encoder_outs,
+            )
+
         input_step_size = 2
 
         step_size = input_step_size if input_step_size < max_len else max_len
@@ -466,20 +490,10 @@ class SequenceGenerator(nn.Module):
 
             if step == 0:
                 # reorder decoder internal states based on the prev choice of beams
-                if reorder_state is not None:
-                    if batch_idxs is not None:
-                        # update beam indices to take into account removed sentences
-                        corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
-                            batch_idxs
-                        )
-                        reorder_state.view(-1, beam_size).add_(
-                            corr.unsqueeze(-1) * beam_size
-                        )
-                        original_batch_idxs = original_batch_idxs[batch_idxs]
-                    self.model.reorder_incremental_state(incremental_states, reorder_state)
-                    encoder_outs = self.model.reorder_encoder_out(
-                        encoder_outs, reorder_state
-                    )
+                (reorder_state,original_batch_idxs,encoder_outs,) = reorder_states(
+                    reorder_state, original_batch_idxs, batch_idxs,
+                    incremental_states, beam_size, encoder_outs,
+                )
 
             raw_lprobs, avg_attn_scores = self.model.forward_decoder(
                 tokens[:, : step + 1],
@@ -630,20 +644,10 @@ class SequenceGenerator(nn.Module):
                 ) = unpack_cand_state(cand_state)
 
                 # reorder decoder internal states based on the prev choice of beams
-                if reorder_state is not None:
-                    if batch_idxs is not None:
-                        # update beam indices to take into account removed sentences
-                        corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
-                            batch_idxs
-                        )
-                        reorder_state.view(-1, beam_size).add_(
-                            corr.unsqueeze(-1) * beam_size
-                        )
-                        original_batch_idxs = original_batch_idxs[batch_idxs]
-                    self.model.reorder_incremental_state(incremental_states, reorder_state)
-                    encoder_outs = self.model.reorder_encoder_out(
-                        encoder_outs, reorder_state
-                    )
+                (reorder_state,original_batch_idxs,encoder_outs,) = reorder_states(
+                    reorder_state, original_batch_idxs, batch_idxs,
+                    incremental_states, beam_size, encoder_outs,
+                )
 
             if mini_step_break:
                 break
