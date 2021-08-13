@@ -636,6 +636,7 @@ class SequenceGenerator(nn.Module):
                     original_batch_idxs,
                 )
 
+                # finalize hypothesis
                 (
                     finalized_sents,
                     num_remaining_sent,
@@ -664,7 +665,7 @@ class SequenceGenerator(nn.Module):
                     break
                 assert mini_step < max_len, f"{mini_step} < {max_len}"
 
-                # handle candidate states
+                # handle candidate state
                 cand_state = to_cand_state(
                     cand_indices, cand_bbsz_idx, cand_offsets,
                     cand_size, cand_scores, cands_to_ignore
@@ -939,9 +940,9 @@ class EnsembleModel(nn.Module):
                 )
             else:
                 if hasattr(model, "decoder"):
-                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out, step_size=step_size,)
+                    decoder_out = model.decoder.forward(tokens, encoder_out=encoder_out, step_size=step_size, step=step)
                 else:
-                    decoder_out = model.forward(tokens, step_size=step_size,)
+                    decoder_out = model.forward(tokens, step_size=step_size, step=step)
 
             attn: Optional[Tensor] = None
             decoder_len = len(decoder_out)
