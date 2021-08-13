@@ -494,7 +494,7 @@ class SequenceGenerator(nn.Module):
             for mini_step in range( start_step_index, start_step_index + step_size, 1 ):
 
                 # resolve new lprobs
-                if len(raw_lprobs.size()) > 2:
+                if len(raw_lprobs.size()) > 2: # 3 dimensions after step 0
                     lprobs = raw_lprobs[:, mini_step - start_step_index, :]
                 else:
                     lprobs = raw_lprobs
