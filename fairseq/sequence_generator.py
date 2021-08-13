@@ -614,7 +614,7 @@ class SequenceGenerator(nn.Module):
                     cand_size, cand_scores, cands_to_ignore
                 )
 
-                (finalized_sents,eos_mask,cand_state,scores,tokens,reorder_state,) = self.handle_cands(
+                (reorder_state,finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_cands(
                         mini_step, bsz, attn,
                         finalized_sents,
                         eos_mask,
@@ -628,21 +628,21 @@ class SequenceGenerator(nn.Module):
                     cand_size, cand_scores, cands_to_ignore
                 ) = unpack_cand_state(cand_state)
 
-                # # reorder decoder internal states based on the prev choice of beams
-                # if reorder_state is not None:
-                #     if batch_idxs is not None:
-                #         # update beam indices to take into account removed sentences
-                #         corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
-                #             batch_idxs
-                #         )
-                #         reorder_state.view(-1, beam_size).add_(
-                #             corr.unsqueeze(-1) * beam_size
-                #         )
-                #         original_batch_idxs = original_batch_idxs[batch_idxs]
-                #     self.model.reorder_incremental_state(incremental_states, reorder_state)
-                #     encoder_outs = self.model.reorder_encoder_out(
-                #         encoder_outs, reorder_state
-                #     )
+                # reorder decoder internal states based on the prev choice of beams
+                if reorder_state is not None:
+                    if batch_idxs is not None:
+                        # update beam indices to take into account removed sentences
+                        corr = batch_idxs - torch.arange(batch_idxs.numel()).type_as(
+                            batch_idxs
+                        )
+                        reorder_state.view(-1, beam_size).add_(
+                            corr.unsqueeze(-1) * beam_size
+                        )
+                        original_batch_idxs = original_batch_idxs[batch_idxs]
+                    self.model.reorder_incremental_state(incremental_states, reorder_state)
+                    encoder_outs = self.model.reorder_encoder_out(
+                        encoder_outs, reorder_state
+                    )
 
             if mini_step_break:
                 break
