@@ -912,6 +912,7 @@ class TransformerDecoder(FairseqIncrementalDecoder):
             if step == 0:
                 prev_output_tokens = prev_output_tokens.repeat(1,step_size)
             else:
+                print('here')
                 prev_output_tokens = torch.cat(
                     (prev_output_tokens, prev_output_tokens[:,-1].unsqueeze(1).repeat(1,step_size) ),
                     dim = 1
