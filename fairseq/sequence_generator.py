@@ -541,7 +541,7 @@ class SequenceGenerator(nn.Module):
                 cand_scores,
             )
 
-        input_step_size = 3
+        input_step_size = 2
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size ) + 1
