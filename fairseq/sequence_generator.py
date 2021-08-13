@@ -290,6 +290,7 @@ class SequenceGenerator(nn.Module):
         reorder_state = active_bbsz_idx
 
         return (
+            reorder_state,
             finalized_sents,
             eos_mask,
             cand_state,
@@ -613,7 +614,7 @@ class SequenceGenerator(nn.Module):
                     cand_size, cand_scores, cands_to_ignore
                 )
 
-                (finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_cands(
+                (finalized_sents,eos_mask,cand_state,scores,tokens,reorder_state,) = self.handle_cands(
                         mini_step, bsz, attn,
                         finalized_sents,
                         eos_mask,
