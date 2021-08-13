@@ -481,6 +481,61 @@ class SequenceGenerator(nn.Module):
                 encoder_outs,
             )
 
+        def hypos_finalize_wrapper(
+            mini_step,
+            bbsz_offsets,
+            cand_scores,
+            cand_indices,
+            cands_to_ignore,
+            beam_size,
+            finished,
+        ):
+
+            # cand_bbsz_idx contains beam indices for the top candidate
+            # hypotheses, with a range of values: [0, bsz*beam_size),
+            # and dimensions: [bsz, cand_size]
+            cand_bbsz_idx = cand_beams.add(bbsz_offsets)
+
+            # finalize hypotheses that end in eos
+            # Shape of eos_mask: (batch size, beam size)
+            eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
+            eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
+
+            # only consider eos when it's among the top beam_size indices
+            # Now we know what beam item(s) to finish
+            # Shape: 1d list of absolute-numbered
+            eos_bbsz_idx = torch.masked_select(
+                cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
+            )
+
+            finalized_sents: List[int] = []
+            if eos_bbsz_idx.numel() > 0:
+
+                eos_scores = torch.masked_select(
+                    cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
+                )
+
+                finalized_sents = self.finalize_hypos(
+                    mini_step,
+                    eos_bbsz_idx,
+                    eos_scores,
+                    tokens,
+                    scores,
+                    finalized,
+                    finished,
+                    beam_size,
+                    attn,
+                    src_lengths,
+                    max_len,
+                )
+                num_remaining_sent -= len(finalized_sents)
+
+            return (
+                finalized_sents,
+                num_remaining_sent,
+                eos_bbsz_idx,
+            )
+
         input_step_size = 2000
 
         step_size = input_step_size if input_step_size < max_len else max_len
@@ -576,43 +631,19 @@ class SequenceGenerator(nn.Module):
                     original_batch_idxs,
                 )
 
-                # cand_bbsz_idx contains beam indices for the top candidate
-                # hypotheses, with a range of values: [0, bsz*beam_size),
-                # and dimensions: [bsz, cand_size]
-                cand_bbsz_idx = cand_beams.add(bbsz_offsets)
-
-                # finalize hypotheses that end in eos
-                # Shape of eos_mask: (batch size, beam size)
-                eos_mask = cand_indices.eq(self.eos) & cand_scores.ne(-math.inf)
-                eos_mask[:, :beam_size][cands_to_ignore] = torch.tensor(0).to(eos_mask)
-
-                # only consider eos when it's among the top beam_size indices
-                # Now we know what beam item(s) to finish
-                # Shape: 1d list of absolute-numbered
-                eos_bbsz_idx = torch.masked_select(
-                    cand_bbsz_idx[:, :beam_size], mask=eos_mask[:, :beam_size]
+                (
+                    finalized_sents,
+                    num_remaining_sent,
+                    eos_bbsz_idx,
+                ) = hypos_finalize_wrapper(
+                    mini_step,
+                    bbsz_offsets,
+                    cand_scores,
+                    cand_indices,
+                    cands_to_ignore,
+                    beam_size,
+                    finished,
                 )
-
-                finalized_sents: List[int] = []
-                if eos_bbsz_idx.numel() > 0:
-                    eos_scores = torch.masked_select(
-                        cand_scores[:, :beam_size], mask=eos_mask[:, :beam_size]
-                    )
-
-                    finalized_sents = self.finalize_hypos(
-                        mini_step,
-                        eos_bbsz_idx,
-                        eos_scores,
-                        tokens,
-                        scores,
-                        finalized,
-                        finished,
-                        beam_size,
-                        attn,
-                        src_lengths,
-                        max_len,
-                    )
-                    num_remaining_sent -= len(finalized_sents)
 
                 assert num_remaining_sent >= 0
                 if num_remaining_sent == 0:
@@ -623,12 +654,11 @@ class SequenceGenerator(nn.Module):
                     break
                 assert mini_step < max_len, f"{mini_step} < {max_len}"
 
+                # handle candidate states
                 cand_state = to_cand_state(
                     cand_indices, cand_bbsz_idx, cand_offsets,
                     cand_size, cand_scores, cands_to_ignore
                 )
-
-                # handle candidate states
                 (reorder_state,finalized_sents,eos_mask,cand_state,scores,tokens,) = self.handle_cands(
                         mini_step, bsz, attn,
                         finalized_sents,
