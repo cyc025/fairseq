@@ -483,6 +483,7 @@ class SequenceGenerator(nn.Module):
 
         def hypos_finalize_wrapper(
             mini_step,
+            num_remaining_sent,
             bbsz_offsets,
             cand_scores,
             cand_indices,
@@ -536,7 +537,7 @@ class SequenceGenerator(nn.Module):
                 eos_bbsz_idx,
             )
 
-        input_step_size = 2000
+        input_step_size = 1
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size ) + 1
@@ -637,6 +638,7 @@ class SequenceGenerator(nn.Module):
                     eos_bbsz_idx,
                 ) = hypos_finalize_wrapper(
                     mini_step,
+                    num_remaining_sent,
                     bbsz_offsets,
                     cand_scores,
                     cand_indices,
