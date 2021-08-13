@@ -491,11 +491,11 @@ class SequenceGenerator(nn.Module):
             # perform mini-step
             mini_step_break = False
             start_step_index = step_size * step
-            for mini_step in range( start_step_index, start_step_index + step_size, 1):
+            for mini_step in range( start_step_index, start_step_index + step_size, 1 ):
 
                 # resolve new lprobs
-                if len(raw_lprobs.size()) > 2:
-                    lprobs = raw_lprobs[:,mini_step-start_step_index,:]
+                if len(raw_lprobs.size()) > 1:
+                    lprobs = raw_lprobs[:, mini_step - start_step_index, :]
                 else:
                     lprobs = raw_lprobs
 
@@ -629,7 +629,6 @@ class SequenceGenerator(nn.Module):
 
             if mini_step_break:
                 break
-
 
         # sort by score descending
         for sent in range(len(finalized)):
@@ -931,6 +930,7 @@ class EnsembleModel(nn.Module):
 
         if avg_attn is not None:
             avg_attn.div_(self.models_size)
+
         return avg_probs, avg_attn
 
     @torch.jit.export
