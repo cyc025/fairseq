@@ -456,7 +456,7 @@ class SequenceGenerator(nn.Module):
             return cand_state['cand_indices'], cand_state['cand_bbsz_idx'], cand_state['cand_offsets'], \
                     cand_state['cand_size'], cand_state['cand_scores'], cand_state['cands_to_ignore']
 
-        input_step_size = 2
+        input_step_size = 1
 
         step_size = input_step_size if input_step_size < max_len else max_len
         step_max_len = int( max_len / step_size ) + 1
@@ -494,7 +494,7 @@ class SequenceGenerator(nn.Module):
             for mini_step in range( start_step_index, start_step_index + step_size, 1 ):
 
                 # resolve new lprobs
-                if len(raw_lprobs.size()) > 1:
+                if len(raw_lprobs.size()) > 2:
                     lprobs = raw_lprobs[:, mini_step - start_step_index, :]
                 else:
                     lprobs = raw_lprobs
